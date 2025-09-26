@@ -120,13 +120,7 @@ const Index = () => {
                   }
                 />
               </div>
-              <div className="flex flex-row w-full gap-x-4">
-                <Link
-                  className="bg-secondary text-white px-4 py-3 rounded w-full uppercase font-bold text-center"
-                  href="/signup"
-                >
-                  Sign Up
-                </Link>
+              <div className="flex flex-col w-full justify-center items-center gap-y-4">
                 <button
                   className="bg-secondary hover:bg-secondary-900 text-white px-4 py-2 rounded w-full transition-all duration-300"
                   onClick={async () => {
@@ -135,6 +129,12 @@ const Index = () => {
                 >
                   Login
                 </button>
+                <Link
+                  className=" text-white text-md text-center hover:underline"
+                  href="/signup"
+                >
+                  Sign Up
+                </Link>
               </div>
             </div>
           </div>
