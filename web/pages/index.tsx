@@ -4,6 +4,7 @@ import { useState } from "react";
 import PBB from "../public/transparent-logo.png";
 import { Check, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 const Index = () => {
   const [signedIn, setSignedIn] = useState(false);
@@ -115,12 +116,12 @@ const Index = () => {
                   <p className="text-2xl mb-2 font-medium text-white">
                     Password
                   </p>
-                  <a
+                  <Link
                     className="text-md md:text-xl mb-1 md:mb-2 hover:underline"
                     href="/forgot-password"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <input
                   className="rounded px-4 py-2 bg-white text-black w-full"
@@ -133,12 +134,12 @@ const Index = () => {
                 />
               </div>
               <div className="flex flex-row w-full gap-x-4">
-                <a
+                <Link
                   className="bg-secondary text-white px-4 py-3 rounded w-full uppercase font-bold text-center"
                   href="/signup"
                 >
                   Sign Up
-                </a>
+                </Link>
                 <button
                   className="bg-secondary hover:bg-secondary-900 text-white px-4 py-2 rounded w-full transition-all duration-300"
                   onClick={async () => {
