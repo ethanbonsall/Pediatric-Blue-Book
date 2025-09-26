@@ -56,8 +56,17 @@ const Index = () => {
   return (
     <div>
       {signedIn ? (
-        <div className="bg-background flex flex-col items-center w-full font-roboto min-h-screen">
+        <div className="flex flex-col items-center w-full font-roboto min-h-screen bg-gradient-to-br from-background to-primary-300">
           <NavBar />
+          <div className="flex flex-col h-screen" id="nutrient">
+            Nutrient Needs Calculator
+          </div>
+          <div className="flex flex-col h-screen" id="formula_calc">
+            Formula Recipe Calculator
+          </div>
+          <div className="flex flex-col h-screen" id="formula_lookup">
+            Formula Look Up Tool
+          </div>
         </div>
       ) : (
         <div className="bg-gradient-to-tr from-primary to-background flex flex-col items-center justify-center w-full font-roboto min-h-screen">

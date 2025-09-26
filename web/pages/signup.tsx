@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import router from "next/router";
+import Link from "next/link";
 
 const Index = () => {
   const [signUp, setSignUp] = useState(false);
@@ -62,15 +63,29 @@ const Index = () => {
   }, []);
 
   const handleSignUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
 
+    const user = data.user;
+
+    if (user) {
+      const {} = await supabase.from("users").insert([
+        {
+          id: user.id,
+          email: user.email,
+          created_at: new Date(),
+          first_name: firstName,
+          title: title,
+        },
+      ]);
+    }
     if (error) {
       alert(error.message);
+    } else {
+      router.push("/");
     }
-    router.push("/");
   };
 
   return (
@@ -259,7 +274,7 @@ const Index = () => {
               }
             />
           </div>
-          <div className="flex flex-row w-full gap-x-4">
+          <div className="flex flex-col w-full items-center gap-y-2">
             <button
               className="bg-secondary text-white px-4 py-3 rounded w-full"
               onClick={() => {
@@ -280,6 +295,9 @@ const Index = () => {
             >
               Sign Up
             </button>
+            <Link href="/" className="hover:underline text-md md:text-lg">
+              Already have an account?
+            </Link>
           </div>
         </div>
       </div>
