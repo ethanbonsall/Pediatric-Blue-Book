@@ -10,6 +10,24 @@
   }
 }
 
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-flow {
+  background: linear-gradient(-45deg, #4b9cd3, #8ca5e8, #6a81b2, #0a2540);
+  background-size: 400% 400%;
+  animation: gradient-flow 15s ease infinite;
+}
+
 :root {
   --text: #141414;
   --background: #ffffff;

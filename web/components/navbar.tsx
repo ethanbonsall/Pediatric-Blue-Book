@@ -4,6 +4,7 @@
 import Link from "next/link";
 import PBB from "../public/transparent-logo.png";
 import { Apple, Calculator, Search } from "lucide-react";
+import avatar from "../public/avatar.png";
 
 export default function Navbar() {
   return (
@@ -25,6 +26,9 @@ export default function Navbar() {
         <Link href="#formula_lookup" className="lg:slide delay-[${i * 100}ms]">
           <Search className="flex lg:hidden" />
           <span className="hidden lg:flex">Formula Look Up Tool </span>
+        </Link>
+        <Link href="/profile">
+          <img src={avatar.src} alt="user" className="rounded-full h-[50px]" />
         </Link>
       </div>
     </nav>
