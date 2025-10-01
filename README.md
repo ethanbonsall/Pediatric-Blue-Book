@@ -1,4 +1,4 @@
-# TEAM O - COMP 523
+# Pediatric Blue Book
 
 ##  Tech Stack
 
@@ -10,11 +10,13 @@
 
 ## Running Locally
 
-    git clone https://github.com/ethanbonsall/COMP-523-O.git
+    git clone https://github.com/ethanbonsall/Pediatric-Blue-Book.git
+
+    cd pediatric-blue-book
     
     cd web
 
-    npm install
+    npm install --f
 
     npm run dev
 
