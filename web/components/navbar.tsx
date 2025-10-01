@@ -8,11 +8,11 @@ import avatar from "../public/avatar.png";
 
 export default function Navbar() {
   return (
-    <nav className="flex sticky top-0 p-6 justify-between w-full z-50 bg-primary text-text">
+    <nav className="flex sticky top-0 p-2 lg:p-6 justify-between w-full z-50 bg-primary text-text">
       <Link href="#home" className="h-12">
         <img src={PBB.src} alt="Pediatric Blue Book" className="h-full"></img>
       </Link>
-      <div className="flex flex-row gap-x-6 text-2xl items-center font-medium text-background">
+      <div className="flex flex-row gap-x-3 lg:gap-x-6 text-2xl items-center font-medium text-background">
         <Link href="#nutrient" className="lg:slide delay-[${i * 100}ms]">
           <Apple className="flex lg:hidden" />
           <span className="hidden lg:flex">Nutrient Needs Calculator</span>
@@ -28,7 +28,11 @@ export default function Navbar() {
           <span className="hidden lg:flex">Formula Look Up Tool </span>
         </Link>
         <Link href="/profile">
-          <img src={avatar.src} alt="user" className="rounded-full h-[50px]" />
+          <img
+            src={avatar.src}
+            alt="user"
+            className="rounded-full h-[50px] aspect-square"
+          />
         </Link>
       </div>
     </nav>
