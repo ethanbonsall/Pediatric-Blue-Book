@@ -121,7 +121,7 @@ const NutrientNeedsCalculator = () => {
         Nutrient Needs Calculator
       </p>
       <div className="flex flex-col md:flex-row min-h-screen gap-[3dvw] items-center md:items-start justify-center">
-        <div className="flex flex-col w-[90dvw] h-fit gap-y-[3dvh] md:w-[30dvw] md:h-[80dvh] bg-white rounded-[20px] shadow-2xl p-[2dvw] overflow-hidden">
+        <div className="flex flex-col w-[90dvw] h-fit md:h-[95dvh] gap-y-[2dvh] 2xl:gap-y-[3dvh] md:w-[30dvw] bg-white rounded-[20px] shadow-2xl p-[2dvw] overflow-hidden">
           <div className="flex flex-col gap-y-1">
             <p className="text-2xl xl:text-3xl 2xl:text-4xl font-medium">Age</p>
             <div className="flex flex-row gap-x-1 lg:gap-x-2 w-full">
@@ -317,7 +317,7 @@ const NutrientNeedsCalculator = () => {
                 }
               }}
             >
-              <SelectTrigger className="w-[55dvw] md:w-[15dvw] bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
+              <SelectTrigger className="w-[55dvw] md:w-[18dvw] bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
                 <SelectValue defaultValue="Male" placeholder="Select Sex" />
               </SelectTrigger>
               <SelectContent className="bg-white w-fit rounded">
@@ -363,7 +363,7 @@ const NutrientNeedsCalculator = () => {
                 }
               }}
             >
-              <SelectTrigger className="w-[55dvw] md:w-[15dvw] bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
+              <SelectTrigger className="w-[55dvw] md:w-[18dvw] bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
                 <SelectValue
                   defaultValue="Not Applicable"
                   placeholder="Select Activity Level"
@@ -424,7 +424,7 @@ const NutrientNeedsCalculator = () => {
                 }
               }}
             >
-              <SelectTrigger className="w-[55dvw] md:w-[15dvw] bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
+              <SelectTrigger className="w-[55dvw] md:w-[18dvw] bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
                 <SelectValue
                   defaultValue="Standard"
                   placeholder="Select Needs Type"
@@ -455,13 +455,13 @@ const NutrientNeedsCalculator = () => {
             </Select>
           </div>
           <button
-            className="rounded text-white bg-primary-600 px-6 py-3 w-fit text-md xl:text-lg 2xl:text-xl hover:bg-primary-700 transition-all duration-300 self-end mt-6 mb-4 lg:mb-0 lg:mt-12 xl:mt-16 2xl:mt-20"
+            className="rounded text-white bg-primary-600 px-6 py-3 w-fit text-md xl:text-lg 2xl:text-xl hover:bg-primary-700 transition-all duration-300 self-end mt-6 mb-4 lg:mb-0"
             onClick={calculate}
           >
             Calculate
           </button>
         </div>
-        <div className="flex flex-col w-[90dvw] h-fit md:w-[30dvw] md:h-[80dvh] bg-white rounded-[20px] shadow-2xl p-[2dvw] gap-y-[1dvh]">
+        <div className="flex flex-col w-[90dvw] h-fit md:w-[30dvw] md:h-[95dvh] bg-white rounded-[20px] shadow-2xl p-[2dvw] gap-y-[1dvh]">
           <>
             <p className="text-lg xl:text-xl 2xl:text-2xl font-bold">
               Daily Estimated Nutritional Needs
@@ -470,12 +470,15 @@ const NutrientNeedsCalculator = () => {
               Needs are based on the selected needs type
             </p>
           </>
-          <div className="flex flex-col w-full h-full border rounded-[20px] gap-y-[1dvh] overflow-scroll">
-            <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] pt-[1dvh] font-semibold">
-              <p className="w-[45dvw] md:w-[17dvw]">Nutrient</p>
-              <p className="w-[35dvw] md:w-[13dvw]">Amount</p>
+          <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-scroll relative">
+            <div className="sticky top-0">
+              <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
+                <p className="w-[45dvw] md:w-[17dvw]">Nutrient</p>
+                <p className="w-[35dvw] md:w-[13dvw]">Amount</p>
+              </div>
+              <hr className="w-full" />
             </div>
-            <hr className="w-full" />
+
             {nutrients.map((nutrient, index) => (
               <div key={index}>
                 <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh]">
@@ -487,40 +490,40 @@ const NutrientNeedsCalculator = () => {
             ))}
           </div>
         </div>
-        <div className="flex flex-col w-full h-fit md:w-[30dvw] md:h-[80dvh] items-center justify-center md:justify-start">
+        <div className="flex flex-col w-full h-fit md:w-[30dvw] md:h-[95dvh] items-center justify-center md:justify-start">
           <div className="flex flex-1">
             <div className="flex flex-col w-[90dvw] h-fit md:w-[30dvw] bg-white rounded-[20px] shadow-2xl p-[2dvw] md:p-[1dvw] gap-y-[4dvh]">
-              <p className="text-3xl md:text-4xl xl:text-5xl 2xl:text-6l font-semibold">
+              <p className="text-3xl md:text-4xl 2xl:text-6l font-semibold">
                 Ideal Body Weight
               </p>
-              <div className="flex flex-row text-lg lg:text-xl xl:text-3xl ">
+              <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
                 <p className="font-semibold">
                   BMI (50th Percentile for age):&nbsp;
                 </p>
                 <p>{BMI50}</p>
               </div>
-              <div className="flex flex-row text-lg lg:text-xl xl:text-3xl ">
+              <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
                 <p className="font-semibold">
                   BMI (25th Percentile for age):&nbsp;
                 </p>
                 <p>{BMI25}</p>
               </div>
-              <div className="flex flex-row text-lg lg:text-xl xl:text-3xl">
+              <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">
                 <p className="font-semibold">Catch up Growth:&nbsp;</p>
                 <p>{Catchup}</p>
               </div>
             </div>
           </div>
-          <div className="flex flex-row justify-center gap-x-[20dvw] md:gap-x-[5dvw] w-[90dvw] md:w-fit mt-[5dvh] h-fit  self-center md:self-end">
+          <div className="flex flex-row justify-center gap-x-[8dvw] md:gap-x-[1dvw] w-[90dvw] md:w-fit mt-[5dvh] mb-[1dvh] h-fit self-center ">
             <Link
-              className="flex uppercase w-fit bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 xl:px-6 xl:py-3 rounded text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
+              className="flex uppercase w-fit bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 2xl:px-6 2xl:py-3 rounded text-nowrap text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
               href="#formula_calc"
             >
-              Formula Calculator
+              Formula Calc
             </Link>
             <button
               onClick={printNutrientPDF}
-              className="flex w-fit bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 xl:px-6 xl:py-3 text-nowrap items-center rounded text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
+              className="flex w-fit bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 2xl:px-6 2xl:py-3 text-nowrap items-center rounded text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
             >
               Print Out
             </button>
