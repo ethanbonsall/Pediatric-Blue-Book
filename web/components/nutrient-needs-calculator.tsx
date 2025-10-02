@@ -74,11 +74,20 @@ const NutrientNeedsCalculator = () => {
     setLengthInches(numericValue);
   };
 
-  const calculate = (): null => {
-    return null;
+  const calculate = () => {
+    const number =
+      age +
+      height +
+      heightInches +
+      length +
+      lengthInches +
+      sex +
+      activityLevel +
+      needsType;
+    return number;
   };
 
-  const printNutrientPDF = (): null => {
+  const printNutrientPDF = () => {
     return null;
   };
 
