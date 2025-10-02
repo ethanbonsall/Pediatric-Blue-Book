@@ -57,6 +57,16 @@ const Profile = () => {
     };
   }, []);
 
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    setSignedIn(false);
+    router.push("/");
+  }
+
   async function getUser() {
     const {
       data: { user },
@@ -258,6 +268,12 @@ const Profile = () => {
                 }}
               >
                 Save
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="bg-red-600 text-white px-4 py-2 rounded ml-2 w-[20dvw]"
+              >
+                Logout
               </button>
             </div>
           </div>
