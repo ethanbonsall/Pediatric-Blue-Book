@@ -1,3 +1,4 @@
+"use client";
 /* eslint-disable @next/next/no-img-element */
 import NavBar from "@/components/navbar";
 import PBB from "../public/transparent-logo.png";
@@ -5,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Head from "next/head";
+import NutrientNeedsCalculator from "@/components/nutrient-needs-calculator";
 
 const Index = () => {
   const [signedIn, setSignedIn] = useState(false);
@@ -63,9 +65,7 @@ const Index = () => {
         {signedIn ? (
           <div className="flex flex-col items-center w-full font-roboto min-h-screen bg-gradient-to-br from-background to-primary-300">
             <NavBar />
-            <div className="flex flex-col h-screen" id="nutrient">
-              Nutrient Needs Calculator
-            </div>
+            <NutrientNeedsCalculator />
             <div className="flex flex-col h-screen" id="formula_calc">
               Formula Recipe Calculator
             </div>
