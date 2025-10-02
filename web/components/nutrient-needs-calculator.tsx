@@ -121,7 +121,7 @@ const NutrientNeedsCalculator = () => {
         Nutrient Needs Calculator
       </p>
       <div className="flex flex-col md:flex-row min-h-screen gap-[3dvw] items-center md:items-start justify-center">
-        <div className="flex flex-col w-[90dvw] h-fit md:h-[95dvh] gap-y-[2dvh] 2xl:gap-y-[3dvh] md:w-[30dvw] bg-white rounded-[20px] shadow-2xl p-[2dvw] overflow-hidden">
+        <div className="flex flex-col w-[90dvw] md:min-h-[95dvh] max-h-fit gap-y-[2dvh] 2xl:gap-y-[3dvh] md:w-[30dvw] bg-white rounded-[20px] shadow-2xl p-[2dvw] overflow-hidden">
           <div className="flex flex-col gap-y-1">
             <p className="text-2xl xl:text-3xl 2xl:text-4xl font-medium">Age</p>
             <div className="flex flex-row gap-x-1 lg:gap-x-2 w-full">
