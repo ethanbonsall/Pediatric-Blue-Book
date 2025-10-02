@@ -271,7 +271,9 @@ const Profile = () => {
               </button>
               <button
                 onClick={handleSignOut}
-                className="bg-red-600 text-white px-4 py-2 rounded ml-2 w-[20dvw]"
+                className={`${
+                  edit ? "hidden" : "block"
+                } bg-red-600 text-white px-4 py-2 rounded ml-2 w-[20dvw]`}
               >
                 Logout
               </button>
