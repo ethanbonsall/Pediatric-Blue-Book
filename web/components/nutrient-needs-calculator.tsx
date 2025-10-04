@@ -116,8 +116,11 @@ const NutrientNeedsCalculator = () => {
   const Catchup = "10 cm";
 
   return (
-    <div className="flex flex-col" id="nutrient">
-      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-[8dvh] mb-[2dvh]">
+    <div
+      className="flex flex-col bg-gradient-to-tl from-primary-200 to-primary-400 w-full mb-4"
+      id="nutrient"
+    >
+      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-[8dvh] mb-[2dvh] ml-[2dvw]">
         Nutrient Needs Calculator
       </p>
       <div className="flex flex-col md:flex-row min-h-screen gap-[3dvw] items-center md:items-start justify-center">
@@ -470,7 +473,7 @@ const NutrientNeedsCalculator = () => {
               Needs are based on the selected needs type
             </p>
           </>
-          <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-scroll relative">
+          <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll relative">
             <div className="sticky top-0">
               <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
                 <p className="w-[45dvw] md:w-[17dvw]">Nutrient</p>

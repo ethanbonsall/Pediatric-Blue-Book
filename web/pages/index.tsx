@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import NutrientNeedsCalculator from "@/components/nutrient-needs-calculator";
+import FormulaNeedsCalculator from "@/components/formula-needs-calculator";
 
 const Index = () => {
   const [signedIn, setSignedIn] = useState(false);
@@ -63,12 +64,10 @@ const Index = () => {
       </Head>
       <div>
         {signedIn ? (
-          <div className="flex flex-col items-center w-full font-roboto min-h-screen bg-gradient-to-br from-background to-primary-300">
+          <div className="flex flex-col items-center w-full font-roboto min-h-screen bg-background">
             <NavBar />
             <NutrientNeedsCalculator />
-            <div className="flex flex-col h-screen" id="formula_calc">
-              Formula Recipe Calculator
-            </div>
+            <FormulaNeedsCalculator />
             <div className="flex flex-col h-screen" id="formula_lookup">
               Formula Look Up Tool
             </div>
