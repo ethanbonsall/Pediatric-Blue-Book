@@ -473,7 +473,7 @@ const NutrientNeedsCalculator = () => {
               Needs are based on the selected needs type
             </p>
           </>
-          <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll relative">
+          <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll no-scrollbar relative">
             <div className="sticky top-0">
               <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
                 <p className="w-[45dvw] md:w-[17dvw]">Nutrient</p>

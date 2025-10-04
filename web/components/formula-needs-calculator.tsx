@@ -167,7 +167,7 @@ const FormulaNeedsCalculator = () => {
               <div
                 className={`${
                   search
-                    ? "absolute top-full left-0 bg-white rounded w-full max-h-[40dvh] overflow-y-scroll shadow-lg z-30 transition-all"
+                    ? "absolute top-full left-0 bg-white rounded w-full max-h-[40dvh] overflow-y-scroll no-scrollbar shadow-lg z-30 transition-all"
                     : "hidden"
                 }`}
               >
@@ -202,7 +202,7 @@ const FormulaNeedsCalculator = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col h-[50dvh] w-full md:w-[50dvw] overflow-y-scroll bg-background rounded-xl relative">
+          <div className="flex flex-col h-[50dvh] w-full md:w-[50dvw] overflow-y-scroll  no-scrollbar bg-background rounded-xl relative">
             <div className="w-full sticky top-0">
               <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl font-medium py-[1dvh]">
                 <div className="w-[8%]"></div>
@@ -263,7 +263,7 @@ const FormulaNeedsCalculator = () => {
               />
             </div>
           </div>
-          <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll relative bg-background">
+          <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll no-scrollbar relative bg-background">
             <div className="sticky top-0">
               <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
                 <p className="w-[40%]">Nutrient</p>
