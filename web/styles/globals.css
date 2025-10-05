@@ -22,6 +22,15 @@
   }
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .bg-flow {
   background: linear-gradient(-45deg, #4b9cd3, #8ca5e8, #6a81b2, #0a2540);
   background-size: 400% 400%;
