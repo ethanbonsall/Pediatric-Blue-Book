@@ -58,19 +58,27 @@ const NutrientNeedsCalculator = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const numericValue = inputValue.replace(/[^0-9]/g, "");
+    const numericValue = inputValue
+      .replace(/[^0-9.]/g, "")
+      .replace(/(\..*?)\..*/g, "$1");
+
     e.target.value = numericValue;
     setAge(numericValue);
   };
   const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const numericValue = inputValue.replace(/[^0-9]/g, "");
+    const numericValue = inputValue
+      .replace(/[^0-9.]/g, "")
+      .replace(/(\..*?)\..*/g, "$1");
     e.target.value = numericValue;
     setHeight(numericValue);
   };
   const handleLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const numericValue = inputValue.replace(/[^0-9]/g, "");
+    const numericValue = inputValue
+      .replace(/[^0-9.]/g, "")
+      .replace(/(\..*?)\..*/g, "$1");
+
     e.target.value = numericValue;
     setLength(numericValue);
   };
@@ -110,6 +118,9 @@ const NutrientNeedsCalculator = () => {
   } else if (ageUnit === "Months") {
     agePlaceholder = "Months (0-36)";
     max = 36;
+  } else if (ageUnit === "Weeks") {
+    agePlaceholder = "Weeks (0-52)";
+    max = 52;
   }
   if (heightUnit === "Imperial") {
     measurment = "ft";
@@ -158,6 +169,9 @@ const NutrientNeedsCalculator = () => {
                     case "Months":
                       setAgeUnit("Months");
                       break;
+                    case "Weeks":
+                      setAgeUnit("Weeks");
+                      break;
                   }
                 }}
               >
@@ -177,6 +191,12 @@ const NutrientNeedsCalculator = () => {
                       value="Months"
                     >
                       Months
+                    </SelectItem>
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="Weeks"
+                    >
+                      Weeks
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
