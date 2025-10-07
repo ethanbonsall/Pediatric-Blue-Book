@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Head from "next/head";
 import NutrientNeedsCalculator from "@/components/nutrient-needs-calculator";
 import FormulaNeedsCalculator from "@/components/formula-needs-calculator";
+import FormulaLookup from "@/components/formula-lookup";
 
 const Index = () => {
   const [signedIn, setSignedIn] = useState(false);
@@ -68,9 +69,7 @@ const Index = () => {
             <NavBar />
             <NutrientNeedsCalculator />
             <FormulaNeedsCalculator />
-            <div className="flex flex-col h-screen" id="formula_lookup">
-              Formula Look Up Tool
-            </div>
+            <FormulaLookup />
           </div>
         ) : (
           <div className="bg-flow flex flex-col items-center justify-center w-full font-roboto min-h-screen">
