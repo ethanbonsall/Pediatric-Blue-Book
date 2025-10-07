@@ -95,10 +95,10 @@ const FormulaNeedsCalculator = () => {
 
   return (
     <>
-      <div
-        className="flex flex-col min-h-screen w-full bg-gradient-to-br from-primary-200 to-primary-400 p-2 mb-4"
-        id="formula-calc"
-      >
+    <div
+      className="flex flex-col min-h-screen w-full bg-gradient-to-br from-primary-200 to-primary-400 p-2 mb-4"
+      id="formula_calc"
+    >
         <Popup popUp={popUp} setPopUp={setPopUp} />
         <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-[8dvh] ml-[2dvw] mb-[2dvh]">
           Formula Calculator
