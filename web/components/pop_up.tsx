@@ -27,9 +27,9 @@ const Popup = ({
   const prebiotic = "Prebiotic";
   const probiotic = "Probiotic";
   const water_percent = "90.5%";
-  const allergens = "allergen";
   const [serving, setServing] = useState("");
   const [servingType, setServingType] = useState("");
+  const allergens = servingType + serving;
 
   return (
     <div
