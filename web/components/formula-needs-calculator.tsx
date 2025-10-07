@@ -15,11 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import Popup from "./pop_up";
 
 const FormulaNeedsCalculator = () => {
-  const PopUp = () => {
-    return null;
-  };
+  const [popUp, setPopUp] = useState(false);
   const Heart = () => {
     return null;
   };
@@ -95,198 +94,203 @@ const FormulaNeedsCalculator = () => {
   };
 
   return (
-    <div
-      className="flex flex-col min-h-screen w-full bg-gradient-to-br from-primary-200 to-primary-400 p-2 mb-4"
-      id="formula-calc"
-    >
-      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-[8dvh] ml-[2dvw] mb-[2dvh]">
-        Formula Calculator
-      </p>
-      <div className="flex flex-col md:flex-row min-h-screen">
-        <div className="w-full md:w-[60dvw] flex flex-col mt-[2%] items-center">
-          <div className="flex flex-col text-black h-[10dvh] rounded ">
-            <div className="flex flex-row w-full md:w-[50dvw] relative">
-              <input
-                onFocus={() => setSearch(true)}
-                onBlur={() => setSearch(false)}
-                placeholder="Search Formulas and Add Ins"
-                onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
-                className="w-[70dvw] md:w-[40dvw] rounded-xl border p-1 lg:p-2 2xl:p-3 m-1 text-lg lg:text-xl 2xl:text-2xl"
-              />
-              <Select
-                onValueChange={(value) => {
-                  switch (value) {
-                    case "All":
-                      setFilter("All");
-                      break;
-                    case "Formula":
-                      setFilter("Formula");
-                      break;
-                    case "Add In":
-                      setFilter("Add In");
-                      break;
-                    case "Favorites":
-                      setFilter("Favorites");
-                      break;
+    <>
+      <div
+        className="flex flex-col min-h-screen w-full bg-gradient-to-br from-primary-200 to-primary-400 p-2 mb-4"
+        id="formula-calc"
+      >
+        <Popup popUp={popUp} setPopUp={setPopUp} />
+        <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-[8dvh] ml-[2dvw] mb-[2dvh]">
+          Formula Calculator
+        </p>
+        <div className="flex flex-col md:flex-row min-h-screen">
+          <div className="w-full md:w-[60dvw] flex flex-col mt-[2%] items-center">
+            <div className="flex flex-col text-black h-[10dvh] rounded ">
+              <div className="flex flex-row w-full md:w-[50dvw] relative">
+                <input
+                  onFocus={() => setSearch(true)}
+                  onBlur={() => setSearch(false)}
+                  placeholder="Search Formulas and Add Ins"
+                  onInput={(e) =>
+                    setQuery((e.target as HTMLInputElement).value)
                   }
-                }}
-              >
-                <SelectTrigger className="w-[20dvw] md:w-[10dvw] m-1 bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
-                  <SelectValue defaultValue="All" placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="bg-white w-fit rounded">
-                  <SelectGroup className="bg-white">
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="All"
-                    >
-                      All
-                    </SelectItem>
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Formula"
-                    >
-                      Formula
-                    </SelectItem>
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Add In"
-                    >
-                      Add In
-                    </SelectItem>
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Favorites"
-                    >
-                      Favorites
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                  className="w-[70dvw] md:w-[40dvw] rounded-xl border p-1 lg:p-2 2xl:p-3 m-1 text-lg lg:text-xl 2xl:text-2xl"
+                />
+                <Select
+                  onValueChange={(value) => {
+                    switch (value) {
+                      case "All":
+                        setFilter("All");
+                        break;
+                      case "Formula":
+                        setFilter("Formula");
+                        break;
+                      case "Add In":
+                        setFilter("Add In");
+                        break;
+                      case "Favorites":
+                        setFilter("Favorites");
+                        break;
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-[20dvw] md:w-[10dvw] m-1 bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
+                    <SelectValue defaultValue="All" placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white w-fit rounded">
+                    <SelectGroup className="bg-white">
+                      <SelectItem
+                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                        value="All"
+                      >
+                        All
+                      </SelectItem>
+                      <SelectItem
+                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                        value="Formula"
+                      >
+                        Formula
+                      </SelectItem>
+                      <SelectItem
+                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                        value="Add In"
+                      >
+                        Add In
+                      </SelectItem>
+                      <SelectItem
+                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                        value="Favorites"
+                      >
+                        Favorites
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
 
-              <div
-                className={`${
-                  search
-                    ? "absolute top-full left-0 bg-white rounded w-full max-h-[40dvh] overflow-y-scroll no-scrollbar shadow-lg z-30 transition-all"
-                    : "hidden"
-                }`}
-              >
-                {filteredIngredients.map((ingredient, index) => (
-                  <>
-                    <button
-                      className="w-full normal-case font-medium h-fit transition-all duration-200"
-                      key={index}
-                    >
-                      <div className="flex flex-row text-lg lg:text-xl 2xl:text-2xl pl-[1dvw] py-[1dvh] text-start items-center hover:bg-gray-50">
-                        <p className="w-2/5">{ingredient.name}</p>
-                        <p className="w-2/5 text-medium">{ingredient.type}</p>
-                        <div className="flex flex-row w-1/5 justify-end mr-[2%]">
-                          <button
-                            onClick={PopUp}
-                            className="z-30 hover:bg-gray-200 place-self-end w-fit h-fit aspect-square transition-all"
-                          >
-                            <Plus className="w-8 aspect-square" />
-                          </button>
-                          <button
-                            onClick={Heart}
-                            className="z-30  ml-[1dvw] place-self-end w-fit h-fit aspect-square transition-all"
-                          >
-                            <HeartIcon className="w-8 aspect-square hover:fill-red-400" />
-                          </button>
+                <div
+                  className={`${
+                    search
+                      ? "absolute top-full left-0 bg-white rounded w-full max-h-[40dvh] overflow-y-scroll no-scrollbar shadow-lg z-30 transition-all"
+                      : "hidden"
+                  }`}
+                >
+                  {filteredIngredients.map((ingredient, index) => (
+                    <>
+                      <div
+                        className="w-full normal-case font-medium h-fit transition-all duration-200"
+                        key={index}
+                      >
+                        <div className="flex flex-row text-lg lg:text-xl 2xl:text-2xl pl-[1dvw] py-[1dvh] text-start items-center hover:bg-gray-50">
+                          <p className="w-2/5">{ingredient.name}</p>
+                          <p className="w-2/5 text-medium">{ingredient.type}</p>
+                          <div className="flex flex-row w-1/5 justify-end mr-[2%]">
+                            <button
+                              onMouseDown={() => setPopUp(true)}
+                              className="z-30 hover:bg-gray-200 place-self-end w-fit h-fit aspect-square transition-all"
+                            >
+                              <Plus className="w-8 aspect-square" />
+                            </button>
+                            <button
+                              onClick={Heart}
+                              className="z-30  ml-[1dvw] place-self-end w-fit h-fit aspect-square transition-all"
+                            >
+                              <HeartIcon className="w-8 aspect-square hover:fill-red-400" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </button>
-                    <hr className="w-full" />
-                  </>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col h-[50dvh] w-full md:w-[50dvw] overflow-y-scroll  no-scrollbar bg-background rounded-xl relative">
-            <div className="w-full sticky top-0">
-              <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl font-medium py-[1dvh]">
-                <div className="w-[8%]"></div>
-                <p className="w-1/4">Name</p>
-                <p className="w-1/4">Type</p>
-                <p className="w-1/4">Amount</p>
-                <div className="w-[12%] flex justify-end gap-2">
-                  <button className="w-8">
-                    <HeartIcon className="hover:fill-red-400" />
-                  </button>
-                  <button className="w-8">
-                    <SquareArrowUpRight />
-                  </button>
+                      <hr className="w-full" />
+                    </>
+                  ))}
                 </div>
               </div>
-              <hr className="w-full" />
             </div>
-            {selectedIngredients.map((selectedIngredient, index) => (
-              <div key={index}>
+            <div className="flex flex-col h-[50dvh] w-full md:w-[50dvw] overflow-y-scroll  no-scrollbar bg-background rounded-xl relative">
+              <div className="w-full sticky top-0">
                 <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl font-medium py-[1dvh]">
-                  <div className="flex justify-center w-[8%]">
-                    <button
-                      onClick={() => toggleCheck(index)}
-                      className="p-0 m-0 space-x-0"
-                    >
-                      {checked[index] ? (
-                        <CheckSquare className="w-8 text-red-500" />
-                      ) : (
-                        <Square className="w-8" />
-                      )}
+                  <div className="w-[8%]"></div>
+                  <p className="w-1/4">Name</p>
+                  <p className="w-1/4">Type</p>
+                  <p className="w-1/4">Amount</p>
+                  <div className="w-[12%] flex justify-end gap-2">
+                    <button className="w-8">
+                      <HeartIcon className="hover:fill-red-400" />
                     </button>
-                  </div>
-                  <p className="w-1/4">{selectedIngredient.name}</p>
-                  <p className="w-1/4">{selectedIngredient.type}</p>
-                  <p className="w-1/4">{selectedIngredient.amount}</p>
-                  <div className="flex justify-end w-[12%]">
-                    <button>
-                      <Ellipsis className="w-8" />
+                    <button className="w-8">
+                      <SquareArrowUpRight />
                     </button>
                   </div>
                 </div>
                 <hr className="w-full" />
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="w-full md:w-[30dvw] flex flex-col">
-          <div className="flex flex-row w-[20%] my-[2%]">
-            <div className="flex flex-col">
-              <p className="text-lg lg:text-xl 2xl:text-2xl font-medium ">
-                Servings
-              </p>
-              <input
-                className="px-2 p-1 lg:p-2 2xl:p-3 text-md lg:text-lg 2xl:text-xl rounded-xl"
-                type="number"
-                defaultValue={1}
-                placeholder="1"
-              />
+              {selectedIngredients.map((selectedIngredient, index) => (
+                <div key={index}>
+                  <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl font-medium py-[1dvh]">
+                    <div className="flex justify-center w-[8%]">
+                      <button
+                        onClick={() => toggleCheck(index)}
+                        className="p-0 m-0 space-x-0"
+                      >
+                        {checked[index] ? (
+                          <CheckSquare className="w-8 text-red-500" />
+                        ) : (
+                          <Square className="w-8" />
+                        )}
+                      </button>
+                    </div>
+                    <p className="w-1/4">{selectedIngredient.name}</p>
+                    <p className="w-1/4">{selectedIngredient.type}</p>
+                    <p className="w-1/4">{selectedIngredient.amount}</p>
+                    <div className="flex justify-end w-[12%]">
+                      <button>
+                        <Ellipsis className="w-8" />
+                      </button>
+                    </div>
+                  </div>
+                  <hr className="w-full" />
+                </div>
+              ))}
             </div>
           </div>
-          <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll no-scrollbar relative bg-background">
-            <div className="sticky top-0">
-              <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
-                <p className="w-[40%]">Nutrient</p>
-                <p className="w-[30%]">Amount</p>
-                <p className="w-[30%]">Ideal</p>
+          <div className="w-full md:w-[30dvw] flex flex-col">
+            <div className="flex flex-row w-[20%] my-[2%]">
+              <div className="flex flex-col">
+                <p className="text-lg lg:text-xl 2xl:text-2xl font-medium ">
+                  Servings
+                </p>
+                <input
+                  className="px-2 p-1 lg:p-2 2xl:p-3 text-md lg:text-lg 2xl:text-xl rounded-xl"
+                  type="number"
+                  defaultValue={1}
+                  placeholder="1"
+                />
               </div>
-              <hr className="w-full" />
             </div>
+            <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll no-scrollbar relative bg-background">
+              <div className="sticky top-0">
+                <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
+                  <p className="w-[40%]">Nutrient</p>
+                  <p className="w-[30%]">Amount</p>
+                  <p className="w-[30%]">Ideal</p>
+                </div>
+                <hr className="w-full" />
+              </div>
 
-            {nutrients.map((nutrient, index) => (
-              <div key={index} className="bg-background">
-                <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh]">
-                  <p className="w-[40%] ">{nutrient.name}</p>
-                  <p className="w-[30%]">{nutrient.amount}</p>
-                  <p className="w-[30%]">{idealNutrients[index].amount}</p>
+              {nutrients.map((nutrient, index) => (
+                <div key={index} className="bg-background">
+                  <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh]">
+                    <p className="w-[40%] ">{nutrient.name}</p>
+                    <p className="w-[30%]">{nutrient.amount}</p>
+                    <p className="w-[30%]">{idealNutrients[index].amount}</p>
+                  </div>
+                  <hr className="w-full" />
                 </div>
-                <hr className="w-full" />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
