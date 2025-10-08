@@ -11,39 +11,61 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 const NutrientNeedsCalculator = () => {
-  let agePlaceholder = "Years 0-17";
-  let max = 17;
-  let measurment = "m";
-  let measurmentLength = "m";
-  let measurmentWeight = "kg";
-  let ageCalc = 0;
-  let weightCalc = 0;
-  let heightCalc = 0;
-  let monthCalc = 0;
-  let energyNeedsCalc = 0;
-  let catchUpEnergyNeeds = 0;
-  let hollidaySegar = 0;
-  let dri = 0;
-  let bmi50Calc = 0;
-  let bmi25Calc = 0;
+  // Variables for user to use calculator
+  let age_input_placeholder = "Years 0-17";
+  let max_input_age = 17;
+  let height_unit = "m";
+  let length_unit = "m";
+  let weight_unit = "kg";
 
+  // Variables needed for nutrient calculation
+  let age_in_years = 0;
+  let weight_in_kg = 0;
+  let height_in_meters = 0;
+  let age_in_months = 0;
+  let calorie_needs = 0;
+  let catchup_calories = 0;
+  let holliday_segar_fluid = 0;
+  let dri = 0;
+  let ideal_weight_50 = 0;
+  let ideal_weight_25 = 0;
+  let protein_per_kg = 0;
+
+  // Variables needed to get have calculator be functional
+
+  // Age
   const [age, setAge] = useState<number>(0);
   const [ageUnit, setAgeUnit] = useState("Years");
+
+  // Height
   const [height, setHeight] = useState<number>(0);
   const [heightUnit, setHeightUnit] = useState("Metric");
   const [heightInches, setHeightInches] = useState<number>(0);
+
+  // Length
   const [, setLength] = useState<number>(0);
   const [lengthUnit, setLengthUnit] = useState("Metric");
   const [, setLengthInches] = useState<number>(0);
+
+  // Sex
   const [sex, setSex] = useState("");
+
+  // Activity Level
   const [activityLevel, setActivityLevel] = useState("");
+
+  // Needs Type
   const [, setNeedsType] = useState("");
+
+  // Weight
   const [weight, setWeight] = useState<number>(0);
   const [weightUnit, setWeightUnit] = useState("Metric");
-  const [BMI25, setBMI25] = useState<number>(0);
-  const [BMI50, setBMI50] = useState<number>(0);
-  const [energyNeeds, setEnergyNeeds] = useState<number>(0);
 
+  // Ideal Weight
+  const [idealWeight25, setidealWeight25] = useState<number>(0);
+  const [idealWeight50, setIdealWeight50] = useState<number>(0);
+
+  // Nutrients
+  const [calories, setCalories] = useState<number>(0);
   const [vitaminA, setVitaminA] = useState("");
   const [vitaminC, setVitaminC] = useState("");
   const [vitaminD, setVitaminD] = useState("");
@@ -75,15 +97,17 @@ const NutrientNeedsCalculator = () => {
   const [carbohydrates] = useState("");
   const [fat] = useState("");
   const [fiber] = useState("");
-
   const [protein, setProtein] = useState<number>(0);
   const [highProtein, setHighProtein] = useState<number>(0);
   const [segarFluid, setSegarFluid] = useState<number>(0);
-  const [DRIFluid, setDRIFluid] = useState<number>(0);
+  const [driFluid, setDriFluid] = useState<number>(0);
   const [catchUpEnergy, setCatchUpEnergy] = useState<number>(0);
+
+  // Sets up nutrient needs object
   const nutrientsObj: Record<string, string> = {};
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //Handling inputs into calculator and ensuring they are only valid characters
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const numericString = inputValue
       .replace(/[^0-9.]/g, "")
@@ -130,34 +154,73 @@ const NutrientNeedsCalculator = () => {
     setLengthInches(numericValue);
   };
 
+  // Placeholder print nutrient PDF function for print button
+  const printNutrientPDF = () => {
+    return null;
+  };
+
+  // Changes the values of the input functions upon unit change
+  if (ageUnit === "Years") {
+    age_input_placeholder = "Years (0-17)";
+    max_input_age = 17;
+  } else if (ageUnit === "Months") {
+    age_input_placeholder = "Months (0-36))";
+    max_input_age = 36;
+  }
+
+  if (heightUnit === "Imperial") {
+    height_unit = "ft";
+  } else if (heightUnit === "Metric") {
+    height_unit = "m";
+  }
+
+  if (lengthUnit === "Imperial") {
+    length_unit = "ft";
+  } else if (lengthUnit === "Metric") {
+    length_unit = "m";
+  }
+
+  if (weightUnit === "Imperial") {
+    weight_unit = "lbs";
+  } else if (weightUnit === "Metric") {
+    weight_unit = "kg";
+  }
+
+  const heightBool = heightUnit === "Imperial" ? true : false;
+  const lengthBool = lengthUnit === "Imperial" ? true : false;
+
   const calculate = async () => {
+    //Setting Up Variables Needed For Calculation
+
     if (ageUnit === "Months") {
-      ageCalc = age / 12;
+      age_in_years = age / 12;
     } else {
-      ageCalc = age;
+      age_in_years = age;
     }
 
     if (ageUnit === "Months") {
-      monthCalc = age;
+      age_in_months = age;
     } else {
-      monthCalc = age * 12;
+      age_in_months = age * 12;
     }
 
-    monthCalc = Math.round(monthCalc * 2) / 2;
+    age_in_months = Math.round(age_in_months * 2) / 2;
 
     if (weightUnit === "Imperial") {
-      weightCalc = weight * 0.453592;
+      weight_in_kg = weight * 0.453592;
     } else {
-      weightCalc = weight;
+      weight_in_kg = weight;
     }
 
     if (heightUnit === "Imperial") {
-      heightCalc = (height * 12 + heightInches) * 0.0254;
+      height_in_meters = (height * 12 + heightInches) * 0.0254;
     } else {
-      heightCalc = height;
+      height_in_meters = height;
     }
 
+    // Physical Activity Level
     let PA = 1;
+
     if (sex === "Male") {
       switch (activityLevel) {
         case "Not Applicable":
@@ -196,49 +259,53 @@ const NutrientNeedsCalculator = () => {
       }
     }
 
-    if (ageCalc < 0.25) {
-      energyNeedsCalc = 89 * weightCalc - 100 + 175;
-    } else if (ageCalc < 0.5) {
-      energyNeedsCalc = 89 * weightCalc - 100 + 56;
-    } else if (ageCalc < 1) {
-      energyNeedsCalc = 89 * weightCalc - 100 + 22;
-    } else if (ageCalc < 3) {
-      energyNeedsCalc = 89 * weightCalc - 100 + 20;
+    // Calculating calorie needs
+    if (age_in_years < 0.25) {
+      calorie_needs = 89 * weight_in_kg - 100 + 175;
+    } else if (age_in_years < 0.5) {
+      calorie_needs = 89 * weight_in_kg - 100 + 56;
+    } else if (age_in_years < 1) {
+      calorie_needs = 89 * weight_in_kg - 100 + 22;
+    } else if (age_in_years < 3) {
+      calorie_needs = 89 * weight_in_kg - 100 + 20;
     } else if (sex === "Male") {
-      if (ageCalc >= 3 && ageCalc <= 8) {
-        energyNeedsCalc =
+      if (age_in_years >= 3 && age_in_years <= 8) {
+        calorie_needs =
           88.5 -
-          61.9 * ageCalc +
-          PA * (26.7 * weightCalc + 903 * heightCalc) +
+          61.9 * age_in_years +
+          PA * (26.7 * weight_in_kg + 903 * height_in_meters) +
           20;
-      } else if (ageCalc > 8 && ageCalc <= 18) {
-        energyNeedsCalc =
+      } else if (age_in_years > 8 && age_in_years <= 18) {
+        calorie_needs =
           88.5 -
-          61.9 * ageCalc +
-          PA * (26.7 * weightCalc + 903 * heightCalc) +
+          61.9 * age_in_years +
+          PA * (26.7 * weight_in_kg + 903 * height_in_meters) +
           25;
       }
     } else if (sex === "Female") {
-      if (ageCalc >= 3 && ageCalc <= 8) {
-        energyNeedsCalc =
+      if (age_in_years >= 3 && age_in_years <= 8) {
+        calorie_needs =
           135.3 -
-          30.8 * ageCalc +
-          PA * (10 * weightCalc + 934 * heightCalc) +
+          30.8 * age_in_years +
+          PA * (10 * weight_in_kg + 934 * height_in_meters) +
           20;
-      } else if (ageCalc > 8 && ageCalc <= 18) {
-        energyNeedsCalc =
+      } else if (age_in_years > 8 && age_in_years <= 18) {
+        calorie_needs =
           135.3 -
-          30.8 * ageCalc +
-          PA * (10 * weightCalc + 934 * heightCalc) +
+          30.8 * age_in_years +
+          PA * (10 * weight_in_kg + 934 * height_in_meters) +
           20;
       }
     }
+    setCalories(Math.round(calorie_needs * 10) / 10);
+
+    // Getting 25th and 50th percentile BMI's from supabase for 2-18 and ideal weight directly for 0-2
     try {
       const { data, error } = await supabase
         .from("weight")
         .select("p25, p50")
         .eq("sex", sex.toLowerCase())
-        .lte("age", monthCalc)
+        .lte("age", age_in_months)
         .order("age", { ascending: false })
         .limit(1);
 
@@ -247,79 +314,86 @@ const NutrientNeedsCalculator = () => {
 
       const weightPercentile = data[0];
 
-      if (ageCalc < 2) {
-        setBMI25(Math.round(weightPercentile.p25 * 10) / 10);
-        setBMI50(Math.round(weightPercentile.p50 * 10) / 10);
-        bmi25Calc = weightPercentile.p25;
-        bmi50Calc = weightPercentile.p50;
+      //Calculating Ideal Weight
+      if (age_in_years < 2) {
+        setidealWeight25(Math.round(weightPercentile.p25 * 10) / 10);
+        setIdealWeight50(Math.round(weightPercentile.p50 * 10) / 10);
+        ideal_weight_25 = weightPercentile.p25;
+        ideal_weight_50 = weightPercentile.p50;
       } else {
-        bmi25Calc = heightCalc * heightCalc * weightPercentile.p25;
-        bmi50Calc = heightCalc * heightCalc * weightPercentile.p50;
+        ideal_weight_25 =
+          height_in_meters * height_in_meters * weightPercentile.p25;
+        ideal_weight_50 =
+          height_in_meters * height_in_meters * weightPercentile.p50;
 
-        setBMI25(Math.round(bmi25Calc * 10) / 10);
-        setBMI50(Math.round(bmi50Calc * 10) / 10);
+        setidealWeight25(Math.round(ideal_weight_25 * 10) / 10);
+        setIdealWeight50(Math.round(ideal_weight_50 * 10) / 10);
       }
     } catch (err) {
       console.error("Error fetching weight data:", err);
     }
-    setEnergyNeeds(Math.round(energyNeedsCalc * 10) / 10);
 
-    if (weightCalc <= 10) {
-      hollidaySegar = 100 * weightCalc;
-    } else if (weightCalc <= 20) {
-      hollidaySegar = 1000 + 50 * (weightCalc - 10);
+    // Calculate fluid intake using the Holliday Segar Method
+    if (weight_in_kg <= 10) {
+      holliday_segar_fluid = 100 * weight_in_kg;
+    } else if (weight_in_kg <= 20) {
+      holliday_segar_fluid = 1000 + 50 * (weight_in_kg - 10);
     } else {
-      hollidaySegar = 1500 + 20 * (weightCalc - 20);
+      holliday_segar_fluid = 1500 + 20 * (weight_in_kg - 20);
     }
 
-    if (ageCalc < 0.5) {
+    setSegarFluid(Math.round(holliday_segar_fluid));
+
+    // Calculate fluid intake using the Dietary Reference Intake Method
+    if (age_in_years < 0.5) {
       dri = 0.7;
-    } else if (ageCalc < 1) {
+    } else if (age_in_years < 1) {
       dri = 0.8;
-    } else if (ageCalc < 4) {
+    } else if (age_in_years < 4) {
       dri = 1.3;
-    } else if (ageCalc < 9) {
+    } else if (age_in_years < 9) {
       dri = 1.7;
-    } else if (ageCalc < 14) {
+    } else if (age_in_years < 14) {
       dri = sex === "Male" ? 2.4 : 2.1;
-    } else if (ageCalc < 19) {
+    } else if (age_in_years < 19) {
       dri = sex === "Male" ? 3.3 : 2.3;
     } else {
-      dri = energyNeedsCalc / 1000;
+      dri = calorie_needs / 1000;
     }
 
-    let proteinPerKg = 0;
+    setDriFluid(Math.round(dri * 10) / 10);
 
-    if (ageCalc < 0.5) {
-      proteinPerKg = 1.2;
-    } else if (ageCalc < 1) {
-      proteinPerKg = 1.2;
-    } else if (ageCalc < 2) {
-      proteinPerKg = 1.05;
-    } else if (ageCalc < 14) {
-      proteinPerKg = 0.95;
-    } else if (ageCalc < 19) {
-      proteinPerKg = 0.85;
+    // Calculate Protein Needs
+    if (age_in_years < 0.5) {
+      protein_per_kg = 1.2;
+    } else if (age_in_years < 1) {
+      protein_per_kg = 1.2;
+    } else if (age_in_years < 2) {
+      protein_per_kg = 1.05;
+    } else if (age_in_years < 14) {
+      protein_per_kg = 0.95;
+    } else if (age_in_years < 19) {
+      protein_per_kg = 0.85;
     } else {
-      proteinPerKg = 0.8;
+      protein_per_kg = 0.8;
     }
 
-    const proteinNeeds = proteinPerKg * weightCalc;
-    const highProteinNeeds = weightCalc * 1.5;
+    // Calculate raw protein needs
+    const protein_needs = protein_per_kg * weight_in_kg;
+    const high_protein_needs = weight_in_kg * 1.5;
 
-    setProtein(Math.round(proteinNeeds * 10) / 10);
-    setHighProtein(Math.round(highProteinNeeds * 10) / 10);
+    //Calculate rounded protein needs
+    setProtein(Math.round(protein_needs * 10) / 10);
+    setHighProtein(Math.round(high_protein_needs * 10) / 10);
 
-    setSegarFluid(Math.round(hollidaySegar));
-    setDRIFluid(Math.round(dri * 10) / 10);
-
+    // Getting Nutrient Needs from database based on age and sex
     try {
       const { data, error } = await supabase
         .from("nutrient_needs")
         .select("nutrient, amount, measurement_type")
         .eq("sex", sex)
-        .lte("age_bottom", ageCalc)
-        .gte("age_top", ageCalc);
+        .lte("age_bottom", age_in_years)
+        .gte("age_top", age_in_years);
 
       if (error) throw error;
       if (!data || data.length === 0)
@@ -329,6 +403,7 @@ const NutrientNeedsCalculator = () => {
         nutrientsObj[row.nutrient] = `${row.amount}${row.measurement_type}`;
       });
 
+      // Setting null if no data is sent
       setVitaminA(nutrientsObj["Vitamin A"] || "");
       setVitaminC(nutrientsObj["Vitamin C"] || "");
       setVitaminD(nutrientsObj["Vitamin D"] || "");
@@ -360,20 +435,23 @@ const NutrientNeedsCalculator = () => {
     } catch (err) {
       console.error("Error fetching nutrient needs:", err);
     }
-    catchUpEnergyNeeds = energyNeedsCalc * (bmi50Calc / weightCalc);
-    setCatchUpEnergy(Math.round(catchUpEnergyNeeds * 10) / 10);
+
+    // Catchup calories calculations
+    catchup_calories = calorie_needs * (ideal_weight_50 / weight_in_kg);
+    setCatchUpEnergy(Math.round(catchup_calories * 10) / 10);
   };
 
+  // Setting nutrients into an array to be used in the table
   const nutrients = [
     {
       name: "Energy Needs",
-      amount: `${energyNeeds ? energyNeeds + " cal" : ""}`,
+      amount: `${calories ? calories + " cal" : ""}`,
     },
     {
       name: "Holliday Fluid",
       amount: `${segarFluid ? segarFluid + " mL" : ""}`,
     },
-    { name: "DRI Fluid", amount: `${DRIFluid ? DRIFluid + " L" : ""}` },
+    { name: "DRI Fluid", amount: `${driFluid ? driFluid + " L" : ""}` },
     { name: "Protein", amount: `${protein ? protein + " g" : ""}` },
     {
       name: "High Protein",
@@ -412,39 +490,6 @@ const NutrientNeedsCalculator = () => {
     { name: "Fiber", amount: `${fiber || ""}` },
   ];
 
-  const printNutrientPDF = () => {
-    return null;
-  };
-
-  if (ageUnit === "Years") {
-    agePlaceholder = "Years (0-17)";
-    max = 17;
-  } else if (ageUnit === "Months") {
-    agePlaceholder = "Months (0-36))";
-    max = 12;
-  }
-
-  if (heightUnit === "Imperial") {
-    measurment = "ft";
-  } else if (heightUnit === "Metric") {
-    measurment = "m";
-  }
-
-  if (lengthUnit === "Imperial") {
-    measurmentLength = "ft";
-  } else if (lengthUnit === "Metric") {
-    measurmentLength = "m";
-  }
-
-  if (weightUnit === "Imperial") {
-    measurmentWeight = "lbs";
-  } else if (weightUnit === "Metric") {
-    measurmentWeight = "kg";
-  }
-
-  const heightBool = heightUnit === "Imperial" ? true : false;
-  const lengthBool = lengthUnit === "Imperial" ? true : false;
-
   return (
     <div
       className="flex flex-col bg-gradient-to-tl from-primary-200 to-primary-400 w-full h-fit mb-4 pb-4"
@@ -463,9 +508,9 @@ const NutrientNeedsCalculator = () => {
                 inputMode="numeric"
                 type="number"
                 min="0"
-                max={max}
-                onInput={handleInputChange}
-                placeholder={agePlaceholder}
+                max={max_input_age}
+                onInput={handleAgeChange}
+                placeholder={age_input_placeholder}
               ></input>
               <Select
                 onValueChange={(value) => {
@@ -515,7 +560,7 @@ const NutrientNeedsCalculator = () => {
                 onInput={handleHeightChange}
                 placeholder="Height"
               ></input>
-              <p className="text-md font-medium self-center">{measurment}</p>
+              <p className="text-md font-medium self-center">{height_unit}</p>
               <input
                 className={`${
                   heightBool ? "block w-[26%]" : "hidden"
@@ -580,9 +625,7 @@ const NutrientNeedsCalculator = () => {
                 onInput={handleLengthChange}
                 placeholder="Height"
               ></input>
-              <p className="text-md font-medium self-center">
-                {measurmentLength}
-              </p>
+              <p className="text-md font-medium self-center">{length_unit}</p>
               <input
                 className={`${
                   lengthBool ? "block w-[26%] " : "hidden"
@@ -644,9 +687,7 @@ const NutrientNeedsCalculator = () => {
                 onInput={handleWeightChange}
                 placeholder="Weight"
               ></input>
-              <p className="text-md font-medium self-center">
-                {measurmentWeight}
-              </p>
+              <p className="text-md font-medium self-center">{weight_unit}</p>
               <Select
                 onValueChange={(value) => {
                   switch (value) {
@@ -877,13 +918,13 @@ const NutrientNeedsCalculator = () => {
               <p className="font-semibold">
                 BMI (50th Percentile for age):&nbsp;
               </p>
-              <p>{BMI50} kg</p>
+              <p>{idealWeight50} kg</p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
               <p className="font-semibold">
                 BMI (25th Percentile for age):&nbsp;
               </p>
-              <p>{BMI25} kg</p>
+              <p>{idealWeight25} kg</p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">
               <p className="font-semibold">Catch up Growth:&nbsp;</p>
