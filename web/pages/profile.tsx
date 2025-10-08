@@ -129,154 +129,152 @@ const Profile = () => {
       </Head>
       <Navbar />
       <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-bl from-primary-50 to-primary-400">
-        <div className="flex flex-col bg-background text-text min-w-[50dvw] max-w-[100dvw] h-fit shadow-2xl p-8 rounded-xl items-center">
-          <div>
-            <h1 className="text-4xl font-bold mb-4 text-center">Profile</h1>
-            <img
-              src={avatar.src}
-              alt="user"
-              className="w-[150px] self-center justify-self-center"
-            />
-            <div className="mb-4">
-              <label className="block text-md font-medium">Name</label>
-              {edit ? (
-                <input
-                  className="border p-2 rounded w-full"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              ) : (
-                <p className="text-xl font-light">{username}</p>
-              )}
-            </div>
+        <div className="flex flex-col bg-background text-text min-w-[80dvw] md:min-w-[50dvw] max-w-[100dvw] h-fit shadow-2xl p-8 rounded-xl  text-start">
+          <h1 className="text-4xl font-bold mb-4 text-center">Profile</h1>
+          <img
+            src={avatar.src}
+            alt="user"
+            className="w-[150px] self-center justify-self-center"
+          />
+          <div className="mb-4">
+            <label className="block text-md font-medium">Name</label>
+            {edit ? (
+              <input
+                className="border p-2 rounded w-full"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            ) : (
+              <p className="text-xl font-light">{username}</p>
+            )}
+          </div>
 
-            <div className="mb-4">
-              <label className="block text-md font-medium">Email</label>
-              {edit ? (
-                <p className="text-xl font-light border p-2 rounded w-full">
-                  {email}
-                </p>
-              ) : (
-                <p className="text-xl font-light">{email}</p>
-              )}
-            </div>
+          <div className="mb-4">
+            <label className="block text-md font-medium">Email</label>
+            {edit ? (
+              <p className="text-xl font-light border p-2 rounded w-full">
+                {email}
+              </p>
+            ) : (
+              <p className="text-xl font-light w-full">{email}</p>
+            )}
+          </div>
 
-            <div className="mb-4">
-              <label className="block text-md font-medium">Title</label>
-              {edit ? (
-                <Select
-                  onValueChange={(value) => {
-                    switch (value) {
-                      case "registered_dietician":
-                        setTitle("Registered Dietician");
-                        break;
-                      case "dietician_technician":
-                        setTitle("Dietician Technician");
-                        break;
-                      case "advanced_practice_provider":
-                        setTitle("Advanced Practice Provider");
-                        break;
-                      case "nurse":
-                        setTitle("Nurse");
-                        break;
-                      case "physician":
-                        setTitle("Physician");
-                        break;
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-full bg-white rounded text-text px-4 py-2">
-                    <SelectValue placeholder="Select an occupation" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectGroup className="bg-white">
-                      <SelectItem
-                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                        value="registered_dietician"
-                      >
-                        Registered Dietician
-                      </SelectItem>
-                      <SelectItem
-                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                        value="dietician_technician"
-                      >
-                        Dietician Technician
-                      </SelectItem>
-                      <SelectItem
-                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                        value="advanced_practice_provider"
-                      >
-                        Advanced Practice Provider
-                      </SelectItem>
-                      <SelectItem
-                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                        value="nurse"
-                      >
-                        Nurse
-                      </SelectItem>
-                      <SelectItem
-                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                        value="physician"
-                      >
-                        Physician
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <p className="text-xl font-light">{title}</p>
-              )}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-md font-medium">Password</label>
-              {edit ? (
-                <input
-                  className="border p-2 rounded w-full"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              ) : (
-                <p className="text-lg font-light">●●●●●●●●●</p>
-              )}
-            </div>
-            <div className="flex flex-row">
-              <button
-                onClick={() => {
-                  setEdit(!edit);
-                  setUsername(originalUsername);
-                  setTitle(originalTitle);
-                  setPassword("");
-                }}
-                className="bg-primary-500 text-white px-4 py-2 rounded w-[20dvw]"
-              >
-                {edit ? "Cancel" : "Edit"}
-              </button>
-              <button
-                className={`${
-                  edit ? "block ml-2" : "hidden"
-                } bg-primary-500 text-white px-4 py-2 rounded w-[20dvw]`}
-                onClick={() => {
-                  if (passwordValid || password.length === 0) {
-                    updateUser();
-                    setEdit(false);
-                  } else
-                    alert(
-                      "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
-                    );
+          <div className="mb-4">
+            <label className="block text-md font-medium">Title</label>
+            {edit ? (
+              <Select
+                onValueChange={(value) => {
+                  switch (value) {
+                    case "registered_dietician":
+                      setTitle("Registered Dietician");
+                      break;
+                    case "dietician_technician":
+                      setTitle("Dietician Technician");
+                      break;
+                    case "advanced_practice_provider":
+                      setTitle("Advanced Practice Provider");
+                      break;
+                    case "nurse":
+                      setTitle("Nurse");
+                      break;
+                    case "physician":
+                      setTitle("Physician");
+                      break;
+                  }
                 }}
               >
-                Save
-              </button>
-              <button
-                onClick={handleSignOut}
-                className={`${
-                  edit ? "hidden" : "block"
-                } bg-red-600 text-white px-4 py-2 rounded ml-2 w-[20dvw]`}
-              >
-                Logout
-              </button>
-            </div>
+                <SelectTrigger className="w-full bg-white rounded text-text px-4 py-2">
+                  <SelectValue placeholder="Select an occupation" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectGroup className="bg-white">
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="registered_dietician"
+                    >
+                      Registered Dietician
+                    </SelectItem>
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="dietician_technician"
+                    >
+                      Dietician Technician
+                    </SelectItem>
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="advanced_practice_provider"
+                    >
+                      Advanced Practice Provider
+                    </SelectItem>
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="nurse"
+                    >
+                      Nurse
+                    </SelectItem>
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="physician"
+                    >
+                      Physician
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            ) : (
+              <p className="text-xl font-light">{title}</p>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-md font-medium">Password</label>
+            {edit ? (
+              <input
+                className="border p-2 rounded w-full"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            ) : (
+              <p className="text-lg font-light">●●●●●●●●●</p>
+            )}
+          </div>
+          <div className="flex flex-row justify-center">
+            <button
+              onClick={() => {
+                setEdit(!edit);
+                setUsername(originalUsername);
+                setTitle(originalTitle);
+                setPassword("");
+              }}
+              className="bg-primary-500 text-white px-4 py-2 rounded w-[20dvw] min-w-fit"
+            >
+              {edit ? "Cancel" : "Edit"}
+            </button>
+            <button
+              className={`${
+                edit ? "block ml-2" : "hidden"
+              } bg-primary-500 text-white px-4 py-2 rounded w-[20dvw] min-w-fit`}
+              onClick={() => {
+                if (passwordValid || password.length === 0) {
+                  updateUser();
+                  setEdit(false);
+                } else
+                  alert(
+                    "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+                  );
+              }}
+            >
+              Save
+            </button>
+            <button
+              onClick={handleSignOut}
+              className={`${
+                edit ? "hidden" : "block"
+              } bg-red-600 text-white px-4 py-2 rounded ml-2 w-[20dvw] min-w-fit`}
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
