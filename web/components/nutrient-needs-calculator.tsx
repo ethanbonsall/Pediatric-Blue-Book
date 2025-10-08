@@ -505,7 +505,7 @@ const NutrientNeedsCalculator = () => {
             <div className="flex flex-row gap-x-1 lg:gap-x-2 w-full">
               <input
                 className="border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2 w-[60%]"
-                inputMode="numeric"
+                inputMode="decimal"
                 type="number"
                 min="0"
                 max={max_input_age}
@@ -555,7 +555,7 @@ const NutrientNeedsCalculator = () => {
                 className={`${
                   heightBool ? "w-[26.5%]" : " w-[55%]"
                 } border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2 `}
-                inputMode="numeric"
+                inputMode="decimal"
                 min="0"
                 onInput={handleHeightChange}
                 placeholder="Height"
@@ -620,7 +620,7 @@ const NutrientNeedsCalculator = () => {
                 className={`${
                   lengthBool ? "w-[26.5%] " : " w-[55%] "
                 } border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2 `}
-                inputMode="numeric"
+                inputMode="decimal"
                 min="0"
                 onInput={handleLengthChange}
                 placeholder="Height"
@@ -630,7 +630,7 @@ const NutrientNeedsCalculator = () => {
                 className={`${
                   lengthBool ? "block w-[26%] " : "hidden"
                 } border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2`}
-                inputMode="numeric"
+                inputMode="decimal"
                 min="0"
                 onInput={handleLengthChangeInches}
               ></input>
@@ -683,7 +683,7 @@ const NutrientNeedsCalculator = () => {
             <div className="flex flex-row gap-x-1 lg:gap-x-2 w-full">
               <input
                 className="border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2 w-[55%]"
-                inputMode="numeric"
+                inputMode="decimal"
                 onInput={handleWeightChange}
                 placeholder="Weight"
               ></input>
