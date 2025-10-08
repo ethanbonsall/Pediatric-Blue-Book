@@ -54,7 +54,7 @@ const NutrientNeedsCalculator = () => {
   const [activityLevel, setActivityLevel] = useState("");
 
   // Needs Type
-  const [, setNeedsType] = useState("");
+  const [needsType, setNeedsType] = useState("Standard");
 
   // Weight
   const [weight, setWeight] = useState<number>(0);
@@ -365,7 +365,7 @@ const NutrientNeedsCalculator = () => {
 
     // Calculate Protein Needs
     if (age_in_years < 0.5) {
-      protein_per_kg = 1.2;
+      protein_per_kg = 1.5;
     } else if (age_in_years < 1) {
       protein_per_kg = 1.2;
     } else if (age_in_years < 2) {
@@ -393,7 +393,7 @@ const NutrientNeedsCalculator = () => {
         .select("nutrient, amount, measurement_type")
         .eq("sex", sex)
         .lte("age_bottom", age_in_years)
-        .gte("age_top", age_in_years);
+        .gt("age_top", age_in_years);
 
       if (error) throw error;
       if (!data || data.length === 0)
@@ -927,7 +927,7 @@ const NutrientNeedsCalculator = () => {
               <p>{idealWeight25} kg</p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">
-              <p className="font-semibold">Catch up Growth:&nbsp;</p>
+              <p className="font-semibold">{needsType}:&nbsp;</p>
               <p>{catchUpEnergy} cal</p>
             </div>
           </div>
