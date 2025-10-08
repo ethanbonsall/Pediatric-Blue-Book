@@ -247,14 +247,14 @@ const Profile = () => {
                 setTitle(originalTitle);
                 setPassword("");
               }}
-              className="bg-primary-500 text-white px-4 py-2 rounded w-fit"
+              className="bg-primary-500 text-white px-4 py-2 rounded w-[20dvw] min-w-fit"
             >
               {edit ? "Cancel" : "Edit"}
             </button>
             <button
               className={`${
                 edit ? "block ml-2" : "hidden"
-              } bg-primary-500 text-white px-4 py-2 rounded w-fit`}
+              } bg-primary-500 text-white px-4 py-2 rounded w-[20dvw] min-w-fit`}
               onClick={() => {
                 if (passwordValid || password.length === 0) {
                   updateUser();
@@ -271,7 +271,7 @@ const Profile = () => {
               onClick={handleSignOut}
               className={`${
                 edit ? "hidden" : "block"
-              } bg-red-600 text-white px-4 py-2 rounded ml-2 w-fit`}
+              } bg-red-600 text-white px-4 py-2 rounded ml-2 w-[20dvw] min-w-fit`}
             >
               Logout
             </button>
