@@ -8,17 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import Popup from "./pop_up_lookup";
 
 const FormulaNeedsCalculator = () => {
-  const PopUp = () => {
-    return null;
-  };
   const Heart = () => {
     return null;
   };
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
+  const [popUp, setPopUp] = useState(false);
 
   const ingredients = [
     { name: "Formula A", type: "Formula" },
@@ -45,6 +44,7 @@ const FormulaNeedsCalculator = () => {
       className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 p-2 mb-4"
       id="formula_lookup"
     >
+      <Popup popUp={popUp} setPopUp={setPopUp} />
       <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-[8dvh] ml-[2dvw] mb-[2dvh]">
         Formula Lookup
       </p>
@@ -128,7 +128,7 @@ const FormulaNeedsCalculator = () => {
                         <p className="w-2/5 text-medium">{ingredient.type}</p>
                         <div className="flex flex-row w-1/5 justify-end mr-[2%]">
                           <button
-                            onClick={PopUp}
+                            onMouseDown={() => setPopUp(true)}
                             className="z-30 hover:bg-gray-200 place-self-end w-fit h-fit aspect-square transition-all"
                           >
                             <Search className="w-8 aspect-square" />
