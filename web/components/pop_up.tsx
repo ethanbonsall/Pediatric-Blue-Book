@@ -30,6 +30,7 @@ const Popup = ({
   const [serving, setServing] = useState("");
   const [servingType, setServingType] = useState("");
   const allergens = servingType + serving;
+  const company = "Company Place";
 
   return (
     <div
@@ -44,6 +45,7 @@ const Popup = ({
       <p className="text-lg lg:text-xl 2xl:text-2xl">
         Recommended Age: {product_age}
       </p>
+      <p className="text-lg lg:text-xl 2xl:text-2xl">Company: {company}</p>
 
       <p className="text-lg lg:text-xl 2xl:text-2xl">
         PRO ({protein_percent}): {protein_source}
