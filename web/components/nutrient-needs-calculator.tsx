@@ -15,7 +15,6 @@ const NutrientNeedsCalculator = () => {
   let age_input_placeholder = "Years 0-17";
   let max_input_age = 17;
   let height_unit = "m";
-  let length_unit = "m";
   let weight_unit = "kg";
 
   // Variables needed for nutrient calculation
@@ -41,11 +40,6 @@ const NutrientNeedsCalculator = () => {
   const [height, setHeight] = useState<number>(0);
   const [heightUnit, setHeightUnit] = useState("Metric");
   const [heightInches, setHeightInches] = useState<number>(0);
-
-  // Length
-  const [, setLength] = useState<number>(0);
-  const [lengthUnit, setLengthUnit] = useState("Metric");
-  const [, setLengthInches] = useState<number>(0);
 
   // Sex
   const [sex, setSex] = useState("");
@@ -133,25 +127,11 @@ const NutrientNeedsCalculator = () => {
     const numericValue = numericString ? parseFloat(numericString) : 0;
     setHeight(numericValue);
   };
-  const handleLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    const numericString = inputValue
-      .replace(/[^0-9.]/g, "")
-      .replace(/(\..*?)\..*/g, "$1");
-    const numericValue = numericString ? parseFloat(numericString) : 0;
-    setLength(numericValue);
-  };
   const handleHeightChangeInches = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const numericString = inputValue.replace(/[^0-9]/g, "");
     const numericValue = numericString ? parseFloat(numericString) : 0;
     setHeightInches(numericValue);
-  };
-  const handleLengthChangeInches = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    const numericString = inputValue.replace(/[^0-9]/g, "");
-    const numericValue = numericString ? parseFloat(numericString) : 0;
-    setLengthInches(numericValue);
   };
 
   // Placeholder print nutrient PDF function for print button
@@ -174,12 +154,6 @@ const NutrientNeedsCalculator = () => {
     height_unit = "m";
   }
 
-  if (lengthUnit === "Imperial") {
-    length_unit = "ft";
-  } else if (lengthUnit === "Metric") {
-    length_unit = "m";
-  }
-
   if (weightUnit === "Imperial") {
     weight_unit = "lbs";
   } else if (weightUnit === "Metric") {
@@ -187,7 +161,6 @@ const NutrientNeedsCalculator = () => {
   }
 
   const heightBool = heightUnit === "Imperial" ? true : false;
-  const lengthBool = lengthUnit === "Imperial" ? true : false;
 
   const calculate = async () => {
     //Setting Up Variables Needed For Calculation
@@ -448,7 +421,7 @@ const NutrientNeedsCalculator = () => {
       amount: `${calories ? calories + " cal" : ""}`,
     },
     {
-      name: "Holliday Fluid",
+      name: "Holliday-Segar",
       amount: `${segarFluid ? segarFluid + " mL" : ""}`,
     },
     { name: "DRI Fluid", amount: `${driFluid ? driFluid + " L" : ""}` },
@@ -457,6 +430,8 @@ const NutrientNeedsCalculator = () => {
       name: "High Protein",
       amount: `${highProtein ? highProtein + " g" : ""}`,
     },
+    { name: "Carbohydrates", amount: `${carbohydrates || ""}` },
+    { name: "Fats", amount: `${fat || ""}` },
     { name: "Calcium", amount: `${calcium || ""}` },
     { name: "Iron", amount: `${iron || ""}` },
     { name: "Vitamin D", amount: `${vitaminD || ""}` },
@@ -485,8 +460,6 @@ const NutrientNeedsCalculator = () => {
     { name: "Selenium", amount: `${selenium || ""}` },
     { name: "Sodium", amount: `${sodium || ""}` },
     { name: "Chloride", amount: `${chloride || ""}` },
-    { name: "Carbohydrates", amount: `${carbohydrates || ""}` },
-    { name: "Fats", amount: `${fat || ""}` },
     { name: "Fiber", amount: `${fiber || ""}` },
   ];
 
@@ -590,71 +563,6 @@ const NutrientNeedsCalculator = () => {
                 }}
               >
                 <SelectTrigger className="w-[33%] bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
-                  <SelectValue defaultValue="Metric" placeholder="Metric" />
-                </SelectTrigger>
-                <SelectContent className="bg-white w-fit rounded">
-                  <SelectGroup className="bg-white">
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Metric"
-                    >
-                      Metric
-                    </SelectItem>
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Imperial"
-                    >
-                      Imperial
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="flex flex-col gap-y-1">
-            <p className="text-2xl xl:text-3xl 2xl:text-4xl font-medium">
-              Length
-            </p>
-            <div className="flex flex-row gap-x-1 lg:gap-x-2 w-full">
-              <input
-                className={`${
-                  lengthBool ? "w-[26.5%] " : " w-[55%] "
-                } border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2 `}
-                inputMode="decimal"
-                min="0"
-                onInput={handleLengthChange}
-                placeholder="Height"
-              ></input>
-              <p className="text-md font-medium self-center">{length_unit}</p>
-              <input
-                className={`${
-                  lengthBool ? "block w-[26%] " : "hidden"
-                } border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2`}
-                inputMode="decimal"
-                min="0"
-                onInput={handleLengthChangeInches}
-              ></input>
-              <p
-                className={`${
-                  lengthBool ? "block" : "hidden"
-                } text-md font-medium self-center`}
-              >
-                in
-              </p>
-
-              <Select
-                onValueChange={(value) => {
-                  switch (value) {
-                    case "Metric":
-                      setLengthUnit("Metric");
-                      break;
-                    case "Imperial":
-                      setLengthUnit("Imperial");
-                      break;
-                  }
-                }}
-              >
-                <SelectTrigger className="w-[33%]  bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
                   <SelectValue defaultValue="Metric" placeholder="Metric" />
                 </SelectTrigger>
                 <SelectContent className="bg-white w-fit rounded">
@@ -918,13 +826,17 @@ const NutrientNeedsCalculator = () => {
               <p className="font-semibold">
                 BMI (50th Percentile for age):&nbsp;
               </p>
-              <p>{idealWeight50} kg</p>
+              <p>
+                {idealWeight50} kg ({idealWeight50 * 2.205} lb)
+              </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
               <p className="font-semibold">
                 BMI (25th Percentile for age):&nbsp;
               </p>
-              <p>{idealWeight25} kg</p>
+              <p>
+                {idealWeight25} kg ({idealWeight25 * 2.205} lb){" "}
+              </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">
               <p className="font-semibold">{needsType}:&nbsp;</p>
