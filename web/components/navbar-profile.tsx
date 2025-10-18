@@ -12,8 +12,8 @@ export default function Navbar() {
       <Link href="/" className="h-12">
         <img src={PBB.src} alt="Pediatric Blue Book" className="h-full"></img>
       </Link>
-      <div className="flex flex-row gap-x-2 lg:gap-x-8 text-2xl items-center font-medium text-background">
-        <Link href="/" className="flex flex-row items-center gap-x-1">
+        <div className="flex flex-row gap-x-2 lg:gap-x-8 text-2xl items-center font-medium text-background">
+        <Link href="/" className="flex flex-row items-center gap-x-1 hover:text-primary-700 transition-colors duration-150">
           <Home></Home>Home
         </Link>
         <Link href="/profile">

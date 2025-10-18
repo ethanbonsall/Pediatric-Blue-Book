@@ -41,7 +41,7 @@ const FormulaNeedsCalculator = () => {
 
   return (
     <div
-      className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 p-2 mb-4"
+      className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 pb-2"
       id="formula_lookup"
     >
       <Popup popUp={popUp} setPopUp={setPopUp} />

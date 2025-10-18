@@ -12,19 +12,26 @@ export default function Navbar() {
       <Link href="#home" className="h-12">
         <img src={PBB.src} alt="Pediatric Blue Book" className="h-full"></img>
       </Link>
-      <div className="flex flex-row gap-x-3 lg:gap-x-6 text-2xl items-center font-medium text-background">
-        <Link href="#nutrient" className="lg:slide delay-[${i * 100}ms]">
-          <Apple className="flex lg:hidden" />
+      <div className="flex flex-row gap-x-3 lg:gap-x-7 text-2xl items-center font-medium text-background">
+        <Link
+          href="#nutrient"
+          className="lg:slide delay-[${i * 100}ms] hover:text-primary-700 transition-colors duration-150"
+        >
+          <Apple className="flex lg:hidden text-current" />
           <span className="hidden lg:flex">Nutrient Needs Calculator</span>
         </Link>
-        <div className="hidden lg:flex text-3xl font-thin">|</div>
-        <Link href="#formula_calc" className="lg:slide delay-[${i * 100}ms]">
-          <Calculator className="flex lg:hidden" />
+        <Link
+          href="#formula_calc"
+          className="lg:slide delay-[${i * 100}ms] hover:text-primary-700 transition-colors duration-150"
+        >
+          <Calculator className="flex lg:hidden text-current" />
           <span className="hidden lg:flex">Formula Recipe Calculator</span>
         </Link>
-        <div className="hidden lg:flex text-3xl font-thin">|</div>
-        <Link href="#formula_lookup" className="lg:slide delay-[${i * 100}ms]">
-          <Search className="flex lg:hidden" />
+        <Link
+          href="#formula_lookup"
+          className="lg:slide delay-[${i * 100}ms] hover:text-primary-700 transition-colors duration-150"
+        >
+          <Search className="flex lg:hidden text-current" />
           <span className="hidden lg:flex">Formula Look Up Tool </span>
         </Link>
         <Link href="/profile">
