@@ -96,16 +96,16 @@ const FormulaNeedsCalculator = () => {
   return (
     <>
     <div
-      className="flex flex-col bg-gradient-to-tl from-primary-200 to-primary-400 w-full min-h-screen pb-8"
+      className="flex flex-col min-h-screen w-full bg-gradient-to-tl from-primary-400 to-primary-200 p-2"
       id="formula_calc"
     >
         <Popup popUp={popUp} setPopUp={setPopUp} />
-        <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-[8dvh] ml-[2dvw] mb-[2dvh]">
+        <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
           Formula Calculator
         </p>
-  <div className="flex flex-col md:flex-row min-h-screen items-start">
-          <div className="w-full md:w-[60dvw] flex flex-col mt-[2%] items-center">
-            <div className="flex flex-col text-black h-[14dvh] rounded-xl">
+        <div className="flex flex-col md:flex-row min-h-screen">
+          <div className="w-full md:w-[60dvw] flex flex-col items-center">
+            <div className="flex flex-col text-black h-[10dvh] rounded ">
               <div className="flex flex-row w-full md:w-[50dvw] relative">
                 <input
                   onFocus={() => setSearch(true)}
@@ -205,7 +205,7 @@ const FormulaNeedsCalculator = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col h-[50dvh] w-full md:w-[50dvw] overflow-y-scroll  no-scrollbar bg-background rounded-xl relative">
+            <div className="flex flex-col h-[50dvh] w-full md:w-[50dvw] overflow-y-scroll  no-scrollbar bg-background rounded-xl relative shadow-lg">
               <div className="w-full sticky top-0">
                 <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl font-medium py-[1dvh]">
                   <div className="w-[8%]"></div>
@@ -253,20 +253,20 @@ const FormulaNeedsCalculator = () => {
             </div>
           </div>
           <div className="w-full md:w-[30dvw] flex flex-col">
-            <div className="flex flex-row w-full md:w-[20%] my-0">
-              <div className="flex flex-col h-[17dvh]">
-                <p className="text-lg lg:text-xl 2xl:text-2xl font-medium ">
-                  Servings
-                </p>
-                <input
-                  className="w-[20dvw] md:w-[10dvw] rounded-xl border p-1 lg:p-2 2xl:p-3 m-1 text-lg lg:text-xl 2xl:text-2xl"
-                  type="number"
-                  defaultValue={1}
-                  placeholder="1"
-                />
+            <div className="flex flex-row h-[10dvh] md:w-[50dvw]]">
+              <div className="flex flex-col">
+                  
+                  <input
+                    className="w-[20dvw] md:w-[10dvw] rounded-xl border p-1 lg:p-2 2xl:p-3 m-1 text-lg lg:text-xl 2xl:text-2xl"
+                    type="number"
+                    defaultValue={1}
+                    placeholder="1"
+                  />
               </div>
+              
             </div>
-            <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll no-scrollbar relative bg-background">
+            <div>
+            <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll no-scrollbar relative bg-background shadow-lg">
               <div className="sticky top-0">
                 <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
                   <p className="w-[40%]">Nutrient</p>
@@ -286,6 +286,7 @@ const FormulaNeedsCalculator = () => {
                   <hr className="w-full" />
                 </div>
               ))}
+            </div>
             </div>
           </div>
         </div>

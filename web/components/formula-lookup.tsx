@@ -45,7 +45,7 @@ const FormulaNeedsCalculator = () => {
       id="formula_lookup"
     >
       <Popup popUp={popUp} setPopUp={setPopUp} />
-      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-[8dvh] ml-[2dvw] mb-[2dvh]">
+      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
         Formula Lookup
       </p>
       <div className="flex flex-col md:flex-row min-h-screen">
@@ -77,7 +77,7 @@ const FormulaNeedsCalculator = () => {
                   }
                 }}
               >
-                <SelectTrigger className="w-1/5 m-1 bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
+                <SelectTrigger className="w-1/5 m-1 bg-white rounded-xl text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
                   <SelectValue defaultValue="All" placeholder="All" />
                 </SelectTrigger>
                 <SelectContent className="bg-white w-fit rounded">
