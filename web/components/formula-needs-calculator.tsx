@@ -104,7 +104,7 @@ const FormulaNeedsCalculator = () => {
           Formula Calculator
         </p>
         <div className="flex flex-col md:flex-row min-h-screen">
-          <div className="w-full md:w-[60dvw] flex flex-col items-center">
+          <div className="w-full md:w-[60dvw] flex flex-col items-center mb-10">
             <div className="flex flex-col text-black h-[10dvh] rounded ">
               <div className="flex flex-row w-full md:w-[50dvw] relative">
                 <input
@@ -252,10 +252,10 @@ const FormulaNeedsCalculator = () => {
               ))}
             </div>
           </div>
+          <p className="text-xl">Servings:</p>
           <div className="w-full md:w-[30dvw] flex flex-col">
             <div className="flex flex-row h-[10dvh] md:w-[50dvw]]">
               <div className="flex flex-col">
-                  
                   <input
                     className="w-[20dvw] md:w-[10dvw] rounded-xl border p-1 lg:p-2 2xl:p-3 m-1 text-lg lg:text-xl 2xl:text-2xl"
                     type="number"
