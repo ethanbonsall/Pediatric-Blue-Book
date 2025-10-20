@@ -96,7 +96,7 @@ const FormulaNeedsCalculator = () => {
   return (
     <>
     <div
-      className="flex flex-col min-h-screen w-full bg-gradient-to-tl mb-4 from-primary-400 to-primary-200 p-2"
+      className="flex flex-col min-h-screen w-full bg-gray p-2"
       id="formula_calc"
     >
         <Popup popUp={popUp} setPopUp={setPopUp} />
@@ -205,9 +205,9 @@ const FormulaNeedsCalculator = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col h-[50dvh] w-full md:w-[50dvw] overflow-y-scroll  no-scrollbar bg-background rounded-xl relative shadow-lg">
+            <div className="flex flex-col h-[50dvh] w-full md:w-[50dvw] overflow-y-scroll  no-scrollbar bg-gray rounded-xl relative shadow-lg">
               <div className="w-full sticky top-0">
-                <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl font-medium py-[1dvh]">
+                <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl bg-primary-400 font-medium py-[1dvh]">
                   <div className="w-[8%]"></div>
                   <p className="w-1/4">Name</p>
                   <p className="w-1/4">Type</p>
@@ -266,9 +266,9 @@ const FormulaNeedsCalculator = () => {
               
             </div>
             <div>
-            <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll no-scrollbar relative bg-background shadow-lg">
+            <div className="flex flex-col w-full border rounded-[20px] h-[75dvh] overflow-y-scroll no-scrollbar relative shadow-lg">
               <div className="sticky top-0">
-                <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
+                <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-primary-400">
                   <p className="w-[40%]">Nutrient</p>
                   <p className="w-[30%]">Amount</p>
                   <p className="w-[30%]">Ideal</p>

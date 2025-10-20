@@ -465,7 +465,7 @@ const NutrientNeedsCalculator = () => {
 
   return (
     <div
-      className="flex flex-col bg-gradient-to-tl from-primary-200 to-primary-400 w-full min-h-screen mb-4 pb-8"
+      className="flex flex-col bg-gradient-to-tl from-primary-200 to-primary-300 w-full min-h-screen rounded-b-[20px] pb-8"
       id="nutrient"
     >
       <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-4 mb-2 ml-4">

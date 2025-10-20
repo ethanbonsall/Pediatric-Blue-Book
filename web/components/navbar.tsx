@@ -8,7 +8,7 @@ import avatar from "../public/avatar.png";
 
 export default function Navbar() {
   return (
-    <nav className="flex sticky top-0 p-2 lg:p-6 justify-between w-full z-50 bg-primary text-text">
+    <nav className="flex sticky top-0 p-2 lg:p-6 justify-between w-full z-50 bg-primary shadow-xl text-text">
       <Link href="#home" className="h-12">
         <img src={PBB.src} alt="Pediatric Blue Book" className="h-full"></img>
       </Link>
