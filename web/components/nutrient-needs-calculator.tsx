@@ -353,7 +353,7 @@ const NutrientNeedsCalculator = () => {
 
     // Calculate raw protein needs
     const protein_needs = protein_per_kg * weight_in_kg;
-    const high_protein_needs = weight_in_kg * 1.5;
+    const high_protein_needs = protein_needs * 1.5;
 
     //Calculate rounded protein needs
     setProtein(Math.round(protein_needs * 10) / 10);

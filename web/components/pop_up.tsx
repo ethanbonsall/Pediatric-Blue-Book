@@ -36,7 +36,7 @@ const Popup = ({
     <div
       className={` ${
         popUp ? "fixed" : "hidden"
-      } flex flex-col h-fit w-fit gap-y-4 justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-white p-4 lg:p-8 rounded-xl shadow-2xl z-50`}
+      } flex flex-col h-fit w-fit gap-y-4 justify-center top-[53%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary-600 text-white p-4 lg:p-8 rounded-xl shadow-2xl z-50`}
     >
       <button onClick={() => setPopUp(false)} className="mr-4">
         <X />
