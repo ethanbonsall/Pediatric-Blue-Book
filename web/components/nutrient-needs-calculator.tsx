@@ -9,6 +9,8 @@ import {
 } from "./ui/select";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { pdf } from "@react-pdf/renderer";
+import MyDocument from "./nutrient-needs-summary";
 
 const NutrientNeedsCalculator = () => {
   // Variables for user to use calculator
@@ -134,9 +136,46 @@ const NutrientNeedsCalculator = () => {
     setHeightInches(numericValue);
   };
 
-  // Placeholder print nutrient PDF function for print button
-  const printNutrientPDF = () => {
-    return null;
+  // Tracks if nutrients summary PDF is being generated
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Tracks if calculate button has been hit
+  const [hasCalculated, setHasCalculated] = useState(false);
+
+  type Nutrient = {
+    name: string;
+    amount: string;
+  };
+
+  // Print nutrient PDF function for print button
+  const printNutrientPDF = async (
+    data: Nutrient[],
+    idealWeight50: number,
+    idealWeight25: number,
+    catchUp: number
+  ) => {
+    setIsGenerating(true);
+
+    try {
+      const blob = await pdf(
+        <MyDocument
+          nutrients={data}
+          ideal50={idealWeight50}
+          ideal25={idealWeight25}
+          catchUp={catchUp}
+        />
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "nutrition_needs_summary.pdf"; // PLACEHOLDER
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating PDF: ", error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // Changes the values of the input functions upon unit change
@@ -412,6 +451,8 @@ const NutrientNeedsCalculator = () => {
     // Catchup calories calculations
     catchup_calories = calorie_needs * (ideal_weight_50 / weight_in_kg);
     setCatchUpEnergy(Math.round(catchup_calories * 10) / 10);
+
+    setHasCalculated(true);
   };
 
   // Setting nutrients into an array to be used in the table
@@ -827,7 +868,8 @@ const NutrientNeedsCalculator = () => {
                 BMI (50th Percentile for age):&nbsp;
               </p>
               <p>
-                {idealWeight50} kg ({Math.round((idealWeight50 * 2.205 *10)/10)} lb)
+                {idealWeight50} kg (
+                {Math.round((idealWeight50 * 2.205 * 10) / 10)} lb)
               </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
@@ -835,7 +877,8 @@ const NutrientNeedsCalculator = () => {
                 BMI (25th Percentile for age):&nbsp;
               </p>
               <p>
-                {idealWeight25} kg ({Math.round((idealWeight25 * 2.205 *10)/10)} lb)
+                {idealWeight25} kg (
+                {Math.round((idealWeight25 * 2.205 * 10) / 10)} lb)
               </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">
@@ -851,10 +894,18 @@ const NutrientNeedsCalculator = () => {
               Formula Calc
             </Link>
             <button
-              onClick={printNutrientPDF}
+              onClick={() =>
+                printNutrientPDF(
+                  nutrients,
+                  idealWeight50,
+                  idealWeight25,
+                  catchUpEnergy
+                )
+              }
+              disabled={isGenerating || !hasCalculated}
               className="flex w-fit bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 2xl:px-6 2xl:py-3 text-nowrap items-center rounded text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
             >
-              Print Out
+              {isGenerating ? "Generating..." : "Print Out"}
             </button>
           </div>
         </div>
