@@ -819,7 +819,7 @@ const NutrientNeedsCalculator = () => {
         </div>
         <div className="flex flex-col items-center md:justify-start">
           <div className="flex flex-col w-full bg-white rounded-[20px] shadow-2xl p-4 md:p-3 gap-y-4">
-            <p className="text-3xl md:text-4xl 2xl:text-6l font-semibold">
+            <p className="text-lg xl:text-xl 2xl:text-2xl font-bold">
               Ideal Body Weight
             </p>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
@@ -827,7 +827,7 @@ const NutrientNeedsCalculator = () => {
                 BMI (50th Percentile for age):&nbsp;
               </p>
               <p>
-                {idealWeight50} kg ({idealWeight50 * 2.205} lb)
+                {idealWeight50} kg ({Math.round((idealWeight50 * 2.205 *10)/10)} lb)
               </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
@@ -835,7 +835,7 @@ const NutrientNeedsCalculator = () => {
                 BMI (25th Percentile for age):&nbsp;
               </p>
               <p>
-                {idealWeight25} kg ({idealWeight25 * 2.205} lb){" "}
+                {idealWeight25} kg ({Math.round((idealWeight25 * 2.205 *10)/10)} lb)
               </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">

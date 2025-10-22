@@ -268,7 +268,7 @@ const FormulaNeedsCalculator = () => {
               
             </div>
             <div>
-            <div className="flex flex-col w-full border rounded-xl h-[75dvh] overflow-y-scroll no-scrollbar relative shadow-lg">
+            <div className="flex flex-col w-full border rounded-xl h-[75dvh] overflow-y-scroll no-scrollbar relative shadow-lg mb-10 md:mb-0">
               <div className="sticky top-0">
                 <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl bg-primary-400 font-medium py-[1dvh] pl-[1dvw]">
                   <p className="w-[40%]">Nutrient</p>
