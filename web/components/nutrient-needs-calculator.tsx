@@ -897,8 +897,8 @@ const NutrientNeedsCalculator = () => {
               onClick={() =>
                 printNutrientPDF(
                   nutrients,
-                  idealWeight25,
                   idealWeight50,
+                  idealWeight25,
                   catchUpEnergy
                 )
               }
