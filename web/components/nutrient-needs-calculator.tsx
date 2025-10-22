@@ -353,7 +353,7 @@ const NutrientNeedsCalculator = () => {
 
     // Calculate raw protein needs
     const protein_needs = protein_per_kg * weight_in_kg;
-    const high_protein_needs = weight_in_kg * 1.5;
+    const high_protein_needs = protein_needs * 1.5;
 
     //Calculate rounded protein needs
     setProtein(Math.round(protein_needs * 10) / 10);
@@ -465,13 +465,13 @@ const NutrientNeedsCalculator = () => {
 
   return (
     <div
-      className="flex flex-col bg-gradient-to-tl from-primary-200 to-primary-400 w-full h-fit mb-4 pb-4"
+      className="flex flex-col bg-gradient-to-tl from-primary-200 to-primary-300 w-full min-h-screen rounded-b-[20px] pb-8"
       id="nutrient"
     >
-      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-[8dvh] mb-[2dvh] ml-[2dvw]">
+      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold w-fit rounded-[20px] p-2 mt-4 mb-2 ml-4">
         Nutrient Needs Calculator
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-3 min-h-[50dvh] gap-[3dvh] md:gap-[3dvw] px-1 md:px-[3dvw] items-center md:items-start justify-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-6 px-2 md:px-6 items-start justify-center">
         <div className="flex flex-col gap-y-[2dvh] 2xl:gap-y-[3dvh] h-full bg-white rounded-[20px] shadow-2xl p-[2dvw]">
           <div className="flex flex-col gap-y-1">
             <p className="text-2xl xl:text-3xl 2xl:text-4xl font-medium">Age</p>
@@ -782,13 +782,13 @@ const NutrientNeedsCalculator = () => {
             </Select>
           </div>
           <button
-            className="rounded text-white bg-primary-600 px-6 py-3 w-fit text-md xl:text-lg 2xl:text-xl hover:bg-primary-700 transition-all duration-300 self-end mt-6 mb-4 lg:mb-0"
+            className="rounded text-white bg-primary-600 px-4 py-2 w-fit text-md xl:text-lg hover:bg-primary-700 transition-all duration-300 self-end mt-4"
             onClick={calculate}
           >
             Calculate
           </button>
         </div>
-        <div className="flex flex-col h-full bg-white rounded-[20px] shadow-2xl p-[2dvw] gap-y-[1dvh]">
+        <div className="flex flex-col bg-white rounded-[20px] shadow-2xl h-full p-4 gap-y-2">
           <>
             <p className="text-lg xl:text-xl 2xl:text-2xl font-bold">
               Daily Estimated Nutritional Needs
@@ -797,7 +797,7 @@ const NutrientNeedsCalculator = () => {
               Needs are based on the selected needs type
             </p>
           </>
-          <div className="flex flex-col w-full border rounded-[20px] min-h-[75%] max-h-[65dvh] overflow-y-scroll no-scrollbar relative">
+          <div className="flex flex-col w-full border rounded-[20px] max-h-[70vh] overflow-y-auto no-scrollbar relative">
             <div className="sticky top-0">
               <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
                 <p className="w-[55%] ">Nutrient</p>
@@ -817,9 +817,9 @@ const NutrientNeedsCalculator = () => {
             ))}
           </div>
         </div>
-        <div className="flex flex-col h-full items-center justify-center md:justify-start">
-          <div className="flex flex-col w-full bg-white rounded-[20px] shadow-2xl p-[2dvw] md:p-[1dvw] gap-y-[4dvh]">
-            <p className="text-3xl md:text-4xl 2xl:text-6l font-semibold">
+        <div className="flex flex-col items-center md:justify-start">
+          <div className="flex flex-col w-full bg-white rounded-[20px] shadow-2xl p-4 md:p-3 gap-y-4">
+            <p className="text-lg xl:text-xl 2xl:text-2xl font-bold">
               Ideal Body Weight
             </p>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
@@ -827,7 +827,7 @@ const NutrientNeedsCalculator = () => {
                 BMI (50th Percentile for age):&nbsp;
               </p>
               <p>
-                {idealWeight50} kg ({idealWeight50 * 2.205} lb)
+                {idealWeight50} kg ({Math.round((idealWeight50 * 2.205 *10)/10)} lb)
               </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
@@ -835,7 +835,7 @@ const NutrientNeedsCalculator = () => {
                 BMI (25th Percentile for age):&nbsp;
               </p>
               <p>
-                {idealWeight25} kg ({idealWeight25 * 2.205} lb){" "}
+                {idealWeight25} kg ({Math.round((idealWeight25 * 2.205 *10)/10)} lb)
               </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">
@@ -843,7 +843,7 @@ const NutrientNeedsCalculator = () => {
               <p>{catchUpEnergy} cal</p>
             </div>
           </div>
-          <div className="flex flex-row justify-center gap-x-[8dvw] md:gap-x-[1dvw] md:w-fit mt-[5dvh] mb-[1dvh] h-fit self-center">
+          <div className="flex flex-row justify-center gap-x-8 md:gap-x-4 md:w-fit mt-4 mb-2 h-fit self-center">
             <Link
               className="flex uppercase w-fit bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 2xl:px-6 2xl:py-3 rounded text-nowrap text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
               href="#formula_calc"
