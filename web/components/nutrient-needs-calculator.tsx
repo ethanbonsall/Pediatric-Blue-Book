@@ -142,12 +142,17 @@ const NutrientNeedsCalculator = () => {
   // Tracks if calculate button has been hit
   const [hasCalculated, setHasCalculated] = useState(false);
 
+  type Nutrient = {
+    name: string;
+    amount: string;
+  };
+
   // Print nutrient PDF function for print button
   const printNutrientPDF = async (
-    data: any,
-    idealWeight50: any,
-    idealWeight25: any,
-    catchUp: any
+    data: Nutrient[],
+    idealWeight50: number,
+    idealWeight25: number,
+    catchUp: number
   ) => {
     setIsGenerating(true);
 
