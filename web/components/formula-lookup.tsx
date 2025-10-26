@@ -1,5 +1,5 @@
 import { HeartIcon, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import Popup from "./pop_up_lookup";
+import { supabase } from "@/lib/supabase";
 
 const FormulaNeedsCalculator = () => {
   const Heart = () => {
@@ -19,19 +20,45 @@ const FormulaNeedsCalculator = () => {
   const [filter, setFilter] = useState("All");
   const [popUp, setPopUp] = useState(false);
 
-  const ingredients = [
-    { name: "Formula A", type: "Formula" },
-    { name: "Formula B", type: "Formula" },
-    { name: "Add in 1", type: "Add In" },
-    { name: "Add in 2", type: "Add In" },
-    { name: "Add in 3", type: "Add In" },
-    { name: "Formula C", type: "Formula" },
-    { name: "Formula D", type: "Formula" },
-    { name: "Formula E", type: "Formula" },
-    { name: "Water", type: "Add In" },
-    { name: "Formula 1.2", type: "Add In" },
-    { name: "Formula 0.9", type: "Add In" },
-  ];
+  useEffect(() => {
+    getIngredients();
+  }, []);
+
+  const [ingredients, setIngredients] = useState<{ name: string; type: string }[]>([]);
+
+  const getIngredients = async () => {
+    // Define a small row type to avoid implicit any
+    type ProductRow = { product?: string | null };
+
+   
+    const [powderRes] = await Promise.all([
+      supabase.from("powder_ingredients").select("product")
+    ]);
+
+    const [liquidRes] = await Promise.all([
+      supabase.from("liquid_ingredients").select("product")
+    ]);
+
+
+    if (powderRes.error) console.error("powder_ingredients error:", powderRes.error);
+    if (liquidRes.error) console.error("liquid_ingredients error:", liquidRes.error);
+
+    
+
+    const powderRows: ProductRow[] = powderRes.data ?? [];
+    const liquidRows: ProductRow[] = liquidRes.data ?? [];
+
+    const fetched = [
+      ...powderRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Powder" })),
+      ...liquidRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Liquid" })),
+    ].filter((it) => it.name.length > 0);
+
+    setIngredients((prev) => {
+      const map = new Map<string, { name: string; type: string }>();
+      [...prev, ...fetched].forEach((item) => map.set(item.name.toLowerCase(), item));
+      return Array.from(map.values());
+    });
+  };
 
   const filteredIngredients = ingredients.filter(
     (ingredient) =>
@@ -117,6 +144,7 @@ const FormulaNeedsCalculator = () => {
                     : "hidden"
                 }`}
               >
+                
                 {filteredIngredients.map((ingredient, index) => (
                   <>
                     <button
