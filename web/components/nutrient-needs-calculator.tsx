@@ -31,6 +31,13 @@ const NutrientNeedsCalculator = () => {
   let ideal_weight_50 = 0;
   let ideal_weight_25 = 0;
   let protein_per_kg = 0;
+  let infant = true;
+  let fat_cutoff = 0;
+  let fat_lower_percentage = 0;
+  let fat_upper_percentage = 0;
+  let carb_cutoff = 0;
+  let carb_lower_percentage = 0;
+  let carb_upper_percentage = 0;
 
   // Variables needed to get have calculator be functional
 
@@ -62,6 +69,7 @@ const NutrientNeedsCalculator = () => {
 
   // Nutrients
   const [calories, setCalories] = useState<number>(0);
+  const [caloriesPerKG, setCaloriesPerKG] = useState<number>(0);
   const [vitaminA, setVitaminA] = useState("");
   const [vitaminC, setVitaminC] = useState("");
   const [vitaminD, setVitaminD] = useState("");
@@ -90,8 +98,8 @@ const NutrientNeedsCalculator = () => {
   const [potassium, setPotassium] = useState("");
   const [sodium, setSodium] = useState("");
   const [chloride, setChloride] = useState("");
-  const [carbohydrates] = useState("");
-  const [fat] = useState("");
+  const [carbohydrates, setCarbohydrates] = useState("");
+  const [fat, setFat] = useState("");
   const [fiber] = useState("");
   const [protein, setProtein] = useState<number>(0);
   const [highProtein, setHighProtein] = useState<number>(0);
@@ -310,6 +318,7 @@ const NutrientNeedsCalculator = () => {
       }
     }
     setCalories(Math.round(calorie_needs * 10) / 10);
+    setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
 
     // Getting 25th and 50th percentile BMI's from supabase for 2-18 and ideal weight directly for 0-2
     try {
@@ -398,6 +407,39 @@ const NutrientNeedsCalculator = () => {
     setProtein(Math.round(protein_needs * 10) / 10);
     setHighProtein(Math.round(high_protein_needs * 10) / 10);
 
+    if (age_in_years >= 1) {
+      infant = false;
+    }
+
+    // Calculate fats and carbohydrate needs
+    if (age_in_years < 0.5) {
+      fat_cutoff = 31;
+      carb_cutoff = 60;
+    } else if (age_in_years < 1) {
+      fat_cutoff = 30;
+      carb_cutoff = 95;
+    } else if (age_in_years < 4) {
+      fat_lower_percentage = Math.round(calorie_needs * 0.3 * 10) / 10;
+      fat_upper_percentage = Math.round(calorie_needs * 0.4 * 10) / 10;
+      carb_lower_percentage = Math.round(calorie_needs * 0.45 * 10) / 10;
+      carb_upper_percentage = Math.round(calorie_needs * 0.65 * 10) / 10;
+    } else {
+      fat_lower_percentage = Math.round(calorie_needs * 0.25 * 10) / 10;
+      fat_upper_percentage = Math.round(calorie_needs * 0.35 * 10) / 10;
+      carb_lower_percentage = Math.round(calorie_needs * 0.45 * 10) / 10;
+      carb_upper_percentage = Math.round(calorie_needs * 0.65 * 10) / 10;
+    }
+
+    if (infant) {
+      setCarbohydrates(`${carb_cutoff} g`);
+      setFat(`${fat_cutoff} g`);
+    } else {
+      setCarbohydrates(
+        `${carb_lower_percentage} to ${carb_upper_percentage} g`
+      );
+      setFat(`${fat_lower_percentage} to ${fat_upper_percentage} g`);
+    }
+
     // Getting Nutrient Needs from database based on age and sex
     try {
       const { data, error } = await supabase
@@ -459,20 +501,27 @@ const NutrientNeedsCalculator = () => {
   const nutrients = [
     {
       name: "Energy Needs",
-      amount: `${calories ? calories + " cal" : ""}`,
+      amount: `${
+        calories ? calories + " cal (" + caloriesPerKG + " cal per kg)" : ""
+      }`,
     },
     {
       name: "Holliday-Segar",
       amount: `${segarFluid ? segarFluid + " mL" : ""}`,
     },
     { name: "DRI Fluid", amount: `${driFluid ? driFluid + " L" : ""}` },
-    { name: "Protein", amount: `${protein ? protein + " g" : ""}` },
+    { name: "Protein", amount: `${protein ? "≥ " + protein + " g" : ""}` },
     {
       name: "High Protein",
-      amount: `${highProtein ? highProtein + " g" : ""}`,
+      amount: `${
+        needsType == "Increased" && highProtein ? "≥ " + highProtein + " g" : ""
+      }`,
     },
-    { name: "Carbohydrates", amount: `${carbohydrates || ""}` },
-    { name: "Fats", amount: `${fat || ""}` },
+    {
+      name: "Carbohydrates",
+      amount: `${carbohydrates ? carbohydrates : ""}`,
+    },
+    { name: "Fats", amount: `${fat ? fat : ""}` },
     { name: "Calcium", amount: `${calcium || ""}` },
     { name: "Iron", amount: `${iron || ""}` },
     { name: "Vitamin D", amount: `${vitaminD || ""}` },
