@@ -427,7 +427,7 @@ const NutrientNeedsCalculator = () => {
       carb_cutoff = 95;
     } else if (age_in_years < 4) {
       fat_lower_percentage = Math.round(calorie_needs * 0.3 / 9 * 10) / 10;
-      fat_upper_percentage = Math.round(calorie_needs * 0.4 / 9* 10) / 10;
+      fat_upper_percentage = Math.round(calorie_needs * 0.4 / 9 * 10) / 10;
       carb_lower_percentage = Math.round(calorie_needs * 0.45 / 4 * 10) / 10;
       carb_upper_percentage = Math.round(calorie_needs * 0.65 / 4 * 10) / 10;
     } else {
