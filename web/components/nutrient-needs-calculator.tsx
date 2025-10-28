@@ -30,7 +30,6 @@ const NutrientNeedsCalculator = () => {
   let dri = 0;
   let ideal_weight_50 = 0;
   let ideal_weight_25 = 0;
-  let protein_per_kg = 0;
   let infant = true;
   let fat_cutoff = 0;
   let fat_lower_percentage = 0;
@@ -38,8 +37,11 @@ const NutrientNeedsCalculator = () => {
   let carb_cutoff = 0;
   let carb_lower_percentage = 0;
   let carb_upper_percentage = 0;
+  let protein_per_kg = 0;
 
   // Variables needed to get have calculator be functional
+
+  // Protein Per Kg
 
   // Age
   const [age, setAge] = useState<number>(0);
@@ -100,12 +102,13 @@ const NutrientNeedsCalculator = () => {
   const [chloride, setChloride] = useState("");
   const [carbohydrates, setCarbohydrates] = useState("");
   const [fat, setFat] = useState("");
-  const [fiber] = useState("");
+  const [fiber, setFiber] = useState("");
   const [protein, setProtein] = useState<number>(0);
   const [highProtein, setHighProtein] = useState<number>(0);
   const [segarFluid, setSegarFluid] = useState<number>(0);
   const [driFluid, setDriFluid] = useState<number>(0);
   const [catchUpEnergy, setCatchUpEnergy] = useState<number>(0);
+  const [proteinPerKg, setProteinPerKg] = useState<number>(0);
 
   // Sets up nutrient needs object
   const nutrientsObj: Record<string, string> = {};
@@ -387,18 +390,24 @@ const NutrientNeedsCalculator = () => {
     // Calculate Protein Needs
     if (age_in_years < 0.5) {
       protein_per_kg = 1.5;
+      setProteinPerKg(1.5);
     } else if (age_in_years < 1) {
       protein_per_kg = 1.2;
+      setProteinPerKg(1.2);
     } else if (age_in_years < 2) {
       protein_per_kg = 1.05;
+      setProteinPerKg(1.05);
     } else if (age_in_years < 14) {
       protein_per_kg = 0.95;
+      setProteinPerKg(0.95);
     } else if (age_in_years < 19) {
       protein_per_kg = 0.85;
+      setProteinPerKg(0.85);
     } else {
       protein_per_kg = 0.8;
+      setProteinPerKg(0.8);
     }
-
+      
     // Calculate raw protein needs
     const protein_needs = protein_per_kg * weight_in_kg;
     const high_protein_needs = protein_needs * 1.5;
@@ -419,15 +428,15 @@ const NutrientNeedsCalculator = () => {
       fat_cutoff = 30;
       carb_cutoff = 95;
     } else if (age_in_years < 4) {
-      fat_lower_percentage = Math.round(calorie_needs * 0.3 * 10) / 10;
-      fat_upper_percentage = Math.round(calorie_needs * 0.4 * 10) / 10;
-      carb_lower_percentage = Math.round(calorie_needs * 0.45 * 10) / 10;
-      carb_upper_percentage = Math.round(calorie_needs * 0.65 * 10) / 10;
+      fat_lower_percentage = Math.round(calorie_needs * 0.3 / 9 * 10) / 10;
+      fat_upper_percentage = Math.round(calorie_needs * 0.4 / 9* 10) / 10;
+      carb_lower_percentage = Math.round(calorie_needs * 0.45 / 4 * 10) / 10;
+      carb_upper_percentage = Math.round(calorie_needs * 0.65 / 4 * 10) / 10;
     } else {
-      fat_lower_percentage = Math.round(calorie_needs * 0.25 * 10) / 10;
-      fat_upper_percentage = Math.round(calorie_needs * 0.35 * 10) / 10;
-      carb_lower_percentage = Math.round(calorie_needs * 0.45 * 10) / 10;
-      carb_upper_percentage = Math.round(calorie_needs * 0.65 * 10) / 10;
+      fat_lower_percentage = Math.round(calorie_needs * 0.25 / 9 * 10) / 10;
+      fat_upper_percentage = Math.round(calorie_needs * 0.35 / 9 * 10) / 10;
+      carb_lower_percentage = Math.round(calorie_needs * 0.45 / 4 * 10) / 10;
+      carb_upper_percentage = Math.round(calorie_needs * 0.65 / 4 * 10) / 10;
     }
 
     if (infant) {
@@ -435,9 +444,9 @@ const NutrientNeedsCalculator = () => {
       setFat(`${fat_cutoff} g`);
     } else {
       setCarbohydrates(
-        `${carb_lower_percentage} to ${carb_upper_percentage} g`
+        `${carb_lower_percentage} - ${carb_upper_percentage} g`
       );
-      setFat(`${fat_lower_percentage} to ${fat_upper_percentage} g`);
+      setFat(`${fat_lower_percentage} - ${fat_upper_percentage} g`);
     }
 
     // Getting Nutrient Needs from database based on age and sex
@@ -486,6 +495,7 @@ const NutrientNeedsCalculator = () => {
       setPotassium(nutrientsObj["Potassium"] || "");
       setSodium(nutrientsObj["Sodium"] || "");
       setChloride(nutrientsObj["Chloride"] || "");
+      setFiber(nutrientsObj["Fiber"] || "");
     } catch (err) {
       console.error("Error fetching nutrient needs:", err);
     }
@@ -502,7 +512,7 @@ const NutrientNeedsCalculator = () => {
     {
       name: "Energy Needs",
       amount: `${
-        calories ? calories + " cal (" + caloriesPerKG + " cal per kg)" : ""
+        calories ? calories + " cal (" + caloriesPerKG + " cal/kg)" : ""
       }`,
     },
     {
@@ -510,9 +520,9 @@ const NutrientNeedsCalculator = () => {
       amount: `${segarFluid ? segarFluid + " mL" : ""}`,
     },
     { name: "DRI Fluid", amount: `${driFluid ? driFluid + " L" : ""}` },
-    { name: "Protein", amount: `${protein ? "≥ " + protein + " g" : ""}` },
+    { name: "Protein", amount: `${protein ? "≥ " + protein + " g " + "(" + proteinPerKg + " g/kg" + ")": ""}` },
     {
-      name: "High Protein",
+      name: `${needsType == "Increased" ? "High Protein" : ""}`,
       amount: `${
         needsType == "Increased" && highProtein ? "≥ " + highProtein + " g" : ""
       }`,
@@ -890,21 +900,23 @@ const NutrientNeedsCalculator = () => {
           <div className="flex flex-col w-full border rounded-[20px] max-h-[70vh] overflow-y-auto no-scrollbar relative">
             <div className="sticky top-0">
               <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
-                <p className="w-[55%] ">Nutrient</p>
-                <p className="w-[35%] ">Amount</p>
+                <p className="w-[50%] ">Nutrient</p>
+                <p className="w-[40%] ">Amount</p>
               </div>
               <hr className="w-full" />
             </div>
 
-            {nutrients.map((nutrient, index) => (
+            {nutrients
+             .filter(n => n.name !== "")
+             .map((nutrient, index) => (
               <div key={index}>
                 <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh]">
-                  <p className="w-[55%]">{nutrient.name}</p>
-                  <p className="w-[35%]">{nutrient.amount}</p>
+                  <p className="w-[50%]">{nutrient.name}</p>
+                  <p className="w-[40%] text-lg lg:text-xl text-nowrap">{nutrient.amount}</p>
                 </div>
                 <hr className="w-full" />
               </div>
-            ))}
+          ))}
           </div>
         </div>
         <div className="flex flex-col items-center md:justify-start">
@@ -931,8 +943,12 @@ const NutrientNeedsCalculator = () => {
               </p>
             </div>
             <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">
-              <p className="font-semibold">{needsType}:&nbsp;</p>
-              <p>{catchUpEnergy} cal</p>
+              { needsType == "Increased" ? (
+                <>
+                  <p className="font-semibold">Catch Up Needs:&nbsp;</p>
+                  <p>{catchUpEnergy} cal</p>
+                </>
+              ) : null}
             </div>
           </div>
           <div className="flex flex-row justify-center gap-x-8 md:gap-x-4 md:w-fit mt-4 mb-2 h-fit self-center">
