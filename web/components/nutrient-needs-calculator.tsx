@@ -454,7 +454,7 @@ const NutrientNeedsCalculator = () => {
         throw new Error("No nutrient needs found");
 
       data.forEach((row) => {
-        nutrientsObj[row.nutrient] = `${row.amount}${row.measurement_type}`;
+        nutrientsObj[row.nutrient] = `${row.amount} ${row.measurement_type}`;
       });
 
       // Setting null if no data is sent
