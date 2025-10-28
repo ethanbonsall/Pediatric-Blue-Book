@@ -41,8 +41,6 @@ const NutrientNeedsCalculator = () => {
 
   // Variables needed to get have calculator be functional
 
-  // Protein Per Kg
-
   // Age
   const [age, setAge] = useState<number>(0);
   const [ageUnit, setAgeUnit] = useState("Years");
