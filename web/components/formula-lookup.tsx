@@ -10,6 +10,7 @@ import {
 } from "./ui/select";
 import Popup from "./pop_up_lookup";
 import { supabase } from "@/lib/supabase";
+import type { ProductRow, Ingredient } from "@/lib/types";
 
 const FormulaNeedsCalculator = () => {
   const Heart = () => {
@@ -24,19 +25,14 @@ const FormulaNeedsCalculator = () => {
     getIngredients();
   }, []);
 
-  const [ingredients, setIngredients] = useState<{ name: string; type: string }[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [selectedIngredient, setSelectedIngredient] = useState<ProductRow | null>(null);
 
   const getIngredients = async () => {
-    // Define a small row type to avoid implicit any
-    type ProductRow = { product?: string | null };
-
-   
-    const [powderRes] = await Promise.all([
-      supabase.from("powder_ingredients").select("product")
-    ]);
-
-    const [liquidRes] = await Promise.all([
-      supabase.from("liquid_ingredients").select("product")
+    // fetch rows for powder and liquid
+    const [powderRes, liquidRes] = await Promise.all([
+      supabase.from("powder_ingredients").select("*"),
+      supabase.from("liquid_ingredients").select("*"),
     ]);
 
 
@@ -45,20 +41,20 @@ const FormulaNeedsCalculator = () => {
 
     
 
-    const powderRows: ProductRow[] = powderRes.data ?? [];
-    const liquidRows: ProductRow[] = liquidRes.data ?? [];
+    const powderRows: ProductRow[] = (powderRes.data ?? []) as ProductRow[];
+    const liquidRows: ProductRow[] = (liquidRes.data ?? []) as ProductRow[];
 
-    const fetched = [
-      ...powderRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Powder" })),
-      ...liquidRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Liquid" })),
+    const fetched: Ingredient[] = [
+      ...powderRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Powder", row: r })),
+      ...liquidRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Liquid", row: r })),
     ].filter((it) => it.name.length > 0);
 
     setIngredients((prev) => {
-      const map = new Map<string, { name: string; type: string }>();
+      const map = new Map<string, Ingredient>();
       [...prev, ...fetched].forEach((item) => map.set(item.name.toLowerCase(), item));
       return Array.from(map.values());
-    });
-  };
+        });
+    };
 
   const filteredIngredients = ingredients.filter(
     (ingredient) =>
@@ -71,7 +67,7 @@ const FormulaNeedsCalculator = () => {
       className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 rounded-t-[20px] pb-2"
       id="formula_lookup"
     >
-      <Popup popUp={popUp} setPopUp={setPopUp} />
+  <Popup popUp={popUp} setPopUp={setPopUp} selectedIngredient={selectedIngredient} />
       <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
         Formula Lookup
       </p>
@@ -92,11 +88,11 @@ const FormulaNeedsCalculator = () => {
                     case "All":
                       setFilter("All");
                       break;
-                    case "Formula":
-                      setFilter("Formula");
+                    case "Liquid":
+                      setFilter("Liquid");
                       break;
-                    case "Add In":
-                      setFilter("Add In");
+                    case "Powder":
+                      setFilter("Powder");
                       break;
                     case "Favorites":
                       setFilter("Favorites");
@@ -117,15 +113,15 @@ const FormulaNeedsCalculator = () => {
                     </SelectItem>
                     <SelectItem
                       className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Formula"
+                      value="Liquid"
                     >
-                      Formula
+                      Liquid
                     </SelectItem>
                     <SelectItem
                       className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Add In"
+                      value="Powder"
                     >
-                      Add In
+                      Powder
                     </SelectItem>
                     <SelectItem
                       className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
@@ -146,17 +142,23 @@ const FormulaNeedsCalculator = () => {
               >
                 
                 {filteredIngredients.map((ingredient, index) => (
-                  <>
+                  <div key={index}>
                     <button
                       className="w-full normal-case font-medium h-fit transition-all duration-200"
-                      key={index}
+                      onClick={() => {
+                          setSelectedIngredient(ingredient.row ?? null);
+                          setPopUp(true);
+                        }}
                     >
                       <div className="flex flex-row text-lg lg:text-xl 2xl:text-2xl pl-[1dvw] py-[1dvh] text-start items-center hover:bg-gray-50">
                         <p className="w-2/5">{ingredient.name}</p>
                         <p className="w-2/5 text-medium">{ingredient.type}</p>
                         <div className="flex flex-row w-1/5 justify-end mr-[2%]">
                           <button
-                            onMouseDown={() => setPopUp(true)}
+                            onMouseDown={() => {
+                              setSelectedIngredient(ingredient.row ?? null);
+                              setPopUp(true);
+                            }}
                             className="z-30 hover:bg-gray-200 place-self-end w-fit h-fit aspect-square transition-all"
                           >
                             <Search className="w-8 aspect-square" />
@@ -171,7 +173,7 @@ const FormulaNeedsCalculator = () => {
                       </div>
                     </button>
                     <hr className="w-full" />
-                  </>
+                  </div>
                 ))}
               </div>
             </div>
