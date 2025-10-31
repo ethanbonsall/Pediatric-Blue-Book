@@ -1,17 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Apple, Calculator, Search } from "lucide-react";
-import Navbar from "./navbar"; 
+import AdminNavbar from "./navbar-admin";
+import { supabase } from "../lib/supabase";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+
+// Add type definition for Product
+interface Product {
+  id?: number;
+  Product: string;
+  "Company/Brand": string;
+  Age: string;
+  "Protein Sources": string;
+  Approved: string;
+  Active: string;
+}
 
 const AdminPageDemo = () => {
   const [filterBy, setFilterBy] = useState("Approved");
   const [columns, setColumns] = useState("Nutrient");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedField, setSelectedField] = useState("");
   const [fieldValue, setFieldValue] = useState("");
 
   // Sample data for demonstration
-  const sampleProducts = [
+  const sampleProducts: Product[] = [
     { id: 1, Product: "EleCare (for Infants)", "Company/Brand": "Abbott", Age: "0-12 months", "Protein Sources": "Amino Acids", Approved: "Y", Active: "Y" },
     { id: 2, Product: "Beneprotein", "Company/Brand": "Nutricia", Age: "all", "Protein Sources": "Whey protein isolate", Approved: "Y", Active: "N" },
     { id: 3, Product: "Product3", "Company/Brand": "Company C", Age: "4", "Protein Sources": "Soy", Approved: "N", Active: "N" },
@@ -28,7 +48,7 @@ const AdminPageDemo = () => {
   const textOnlyFields = ["Company/Brand", "Notes"];
 
   // Handle field value change with validation
-  const handleFieldValueChange = (e) => {
+  const handleFieldValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     
     if (textOnlyFields.includes(selectedField)) {
@@ -45,9 +65,13 @@ const AdminPageDemo = () => {
   };
 
   return (
-    <div className="flex flex-col bg-gradient-to-tl from-primary-200 to-primary-300 w-full min-h-screen rounded-b-[20px] pb-8">
+    <div className="flex flex-col bg-gradient-to-tr from-primary-500 to-primary-700 w-full min-h-screen rounded-t-[20px] pb-8">
       {/* shared Navbar */}
-      <Navbar/>
+      <AdminNavbar/>
+
+      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
+        Admin Panel
+      </p>
 
       {/* Main Content */}
       <div className="p-8">
@@ -56,27 +80,43 @@ const AdminPageDemo = () => {
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-4">
               <span className="font-semibold">Filter By:</span>
-              <select 
-                value={filterBy} 
-                onChange={(e) => setFilterBy(e.target.value)}
-                className="w-40 bg-white border border-gray-300 rounded px-3 py-2"
-              >
-                <option value="Approved">Approved</option>
-                <option value="Not Approved">Not Approved</option>
-                <option value="All">All</option>
-              </select>
+              <Select onValueChange={(value) => setFilterBy(value)}>
+                <SelectTrigger className="w-40 bg-white rounded-xl text-text">
+                  <SelectValue defaultValue="Approved" placeholder="Approved" />
+                </SelectTrigger>
+                <SelectContent className="bg-white w-fit rounded">
+                  <SelectGroup className="bg-white">
+                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="Approved">
+                      Approved
+                    </SelectItem>
+                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="Not Approved">
+                      Not Approved
+                    </SelectItem>
+                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="All">
+                      All
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-center gap-4">
               <span className="font-semibold">Columns:</span>
-              <select 
-                value={columns} 
-                onChange={(e) => setColumns(e.target.value)}
-                className="w-40 bg-white border border-gray-300 rounded px-3 py-2"
-              >
-                <option value="Nutrient">Nutrient</option>
-                <option value="All">All</option>
-              </select>
+              <Select onValueChange={(value) => setColumns(value)}>
+                <SelectTrigger className="w-40 bg-white rounded-xl text-text">
+                  <SelectValue defaultValue="Nutrient" placeholder="Nutrient" />
+                </SelectTrigger>
+                <SelectContent className="bg-white w-fit rounded">
+                  <SelectGroup className="bg-white">
+                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="Nutrient">
+                      Nutrient
+                    </SelectItem>
+                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="All">
+                      All
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -147,7 +187,14 @@ const AdminPageDemo = () => {
           <div className="flex justify-end mt-6">
             <button 
               onClick={() => {
-                setSelectedProduct({ Product: "New Product" });
+                setSelectedProduct({ 
+                  Product: "New Product",
+                  "Company/Brand": "",
+                  Age: "",
+                  "Protein Sources": "",
+                  Approved: "N",
+                  Active: "N"
+                });
                 setIsModalOpen(true);
                 setSelectedField("");
                 setFieldValue("");
