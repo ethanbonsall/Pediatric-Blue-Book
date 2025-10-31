@@ -1,5 +1,4 @@
 import { useState } from "react";
-import AdminNavbar from "../components/navbar-admin";
 import {
   Select,
   SelectContent,
@@ -8,6 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import Navbar from "@/components/navbar-profile";
+import Head from "next/head";
+import { Check, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Add type definition for Product
 interface Product {
@@ -20,13 +23,14 @@ interface Product {
   Active: string;
 }
 
-const AdminPageDemo = () => {
+const AdminTable = () => {
   const [filterBy, setFilterBy] = useState("Approved");
   const [columns, setColumns] = useState("Nutrient");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedField, setSelectedField] = useState("");
   const [fieldValue, setFieldValue] = useState("");
+  const [isSuperUser, setIsSuperUser] = useState(true);
 
   // Sample data for demonstration
   const sampleProducts: Product[] = [
@@ -96,9 +100,10 @@ const AdminPageDemo = () => {
 
   return (
     <div className="flex flex-col bg-gradient-to-tr from-primary-500 to-primary-700 w-full min-h-screen rounded-t-[20px] pb-8">
-      {/* shared Navbar */}
-      <AdminNavbar />
-
+      <Head>
+        <title>Formula Table</title>
+      </Head>
+      <Navbar />
       <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
         Admin Panel
       </p>
@@ -140,7 +145,9 @@ const AdminPageDemo = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="font-semibold">Columns: {columns}</span>
+              <span className="font-semibold">
+                Columns: {columns ? "" : ""}
+              </span>
               <Select onValueChange={(value) => setColumns(value)}>
                 <SelectTrigger className="w-40 bg-white rounded-xl text-text">
                   <SelectValue defaultValue="Nutrient" placeholder="Nutrient" />
@@ -163,6 +170,21 @@ const AdminPageDemo = () => {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
+            {isSuperUser ? (
+              <div className="flex gap-[10%]">
+                <Button variant="default" className="rounded-full" size="sm">
+                  <ShieldCheck /> Activate
+                </Button>
+                <Button variant="default" className="rounded-full" size="sm">
+                  <ShieldMinus /> Deactivate
+                </Button>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
 
           {/* Table */}
@@ -237,26 +259,38 @@ const AdminPageDemo = () => {
             </table>
           </div>
 
-          {/* Add Entry Button */}
-          <div className="flex justify-end mt-6">
-            <button
-              onClick={() => {
-                setSelectedProduct({
-                  Product: "New Product",
-                  "Company/Brand": "",
-                  Age: "",
-                  "Protein Sources": "",
-                  Approved: "N",
-                  Active: "N",
-                });
-                setIsModalOpen(true);
-                setSelectedField("");
-                setFieldValue("");
-              }}
-              className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
-            >
-              Add Entry
-            </button>
+          <div className="mt-4 flex justify-between items-center">
+            {isSuperUser ? (
+              <div>
+                <Button variant="default" className="rounded-full" size="sm">
+                  <Check /> Approve
+                </Button>
+              </div>
+            ) : (
+              <></>
+            )}
+            <div>
+              <Button
+                onClick={() => {
+                  setSelectedProduct({
+                    Product: "New Product",
+                    "Company/Brand": "",
+                    Age: "",
+                    "Protein Sources": "",
+                    Approved: "N",
+                    Active: "N",
+                  });
+                  setIsModalOpen(true);
+                  setSelectedField("");
+                  setFieldValue("");
+                }}
+                variant="default"
+                className="rounded-full"
+                size="sm"
+              >
+                <Plus /> Add Entry
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -275,7 +309,7 @@ const AdminPageDemo = () => {
 
             {/* Title */}
             <h2 className="text-xl font-semibold mb-2">
-              Edit {selectedProduct?.Product || "Product"} Information
+              {selectedProduct?.Product || "Product"} Information
             </h2>
             <p className="text-sm text-gray-600 mb-6">
               Make changes to the product data
@@ -399,4 +433,4 @@ const AdminPageDemo = () => {
   );
 };
 
-export default AdminPageDemo;
+export default AdminTable;
