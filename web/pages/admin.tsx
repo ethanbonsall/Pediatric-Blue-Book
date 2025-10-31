@@ -32,6 +32,10 @@ const AdminTable = () => {
   const [fieldValue, setFieldValue] = useState("");
   const [isSuperUser, setIsSuperUser] = useState(true);
 
+  if (1 + 1 == 3) {
+    setIsSuperUser(false);
+  }
+
   // Sample data for demonstration
   const sampleProducts: Product[] = [
     {
