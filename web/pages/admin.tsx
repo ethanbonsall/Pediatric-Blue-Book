@@ -1,7 +1,5 @@
-import { useState, useEffect } from "react";
-import { Apple, Calculator, Search } from "lucide-react";
-import AdminNavbar from "./navbar-admin";
-import { supabase } from "../lib/supabase";
+import { useState } from "react";
+import AdminNavbar from "../components/navbar-admin";
 import {
   Select,
   SelectContent,
@@ -9,7 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../components/ui/select";
 
 // Add type definition for Product
 interface Product {
@@ -32,13 +30,45 @@ const AdminPageDemo = () => {
 
   // Sample data for demonstration
   const sampleProducts: Product[] = [
-    { id: 1, Product: "EleCare (for Infants)", "Company/Brand": "Abbott", Age: "0-12 months", "Protein Sources": "Amino Acids", Approved: "Y", Active: "Y" },
-    { id: 2, Product: "Beneprotein", "Company/Brand": "Nutricia", Age: "all", "Protein Sources": "Whey protein isolate", Approved: "Y", Active: "N" },
-    { id: 3, Product: "Product3", "Company/Brand": "Company C", Age: "4", "Protein Sources": "Soy", Approved: "N", Active: "N" },
-    { id: 4, Product: "Product4", "Company/Brand": "Company D", Age: "5", "Protein Sources": "Casein", Approved: "Y", Active: "Y" },
+    {
+      id: 1,
+      Product: "EleCare (for Infants)",
+      "Company/Brand": "Abbott",
+      Age: "0-12 months",
+      "Protein Sources": "Amino Acids",
+      Approved: "Y",
+      Active: "Y",
+    },
+    {
+      id: 2,
+      Product: "Beneprotein",
+      "Company/Brand": "Nutricia",
+      Age: "all",
+      "Protein Sources": "Whey protein isolate",
+      Approved: "Y",
+      Active: "N",
+    },
+    {
+      id: 3,
+      Product: "Product3",
+      "Company/Brand": "Company C",
+      Age: "4",
+      "Protein Sources": "Soy",
+      Approved: "N",
+      Active: "N",
+    },
+    {
+      id: 4,
+      Product: "Product4",
+      "Company/Brand": "Company D",
+      Age: "5",
+      "Protein Sources": "Casein",
+      Approved: "Y",
+      Active: "Y",
+    },
   ];
 
-  const filteredProducts = sampleProducts.filter(product => {
+  const filteredProducts = sampleProducts.filter((product) => {
     if (filterBy === "Approved") return product.Approved === "Y";
     if (filterBy === "Not Approved") return product.Approved === "N";
     return true;
@@ -50,7 +80,7 @@ const AdminPageDemo = () => {
   // Handle field value change with validation
   const handleFieldValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    
+
     if (textOnlyFields.includes(selectedField)) {
       // Allow only letters, spaces, and common punctuation for text fields
       const textValue = value.replace(/[^a-zA-Z\s.,'-]/g, "");
@@ -67,7 +97,7 @@ const AdminPageDemo = () => {
   return (
     <div className="flex flex-col bg-gradient-to-tr from-primary-500 to-primary-700 w-full min-h-screen rounded-t-[20px] pb-8">
       {/* shared Navbar */}
-      <AdminNavbar/>
+      <AdminNavbar />
 
       <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
         Admin Panel
@@ -86,13 +116,22 @@ const AdminPageDemo = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-white w-fit rounded">
                   <SelectGroup className="bg-white">
-                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="Approved">
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="Approved"
+                    >
                       Approved
                     </SelectItem>
-                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="Not Approved">
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="Not Approved"
+                    >
                       Not Approved
                     </SelectItem>
-                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="All">
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="All"
+                    >
                       All
                     </SelectItem>
                   </SelectGroup>
@@ -101,17 +140,23 @@ const AdminPageDemo = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="font-semibold">Columns:</span>
+              <span className="font-semibold">Columns: {columns}</span>
               <Select onValueChange={(value) => setColumns(value)}>
                 <SelectTrigger className="w-40 bg-white rounded-xl text-text">
                   <SelectValue defaultValue="Nutrient" placeholder="Nutrient" />
                 </SelectTrigger>
                 <SelectContent className="bg-white w-fit rounded">
                   <SelectGroup className="bg-white">
-                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="Nutrient">
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="Nutrient"
+                    >
                       Nutrient
                     </SelectItem>
-                    <SelectItem className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary" value="All">
+                    <SelectItem
+                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                      value="All"
+                    >
                       All
                     </SelectItem>
                   </SelectGroup>
@@ -132,7 +177,9 @@ const AdminPageDemo = () => {
                   <th className="py-2 px-2 font-semibold">Carb Sources</th>
                   <th className="py-2 px-2 font-semibold">Fiber Sources</th>
                   <th className="py-2 px-2 font-semibold">Fat Sources</th>
-                  <th className="py-2 px-2 font-semibold">Specialty Ingredients</th>
+                  <th className="py-2 px-2 font-semibold">
+                    Specialty Ingredients
+                  </th>
                   <th className="py-2 px-2 font-semibold">g/scoop</th>
                   <th className="py-2 px-2 font-semibold">g/tsp</th>
                   <th className="py-2 px-2 font-semibold">Cal/g</th>
@@ -145,11 +192,14 @@ const AdminPageDemo = () => {
               </thead>
               <tbody>
                 {filteredProducts.map((product, index) => (
-                  <tr key={product.id || index} className="border-b hover:bg-gray-50">
+                  <tr
+                    key={product.id || index}
+                    className="border-b hover:bg-gray-50"
+                  >
                     <td className="py-2 px-2">
                       <div className="flex items-center justify-between">
                         <span>{product.Product || ""}</span>
-                        <button 
+                        <button
                           onClick={() => {
                             setSelectedProduct(product);
                             setIsModalOpen(true);
@@ -162,9 +212,13 @@ const AdminPageDemo = () => {
                         </button>
                       </div>
                     </td>
-                    <td className="py-2 px-2">{product["Company/Brand"] || ""}</td>
+                    <td className="py-2 px-2">
+                      {product["Company/Brand"] || ""}
+                    </td>
                     <td className="py-2 px-2">{product.Age || ""}</td>
-                    <td className="py-2 px-2">{product["Protein Sources"] || ""}</td>
+                    <td className="py-2 px-2">
+                      {product["Protein Sources"] || ""}
+                    </td>
                     <td className="py-2 px-2">-</td>
                     <td className="py-2 px-2">-</td>
                     <td className="py-2 px-2">-</td>
@@ -185,15 +239,15 @@ const AdminPageDemo = () => {
 
           {/* Add Entry Button */}
           <div className="flex justify-end mt-6">
-            <button 
+            <button
               onClick={() => {
-                setSelectedProduct({ 
+                setSelectedProduct({
                   Product: "New Product",
                   "Company/Brand": "",
                   Age: "",
                   "Protein Sources": "",
                   Approved: "N",
-                  Active: "N"
+                  Active: "N",
                 });
                 setIsModalOpen(true);
                 setSelectedField("");
@@ -248,7 +302,9 @@ const AdminPageDemo = () => {
 
               {/* Field Selector Dropdown */}
               <div>
-                <label className="block text-sm font-medium mb-2">Select Field</label>
+                <label className="block text-sm font-medium mb-2">
+                  Select Field
+                </label>
                 <select
                   value={selectedField}
                   onChange={(e) => {
@@ -259,17 +315,33 @@ const AdminPageDemo = () => {
                 >
                   <option value="">Choose a field...</option>
                   <option value="Company/Brand">Company/Brand (text)</option>
-                  <option value="Protein Sources">Protein Sources (numeric)</option>
-                  <option value="Carbohydrate Sources">Carbohydrate Sources (numeric)</option>
+                  <option value="Protein Sources">
+                    Protein Sources (numeric)
+                  </option>
+                  <option value="Carbohydrate Sources">
+                    Carbohydrate Sources (numeric)
+                  </option>
                   <option value="Fiber Sources">Fiber Sources (numeric)</option>
                   <option value="Fat Sources">Fat Sources (numeric)</option>
-                  <option value="Specialty Ingredients">Specialty Ingredients (numeric)</option>
-                  <option value="Grams per Scoop">Grams per Scoop (numeric)</option>
-                  <option value="Grams per teaspoon">Grams per teaspoon (numeric)</option>
-                  <option value="Calories per Gram">Calories per Gram (numeric)</option>
-                  <option value="Total Protein g">Total Protein (g) (numeric)</option>
+                  <option value="Specialty Ingredients">
+                    Specialty Ingredients (numeric)
+                  </option>
+                  <option value="Grams per Scoop">
+                    Grams per Scoop (numeric)
+                  </option>
+                  <option value="Grams per teaspoon">
+                    Grams per teaspoon (numeric)
+                  </option>
+                  <option value="Calories per Gram">
+                    Calories per Gram (numeric)
+                  </option>
+                  <option value="Total Protein g">
+                    Total Protein (g) (numeric)
+                  </option>
                   <option value="Total Fat g">Total Fat (g) (numeric)</option>
-                  <option value="VitaminA mcg RE">Vitamin A (mcg RE) (numeric)</option>
+                  <option value="VitaminA mcg RE">
+                    Vitamin A (mcg RE) (numeric)
+                  </option>
                   <option value="Calcium mg">Calcium (mg) (numeric)</option>
                   <option value="Iron mg">Iron (mg) (numeric)</option>
                   <option value="Notes">Notes (text)</option>
@@ -279,13 +351,23 @@ const AdminPageDemo = () => {
               {/* Value Input - Changes based on selected field */}
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Enter Value {selectedField && `(${textOnlyFields.includes(selectedField) ? 'text only' : 'numeric only'})`}
+                  Enter Value{" "}
+                  {selectedField &&
+                    `(${
+                      textOnlyFields.includes(selectedField)
+                        ? "text only"
+                        : "numeric only"
+                    })`}
                 </label>
                 <input
                   type="text"
                   value={fieldValue}
                   onChange={handleFieldValueChange}
-                  placeholder={textOnlyFields.includes(selectedField) ? "Enter text" : "Enter number"}
+                  placeholder={
+                    textOnlyFields.includes(selectedField)
+                      ? "Enter text"
+                      : "Enter number"
+                  }
                   disabled={!selectedField}
                   className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                 />
