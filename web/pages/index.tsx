@@ -10,11 +10,17 @@ import NutrientNeedsCalculator from "@/components/nutrient-needs-calculator";
 import FormulaNeedsCalculator from "@/components/formula-needs-calculator";
 import FormulaLookup from "@/components/formula-lookup";
 
+type Nutrient = {
+  name: string;
+  amount: string;
+};
+
 const Index = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [nutrients, setNutrients] = useState<Nutrient[]>([]);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -67,8 +73,8 @@ const Index = () => {
         {signedIn ? (
           <div className="flex flex-col items-center w-full font-roboto min-h-screen bg-background">
             <NavBar />
-            <NutrientNeedsCalculator />
-            <FormulaNeedsCalculator />
+            <NutrientNeedsCalculator onNutrientsCalculated={setNutrients} />
+            <FormulaNeedsCalculator idealNutrients={nutrients} />
             <FormulaLookup />
           </div>
         ) : (
