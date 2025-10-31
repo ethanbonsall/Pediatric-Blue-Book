@@ -300,10 +300,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
       // Fallback: assume 1g powder = 7ml prepared (rough estimate)
       return grams * 7;
     } else {
-      // Liquid: use amount_per_carton_ml and convert serving type to ml
-      const amountPerCarton = (ingredient.row.amount_per_carton_ml as number) || 0;
-      
-      // Convert serving type to ml
+      // Liquid: convert serving type to ml
       const mlPerServing = 
         servingType === "Cup" ? 236.6 : // US cup = 236.6ml
         servingType === "Tablespoon" ? 14.8 : // 1 tbsp = 14.8ml
@@ -449,7 +446,6 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
     return totals;
   };
 
-  const hasCheckedItems = checked.some((val) => val === true);
 
   const handleDeleteChecked = () => {
     const newSelectedIngredients = selectedIngredients.filter((_, index) => !checked[index]);
