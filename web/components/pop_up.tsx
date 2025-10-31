@@ -7,30 +7,54 @@ import {
   SelectItem,
 } from "./ui/select";
 import { Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import type { ProductRow } from "@/lib/types";
 
 const Popup = ({
   popUp,
   setPopUp,
+  selectedIngredient,
+  onAdd,
+  initialAmount,
+  ingredientType,
 }: {
   popUp: boolean;
   setPopUp: (val: boolean) => void;
+  selectedIngredient?: ProductRow | null;
+  onAdd?: (amount: string, servingType: string) => void;
+  initialAmount?: { amount: string; servingType: string } | null;
+  ingredientType?: string;
 }) => {
-  const product_name = "Product Name";
-  const product_age = "Age (0-12)";
-  const protein_percent = "10%";
-  const protein_source = "Protein Place";
-  const fat_percent = "20%";
-  const fat_source = "Fat Place";
-  const carbohydrate_percent = "70%";
-  const carbohydrate_source = "Carb Place";
-  const prebiotic = "Prebiotic";
-  const probiotic = "Probiotic";
-  const water_percent = "90.5%";
-  const [serving, setServing] = useState("");
-  const [servingType, setServingType] = useState("");
-  const allergens = servingType + serving;
-  const company = "Company Place";
+  const s = selectedIngredient ?? {};
+  const product_name = (s.product as string) ?? (s.company_brand as string) ?? "?";
+  const product_age = (s.age as string) ?? (s.recommended_age as string) ?? "?";
+  const protein_percent = ((s.npc_percent_cal_from_protein as string) ?? "?") + "%";
+  const protein_source = (s.protein_sources as string) ?? "?";
+  const fat_percent = ((s.npc_percent_cal_from_fat as string) ?? "?") + "%";
+  const fat_source = (s.fat_sources as string) ?? "?";
+  const carbohydrate_percent = ((s.npc_percent_cal_from_cho as string) ?? "?") + "%";
+  const carbohydrate_source = (s.carbohydrate_sources as string) ?? "?";
+  const prebiotic = (s.prebiotic as string) ?? "?";
+  const probiotic = (s.probiotic as string) ?? "?";
+  const water_percent = ((s.npc_percent_free_water as string) ?? "?") + "%";
+  const isPowder = ingredientType === "Powder";
+  const [serving, setServing] = useState("1");
+  const [servingType, setServingType] = useState(isPowder ? "Scoop" : "Cup");
+  const allergens = (s.allergens as string) ?? "?";
+  const company = (s.company_brand as string) ?? (s.company as string) ?? "?";
+
+  // Reset serving when popup opens or ingredient changes, or use initialAmount if provided
+  useEffect(() => {
+    if (popUp) {
+      if (initialAmount) {
+        setServing(initialAmount.amount);
+        setServingType(initialAmount.servingType);
+      } else {
+        setServing("1");
+        setServingType(isPowder ? "Scoop" : "Cup");
+      }
+    }
+  }, [popUp, selectedIngredient, initialAmount, isPowder]);
 
   return (
     <div
@@ -72,11 +96,12 @@ const Popup = ({
         <input
           className="px-2 2xl:px-4 rounded text-black"
           type="number"
-          defaultValue={1}
+          value={serving}
           placeholder="1"
           onInput={(e) => setServing((e.target as HTMLInputElement).value)}
         />
         <Select
+          value={servingType}
           onValueChange={(value) => {
             switch (value) {
               case "Scoop":
@@ -95,16 +120,18 @@ const Popup = ({
           }}
         >
           <SelectTrigger className="w-[30dvw] md:w-[8dvw] h-full  bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
-            <SelectValue defaultValue="Scoop" placeholder="Scoop" />
+            <SelectValue placeholder={isPowder ? "Scoop" : "Cup"} />
           </SelectTrigger>
           <SelectContent className="bg-white w-fit rounded">
             <SelectGroup className="bg-white">
-              <SelectItem
-                className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                value="Scoop"
-              >
-                Scoop
-              </SelectItem>
+              {isPowder && (
+                <SelectItem
+                  className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                  value="Scoop"
+                >
+                  Scoop
+                </SelectItem>
+              )}
               <SelectItem
                 className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
                 value="Teaspoon"
@@ -128,7 +155,14 @@ const Popup = ({
         </Select>
       </div>
       <div className="flex flex-row justify-end">
-        <button className="flex flex-row items-center py-1 px-2 lg:py-2 lg:px-4 2xl:py-3 2xl:px-6 bg-primary-700 hover:bg-primary-800 w-fit rounded">
+        <button 
+          onClick={() => {
+            if (onAdd) {
+              onAdd(serving, servingType);
+            }
+          }}
+          className="flex flex-row items-center py-1 px-2 lg:py-2 lg:px-4 2xl:py-3 2xl:px-6 bg-primary-700 hover:bg-primary-800 w-fit rounded"
+        >
           Add &nbsp; <Plus />
         </button>
       </div>
