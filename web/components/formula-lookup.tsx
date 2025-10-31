@@ -1,5 +1,5 @@
 import { HeartIcon, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -9,6 +9,8 @@ import {
   SelectValue,
 } from "./ui/select";
 import Popup from "./pop_up_lookup";
+import { supabase } from "@/lib/supabase";
+import type { ProductRow, Ingredient } from "@/lib/types";
 
 const FormulaNeedsCalculator = () => {
   const Heart = () => {
@@ -19,19 +21,40 @@ const FormulaNeedsCalculator = () => {
   const [filter, setFilter] = useState("All");
   const [popUp, setPopUp] = useState(false);
 
-  const ingredients = [
-    { name: "Formula A", type: "Formula" },
-    { name: "Formula B", type: "Formula" },
-    { name: "Add in 1", type: "Add In" },
-    { name: "Add in 2", type: "Add In" },
-    { name: "Add in 3", type: "Add In" },
-    { name: "Formula C", type: "Formula" },
-    { name: "Formula D", type: "Formula" },
-    { name: "Formula E", type: "Formula" },
-    { name: "Water", type: "Add In" },
-    { name: "Formula 1.2", type: "Add In" },
-    { name: "Formula 0.9", type: "Add In" },
-  ];
+  useEffect(() => {
+    getIngredients();
+  }, []);
+
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [selectedIngredient, setSelectedIngredient] = useState<ProductRow | null>(null);
+
+  const getIngredients = async () => {
+    // fetch rows for powder and liquid
+    const [powderRes, liquidRes] = await Promise.all([
+      supabase.from("powder_ingredients").select("*"),
+      supabase.from("liquid_ingredients").select("*"),
+    ]);
+
+
+    if (powderRes.error) console.error("powder_ingredients error:", powderRes.error);
+    if (liquidRes.error) console.error("liquid_ingredients error:", liquidRes.error);
+
+    
+
+    const powderRows: ProductRow[] = (powderRes.data ?? []) as ProductRow[];
+    const liquidRows: ProductRow[] = (liquidRes.data ?? []) as ProductRow[];
+
+    const fetched: Ingredient[] = [
+      ...powderRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Powder", row: r })),
+      ...liquidRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Liquid", row: r })),
+    ].filter((it) => it.name.length > 0);
+
+    setIngredients((prev) => {
+      const map = new Map<string, Ingredient>();
+      [...prev, ...fetched].forEach((item) => map.set(item.name.toLowerCase(), item));
+      return Array.from(map.values());
+        });
+    };
 
   const filteredIngredients = ingredients.filter(
     (ingredient) =>
@@ -44,7 +67,7 @@ const FormulaNeedsCalculator = () => {
       className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 rounded-t-[20px] pb-2"
       id="formula_lookup"
     >
-      <Popup popUp={popUp} setPopUp={setPopUp} />
+  <Popup popUp={popUp} setPopUp={setPopUp} selectedIngredient={selectedIngredient} />
       <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
         Formula Lookup
       </p>
@@ -65,11 +88,11 @@ const FormulaNeedsCalculator = () => {
                     case "All":
                       setFilter("All");
                       break;
-                    case "Formula":
-                      setFilter("Formula");
+                    case "Liquid":
+                      setFilter("Liquid");
                       break;
-                    case "Add In":
-                      setFilter("Add In");
+                    case "Powder":
+                      setFilter("Powder");
                       break;
                     case "Favorites":
                       setFilter("Favorites");
@@ -90,15 +113,15 @@ const FormulaNeedsCalculator = () => {
                     </SelectItem>
                     <SelectItem
                       className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Formula"
+                      value="Liquid"
                     >
-                      Formula
+                      Liquid
                     </SelectItem>
                     <SelectItem
                       className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Add In"
+                      value="Powder"
                     >
-                      Add In
+                      Powder
                     </SelectItem>
                     <SelectItem
                       className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
@@ -117,18 +140,25 @@ const FormulaNeedsCalculator = () => {
                     : "hidden"
                 }`}
               >
+                
                 {filteredIngredients.map((ingredient, index) => (
-                  <>
+                  <div key={index}>
                     <button
                       className="w-full normal-case font-medium h-fit transition-all duration-200"
-                      key={index}
+                      onClick={() => {
+                          setSelectedIngredient(ingredient.row ?? null);
+                          setPopUp(true);
+                        }}
                     >
                       <div className="flex flex-row text-lg lg:text-xl 2xl:text-2xl pl-[1dvw] py-[1dvh] text-start items-center hover:bg-gray-50">
                         <p className="w-2/5">{ingredient.name}</p>
                         <p className="w-2/5 text-medium">{ingredient.type}</p>
                         <div className="flex flex-row w-1/5 justify-end mr-[2%]">
                           <button
-                            onMouseDown={() => setPopUp(true)}
+                            onMouseDown={() => {
+                              setSelectedIngredient(ingredient.row ?? null);
+                              setPopUp(true);
+                            }}
                             className="z-30 hover:bg-gray-200 place-self-end w-fit h-fit aspect-square transition-all"
                           >
                             <Search className="w-8 aspect-square" />
@@ -143,7 +173,7 @@ const FormulaNeedsCalculator = () => {
                       </div>
                     </button>
                     <hr className="w-full" />
-                  </>
+                  </div>
                 ))}
               </div>
             </div>

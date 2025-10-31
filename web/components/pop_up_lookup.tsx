@@ -1,25 +1,29 @@
 import { X } from "lucide-react";
+import type { ProductRow } from "@/lib/types";
 
 const Popup = ({
   popUp,
   setPopUp,
+  selectedIngredient,
 }: {
   popUp: boolean;
   setPopUp: (val: boolean) => void;
+  selectedIngredient?: ProductRow | null;
 }) => {
-  const product_name = "Product Name";
-  const product_age = "Age (0-12)";
-  const protein_percent = "10%";
-  const protein_source = "Protein Place";
-  const fat_percent = "20%";
-  const fat_source = "Fat Place";
-  const carbohydrate_percent = "70%";
-  const carbohydrate_source = "Carb Place";
-  const prebiotic = "Prebiotic";
-  const probiotic = "Probiotic";
-  const water_percent = "90.5%";
-  const allergen = "Allergen";
-  const company = "Company Place";
+  const s = selectedIngredient ?? {};
+  const product_name = (s.product as string) ?? (s.company_brand as string) ?? "";
+  const product_age = (s.age as string)?? "";
+  const protein_percent = ((s.npc_percent_cal_from_protein as string) ?? "Unknown") + "%";
+  const protein_source = (s.protein_sources as string) ?? "";
+  const fat_percent = ((s.npc_percent_cal_from_fat as string) ?? "Unkown") + "%";
+  const fat_source = (s.fat_sources as string) ?? "";
+  const carbohydrate_percent = ((s.npc_percent_cal_from_cho as string) ?? "Unknown") + "%";
+  const carbohydrate_source = (s.carbohydrate_sources as string) ?? "Unknown";
+  const prebiotic = "Prebiotic placeholder";
+  const probiotic = "Probiotic placeholder";
+  const water_percent = ((s.npc_percent_free_water as string) ?? "Unknown ") + "%";
+  const allergen = "Allergen placeholder";
+  const company = (s.company_brand as string) ?? "";
 
   return (
     <div
