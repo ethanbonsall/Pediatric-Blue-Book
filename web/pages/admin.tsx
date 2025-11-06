@@ -23,10 +23,17 @@ interface Product {
   Active: string;
 }
 
+interface Field {
+  id?: number;
+  field: string;
+}
+
 const AdminTable = () => {
   const [filterBy, setFilterBy] = useState("Approved");
   const [columns, setColumns] = useState("Nutrient");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedField, setSelectedField] = useState("");
   const [fieldValue, setFieldValue] = useState("");
@@ -76,9 +83,18 @@ const AdminTable = () => {
     },
   ];
 
+  const fields: Field[] = [
+    { id: 1, field: "Age" },
+    { id: 2, field: "Protein Sources" },
+    { id: 3, field: "Carbohydrate Sources" },
+    { id: 4, field: "Fiber Sources" },
+  ];
+
   const filteredProducts = sampleProducts.filter((product) => {
     if (filterBy === "Approved") return product.Approved === "Y";
     if (filterBy === "Not Approved") return product.Approved === "N";
+    if (filterBy === "Active") return product.Active === "Y";
+    if (filterBy === "Inactive") return product.Active === "N";
     return true;
   });
 
@@ -103,209 +119,225 @@ const AdminTable = () => {
   };
 
   return (
-    <div className="flex flex-col bg-gradient-to-tr from-primary-500 to-primary-700 w-full min-h-screen rounded-t-[20px] pb-8">
+    <div className="flex flex-col w-full min-h-screen rounded-t-[20px] pb-8">
       <Head>
         <title>Formula Table</title>
       </Head>
       <Navbar />
-      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
+      <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-black w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
         Admin Panel
       </p>
 
       {/* Main Content */}
-      <div className="p-8">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          {/* Filters */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
-              <span className="font-semibold">Filter By:</span>
-              <Select onValueChange={(value) => setFilterBy(value)}>
-                <SelectTrigger className="w-40 bg-white rounded-xl text-text">
-                  <SelectValue defaultValue="Approved" placeholder="Approved" />
-                </SelectTrigger>
-                <SelectContent className="bg-white w-fit rounded">
-                  <SelectGroup className="bg-white">
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Approved"
-                    >
-                      Approved
-                    </SelectItem>
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Not Approved"
-                    >
-                      Not Approved
-                    </SelectItem>
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="All"
-                    >
-                      All
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <span className="font-semibold">
-                Columns: {columns ? "" : ""}
-              </span>
-              <Select onValueChange={(value) => setColumns(value)}>
-                <SelectTrigger className="w-40 bg-white rounded-xl text-text">
-                  <SelectValue defaultValue="Nutrient" placeholder="Nutrient" />
-                </SelectTrigger>
-                <SelectContent className="bg-white w-fit rounded">
-                  <SelectGroup className="bg-white">
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="Nutrient"
-                    >
-                      Nutrient
-                    </SelectItem>
-                    <SelectItem
-                      className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                      value="All"
-                    >
-                      All
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
-            {isSuperUser ? (
-              <div className="flex gap-[10%]">
-                <Button variant="default" className="rounded-full" size="sm">
-                  <ShieldCheck /> Activate
-                </Button>
-                <Button variant="default" className="rounded-full" size="sm">
-                  <ShieldMinus /> Deactivate
-                </Button>
-              </div>
-            ) : (
-              <></>
-            )}
-          </div>
-
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b-2 bg-gray-50">
-                <tr className="text-left">
-                  <th className="py-2 px-2 font-semibold">Product</th>
-                  <th className="py-2 px-2 font-semibold">Company/Brand</th>
-                  <th className="py-2 px-2 font-semibold">Age</th>
-                  <th className="py-2 px-2 font-semibold">Protein Sources</th>
-                  <th className="py-2 px-2 font-semibold">Carb Sources</th>
-                  <th className="py-2 px-2 font-semibold">Fiber Sources</th>
-                  <th className="py-2 px-2 font-semibold">Fat Sources</th>
-                  <th className="py-2 px-2 font-semibold">
-                    Specialty Ingredients
-                  </th>
-                  <th className="py-2 px-2 font-semibold">g/scoop</th>
-                  <th className="py-2 px-2 font-semibold">g/tsp</th>
-                  <th className="py-2 px-2 font-semibold">Cal/g</th>
-                  <th className="py-2 px-2 font-semibold">Protein g</th>
-                  <th className="py-2 px-2 font-semibold">Fat g</th>
-                  <th className="py-2 px-2 font-semibold">Notes</th>
-                  <th className="py-2 px-2 font-semibold">Approved</th>
-                  <th className="py-2 px-2 font-semibold">Active</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.map((product, index) => (
-                  <tr
-                    key={product.id || index}
-                    className="border-b hover:bg-gray-50"
+      <div className="px-[5%]">
+        {/* Filters */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-4">
+            <span className="font-semibold">Filter By:</span>
+            <Select onValueChange={(value) => setFilterBy(value)}>
+              <SelectTrigger className="w-40 bg-white rounded-xl text-text">
+                <SelectValue defaultValue="Approved" placeholder="Approved" />
+              </SelectTrigger>
+              <SelectContent className="bg-white w-fit rounded">
+                <SelectGroup className="bg-white">
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="Approved"
                   >
-                    <td className="py-2 px-2">
-                      <div className="flex items-center justify-between">
-                        <span>{product.Product || ""}</span>
-                        <button
-                          onClick={() => {
-                            setSelectedProduct(product);
-                            setIsModalOpen(true);
-                            setSelectedField("");
-                            setFieldValue("");
-                          }}
-                          className="text-gray-600 hover:text-gray-900 ml-2"
-                        >
-                          <span className="text-xl">⋯</span>
-                        </button>
-                      </div>
-                    </td>
-                    <td className="py-2 px-2">
-                      {product["Company/Brand"] || ""}
-                    </td>
-                    <td className="py-2 px-2">{product.Age || ""}</td>
-                    <td className="py-2 px-2">
-                      {product["Protein Sources"] || ""}
-                    </td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">{product.Approved || ""}</td>
-                    <td className="py-2 px-2">{product.Active || ""}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    Approved
+                  </SelectItem>
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="Not Approved"
+                  >
+                    Not Approved
+                  </SelectItem>
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="Active"
+                  >
+                    Active
+                  </SelectItem>
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="Inactive"
+                  >
+                    Inactive
+                  </SelectItem>
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="All"
+                  >
+                    All
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="mt-4 flex justify-between items-center">
-            {isSuperUser ? (
-              <div>
-                <Button variant="default" className="rounded-full" size="sm">
-                  <Check /> Approve
-                </Button>
-              </div>
-            ) : (
-              <></>
-            )}
-            <div>
+          <div className="flex items-center gap-4">
+            <span className="font-semibold">Columns: {columns ? "" : ""}</span>
+            <Select onValueChange={(value) => setColumns(value)}>
+              <SelectTrigger className="w-40 bg-white rounded-xl text-text">
+                <SelectValue defaultValue="Nutrient" placeholder="Nutrient" />
+              </SelectTrigger>
+              <SelectContent className="bg-white w-fit rounded">
+                <SelectGroup className="bg-white">
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="Nutrient"
+                  >
+                    Nutrient
+                  </SelectItem>
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="All"
+                  >
+                    All
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
+          {isSuperUser ? (
+            <div className="flex gap-[10%] ">
               <Button
-                onClick={() => {
-                  setSelectedProduct({
-                    Product: "New Product",
-                    "Company/Brand": "",
-                    Age: "",
-                    "Protein Sources": "",
-                    Approved: "N",
-                    Active: "N",
-                  });
-                  setIsModalOpen(true);
-                  setSelectedField("");
-                  setFieldValue("");
-                }}
                 variant="default"
-                className="rounded-full"
+                className="rounded-full bg-green-600"
                 size="sm"
               >
-                <Plus /> Add Entry
+                <ShieldCheck /> Activate
+              </Button>
+              <Button
+                variant="default"
+                className="rounded-full bg-red-600"
+                size="sm"
+              >
+                <ShieldMinus /> Deactivate
               </Button>
             </div>
+          ) : (
+            <></>
+          )}
+        </div>
+
+        {/* Product Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b-2 bg-gray-50">
+              <tr className="text-left">
+                <th className="py-2 px-2 font-semibold">Product</th>
+                <th className="py-2 px-2 font-semibold">Company/Brand</th>
+                <th className="py-2 px-2 font-semibold">Age</th>
+                <th className="py-2 px-2 font-semibold">Protein Sources</th>
+                <th className="py-2 px-2 font-semibold">Carb Sources</th>
+                <th className="py-2 px-2 font-semibold">Fiber Sources</th>
+                <th className="py-2 px-2 font-semibold">Fat Sources</th>
+                <th className="py-2 px-2 font-semibold">
+                  Specialty Ingredients
+                </th>
+                <th className="py-2 px-2 font-semibold">g/scoop</th>
+                <th className="py-2 px-2 font-semibold">g/tsp</th>
+                <th className="py-2 px-2 font-semibold">Cal/g</th>
+                <th className="py-2 px-2 font-semibold">Protein g</th>
+                <th className="py-2 px-2 font-semibold">Fat g</th>
+                <th className="py-2 px-2 font-semibold">Notes</th>
+                <th className="py-2 px-2 font-semibold">Approved</th>
+                <th className="py-2 px-2 font-semibold">Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.map((product, index) => (
+                <tr
+                  key={product.id || index}
+                  className="border-b hover:bg-gray-50"
+                >
+                  <td className="py-2 px-2">
+                    <div className="flex items-center justify-between">
+                      <span>{product.Product || ""}</span>
+                      <button
+                        onClick={() => {
+                          setSelectedProduct(product);
+                          setIsEditModalOpen(true);
+                          setSelectedField("");
+                          setFieldValue("");
+                        }}
+                        className="text-gray-600 hover:text-gray-900 ml-2"
+                      >
+                        <span className="text-xl">⋯</span>
+                      </button>
+                    </div>
+                  </td>
+                  <td className="py-2 px-2">
+                    {product["Company/Brand"] || ""}
+                  </td>
+                  <td className="py-2 px-2">{product.Age || ""}</td>
+                  <td className="py-2 px-2">
+                    {product["Protein Sources"] || ""}
+                  </td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">-</td>
+                  <td className="py-2 px-2">{product.Approved || ""}</td>
+                  <td className="py-2 px-2">{product.Active || ""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-4 flex justify-between items-center">
+          {isSuperUser ? (
+            <div>
+              <Button variant="default" className="rounded-full" size="sm">
+                <Check /> Approve
+              </Button>
+            </div>
+          ) : (
+            <></>
+          )}
+          <div>
+            <Button
+              onClick={() => {
+                setSelectedProduct({
+                  Product: "New Product",
+                  "Company/Brand": "",
+                  Age: "",
+                  "Protein Sources": "",
+                  Approved: "N",
+                  Active: "N",
+                });
+                setIsAddModalOpen(true);
+                setSelectedField("");
+                setFieldValue("");
+              }}
+              variant="default"
+              className="rounded-full"
+              size="sm"
+            >
+              <Plus /> Add Entry
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Edit Product Modal */}
-      {isModalOpen && (
+      {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative">
             {/* Close button */}
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => setIsEditModalOpen(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
             >
               ×
@@ -320,82 +352,11 @@ const AdminTable = () => {
             </p>
 
             {/* Form Fields */}
-            <div className="space-y-4">
-              {/* Age Field - Always visible, numeric only */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Age</label>
-                <input
-                  type="text"
-                  defaultValue={selectedProduct?.Age || ""}
-                  placeholder="Enter age"
-                  onChange={(e) => {
-                    const numericValue = e.target.value
-                      .replace(/[^0-9.]/g, "")
-                      .replace(/(\..*?)\..*/g, "$1");
-                    e.target.value = numericValue;
-                  }}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
 
-              {/* Field Selector Dropdown */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Select Field
-                </label>
-                <select
-                  value={selectedField}
-                  onChange={(e) => {
-                    setSelectedField(e.target.value);
-                    setFieldValue("");
-                  }}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Choose a field...</option>
-                  <option value="Company/Brand">Company/Brand (text)</option>
-                  <option value="Protein Sources">
-                    Protein Sources (numeric)
-                  </option>
-                  <option value="Carbohydrate Sources">
-                    Carbohydrate Sources (numeric)
-                  </option>
-                  <option value="Fiber Sources">Fiber Sources (numeric)</option>
-                  <option value="Fat Sources">Fat Sources (numeric)</option>
-                  <option value="Specialty Ingredients">
-                    Specialty Ingredients (numeric)
-                  </option>
-                  <option value="Grams per Scoop">
-                    Grams per Scoop (numeric)
-                  </option>
-                  <option value="Grams per teaspoon">
-                    Grams per teaspoon (numeric)
-                  </option>
-                  <option value="Calories per Gram">
-                    Calories per Gram (numeric)
-                  </option>
-                  <option value="Total Protein g">
-                    Total Protein (g) (numeric)
-                  </option>
-                  <option value="Total Fat g">Total Fat (g) (numeric)</option>
-                  <option value="VitaminA mcg RE">
-                    Vitamin A (mcg RE) (numeric)
-                  </option>
-                  <option value="Calcium mg">Calcium (mg) (numeric)</option>
-                  <option value="Iron mg">Iron (mg) (numeric)</option>
-                  <option value="Notes">Notes (text)</option>
-                </select>
-              </div>
-
-              {/* Value Input - Changes based on selected field */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Enter Value{" "}
-                  {selectedField &&
-                    `(${
-                      textOnlyFields.includes(selectedField)
-                        ? "text only"
-                        : "numeric only"
-                    })`}
+            {fields.map((field) => (
+              <div key={field.id}>
+                <label className="block text-sm font-medium mt-2 mb-1">
+                  {field.field}
                 </label>
                 <input
                   type="text"
@@ -403,19 +364,19 @@ const AdminTable = () => {
                   onChange={handleFieldValueChange}
                   placeholder={
                     textOnlyFields.includes(selectedField)
-                      ? "Enter text"
-                      : "Enter number"
+                      ? "Enter new value"
+                      : "Enter new value"
                   }
                   disabled={!selectedField}
                   className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                 />
               </div>
-            </div>
+            ))}
 
             {/* Action Buttons */}
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => setIsEditModalOpen(false)}
                 className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 transition-colors"
               >
                 Cancel
@@ -423,7 +384,67 @@ const AdminTable = () => {
               <button
                 onClick={() => {
                   alert("Changes saved! (Demo only)");
-                  setIsModalOpen(false);
+                  setIsEditModalOpen(false);
+                }}
+                className="flex-1 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"
+              >
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Add New Product Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative">
+            {/* Close button */}
+            <button
+              onClick={() => setIsAddModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+            >
+              ×
+            </button>
+
+            {/* Title */}
+            <h2 className="text-xl font-semibold mb-2">
+              {selectedProduct?.Product || "Product"} Information
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">Create new product</p>
+
+            {/* Form Fields */}
+            {fields.map((field) => (
+              <div key={field.id}>
+                <label className="block text-sm font-medium mt-2 mb-1">
+                  {field.field}
+                </label>
+                <input
+                  type="text"
+                  value={fieldValue}
+                  onChange={handleFieldValueChange}
+                  placeholder={
+                    textOnlyFields.includes(selectedField)
+                      ? "Enter value"
+                      : "Enter value"
+                  }
+                  disabled={!selectedField}
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                />
+              </div>
+            ))}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  alert("Changes saved! (Demo only)");
+                  setIsAddModalOpen(false);
                 }}
                 className="flex-1 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"
               >

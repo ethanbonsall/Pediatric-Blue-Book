@@ -15,7 +15,7 @@ export default function Navbar() {
       <div className="flex flex-row gap-x-3 lg:gap-x-7 text-2xl items-center font-medium text-background">
         <Link href="/admin" className="lg:slide delay-[${i * 100}ms]">
           <Table className="flex lg:hidden" />
-          <span className="hidden lg:flex">Ingredient Table</span>
+          <span className="hidden lg:flex">Admin Panel</span>
         </Link>
         <Link
           href="#nutrient"
