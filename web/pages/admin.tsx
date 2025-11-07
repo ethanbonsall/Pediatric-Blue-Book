@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -9,11 +9,13 @@ import {
 } from "../components/ui/select";
 import Navbar from "@/components/navbar-profile";
 import Head from "next/head";
-import { Check, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
+import { Check, Plus, Power, ShieldCheck, ShieldMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
+import { LiquidProductRow, PowderProductRow } from "@/lib/types";
 
 // Add type definition for Product
-interface Product {
+interface LiquidProduct {
   id?: number;
   Product: string;
   "Company/Brand": string;
@@ -23,6 +25,15 @@ interface Product {
   Active: string;
 }
 
+interface PowderedProduct {
+  id?: number;
+  Product: string;
+  "Company/Brand": string;
+  Age: string;
+  "Protein Sources": string;
+  Approved: string;
+  Active: string;
+}
 interface Field {
   id?: number;
   field: string;
@@ -30,21 +41,78 @@ interface Field {
 
 const AdminTable = () => {
   const [filterBy, setFilterBy] = useState("Approved");
-  const [columns, setColumns] = useState("Nutrient");
+  const [columns, setColumns] = useState<
+    (keyof LiquidProductRow | keyof PowderProductRow)[]
+  >([]);
+  const [productType, setProductType] = useState("Liquid");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<
+    LiquidProductRow | PowderProductRow | null
+  >(null);
   const [selectedField, setSelectedField] = useState("");
   const [fieldValue, setFieldValue] = useState("");
   const [isSuperUser, setIsSuperUser] = useState(true);
+  const [products, setProducts] = useState<
+    LiquidProductRow[] | PowderProductRow[] | []
+  >([]);
+  type ColumnKeys = keyof LiquidProductRow | keyof PowderProductRow;
 
+  // Checking User permissions - FIXME
   if (1 + 1 == 3) {
     setIsSuperUser(false);
   }
 
+  // Retrieve liquid formulas + fields
+
+  const getFormulas = async (ingredientType: string) => {
+    setProductType(ingredientType);
+
+    if (ingredientType == "Liquid") {
+      const { data: liquidForm, error: liquidFormError } = await supabase
+        .from("liquid_ingredients")
+        .select("*");
+
+      if (liquidFormError) {
+        console.log("Error retrieving liquid formulas: ", liquidFormError);
+      }
+
+      const liquidRows = (liquidForm ?? []) as LiquidProductRow[];
+      const liquidColumns =
+        liquidRows.length > 0
+          ? (Object.keys(liquidRows[0]).filter(
+              (key) => key != "id"
+            ) as ColumnKeys[])
+          : [];
+      setProducts(liquidRows);
+      setColumns(liquidColumns);
+    } else {
+      const { data: powderForm, error: powderFormError } = await supabase
+        .from("powder_ingredients")
+        .select("*");
+
+      if (powderFormError) {
+        console.log("Error retrieving powder formulas: ", powderFormError);
+      }
+
+      const powderRows = (powderForm ?? []) as PowderProductRow[];
+      const powderColumns =
+        powderRows.length > 0
+          ? (Object.keys(powderRows[0]).filter(
+              (key) => key != "id"
+            ) as ColumnKeys[])
+          : [];
+      console.log(powderRows);
+      setProducts(powderRows);
+      setColumns(powderColumns);
+    }
+  };
+
+  // Retrieve powdered formulas + fields
+
   // Sample data for demonstration
-  const sampleProducts: Product[] = [
+  const sampleProducts: LiquidProduct[] = [
     {
       id: 1,
       Product: "EleCare (for Infants)",
@@ -90,11 +158,11 @@ const AdminTable = () => {
     { id: 4, field: "Fiber Sources" },
   ];
 
-  const filteredProducts = sampleProducts.filter((product) => {
-    if (filterBy === "Approved") return product.Approved === "Y";
-    if (filterBy === "Not Approved") return product.Approved === "N";
-    if (filterBy === "Active") return product.Active === "Y";
-    if (filterBy === "Inactive") return product.Active === "N";
+  const filteredProducts = products.filter((product) => {
+    if (filterBy === "Approved") return product.approved === true;
+    if (filterBy === "Not Approved") return product.approved === false;
+    if (filterBy === "Active") return product.active === true;
+    if (filterBy === "Inactive") return product.active === false;
     return true;
   });
 
@@ -117,6 +185,10 @@ const AdminTable = () => {
       setFieldValue(numericValue);
     }
   };
+
+  useEffect(() => {
+    getFormulas("Liquid"); // Load liquid table by default
+  }, []);
 
   return (
     <div className="flex flex-col w-full min-h-screen rounded-t-[20px] pb-8">
@@ -176,24 +248,24 @@ const AdminTable = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="font-semibold">Columns: {columns ? "" : ""}</span>
-            <Select onValueChange={(value) => setColumns(value)}>
+            <span className="font-semibold">Ingredient Type: </span>
+            <Select onValueChange={(value) => getFormulas(value)}>
               <SelectTrigger className="w-40 bg-white rounded-xl text-text">
-                <SelectValue defaultValue="Nutrient" placeholder="Nutrient" />
+                <SelectValue defaultValue="Liquid" placeholder="Liquid" />
               </SelectTrigger>
               <SelectContent className="bg-white w-fit rounded">
                 <SelectGroup className="bg-white">
                   <SelectItem
                     className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                    value="Nutrient"
+                    value="Liquid"
                   >
-                    Nutrient
+                    Liquid
                   </SelectItem>
                   <SelectItem
                     className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                    value="All"
+                    value="Powdered"
                   >
-                    All
+                    Powdered
                   </SelectItem>
                 </SelectGroup>
               </SelectContent>
@@ -229,35 +301,19 @@ const AdminTable = () => {
           <table className="w-full text-sm">
             <thead className="border-b-2 bg-gray-50">
               <tr className="text-left">
-                <th className="py-2 px-2 font-semibold">Product</th>
-                <th className="py-2 px-2 font-semibold">Company/Brand</th>
-                <th className="py-2 px-2 font-semibold">Age</th>
-                <th className="py-2 px-2 font-semibold">Protein Sources</th>
-                <th className="py-2 px-2 font-semibold">Carb Sources</th>
-                <th className="py-2 px-2 font-semibold">Fiber Sources</th>
-                <th className="py-2 px-2 font-semibold">Fat Sources</th>
-                <th className="py-2 px-2 font-semibold">
-                  Specialty Ingredients
-                </th>
-                <th className="py-2 px-2 font-semibold">g/scoop</th>
-                <th className="py-2 px-2 font-semibold">g/tsp</th>
-                <th className="py-2 px-2 font-semibold">Cal/g</th>
-                <th className="py-2 px-2 font-semibold">Protein g</th>
-                <th className="py-2 px-2 font-semibold">Fat g</th>
-                <th className="py-2 px-2 font-semibold">Notes</th>
-                <th className="py-2 px-2 font-semibold">Approved</th>
-                <th className="py-2 px-2 font-semibold">Active</th>
+                {columns!.map((column) => (
+                  <th key={column} className="py-2 px-2 font-semibold">
+                    {column}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product, index) => (
-                <tr
-                  key={product.id || index}
-                  className="border-b hover:bg-gray-50"
-                >
+              {filteredProducts?.map((product) => (
+                <tr key={product.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-2">
                     <div className="flex items-center justify-between">
-                      <span>{product.Product || ""}</span>
+                      <span>{product.product || ""}</span>
                       <button
                         onClick={() => {
                           setSelectedProduct(product);
@@ -271,25 +327,11 @@ const AdminTable = () => {
                       </button>
                     </div>
                   </td>
-                  <td className="py-2 px-2">
-                    {product["Company/Brand"] || ""}
-                  </td>
-                  <td className="py-2 px-2">{product.Age || ""}</td>
-                  <td className="py-2 px-2">
-                    {product["Protein Sources"] || ""}
-                  </td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">-</td>
-                  <td className="py-2 px-2">{product.Approved || ""}</td>
-                  <td className="py-2 px-2">{product.Active || ""}</td>
+                  {columns?.slice(1).map((column) => (
+                    <td key={String(column)} className="py-2 px-2">
+                      {String(product[column as keyof typeof product] ?? "")}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
@@ -309,14 +351,7 @@ const AdminTable = () => {
           <div>
             <Button
               onClick={() => {
-                setSelectedProduct({
-                  Product: "New Product",
-                  "Company/Brand": "",
-                  Age: "",
-                  "Protein Sources": "",
-                  Approved: "N",
-                  Active: "N",
-                });
+                setSelectedProduct(null);
                 setIsAddModalOpen(true);
                 setSelectedField("");
                 setFieldValue("");
@@ -345,7 +380,7 @@ const AdminTable = () => {
 
             {/* Title */}
             <h2 className="text-xl font-semibold mb-2">
-              {selectedProduct?.Product || "Product"} Information
+              {selectedProduct?.product || "Product"} Information
             </h2>
             <p className="text-sm text-gray-600 mb-6">
               Make changes to the product data
@@ -408,7 +443,7 @@ const AdminTable = () => {
 
             {/* Title */}
             <h2 className="text-xl font-semibold mb-2">
-              {selectedProduct?.Product || "Product"} Information
+              {selectedProduct?.product || "Product"} Information
             </h2>
             <p className="text-sm text-gray-600 mb-6">Create new product</p>
 
