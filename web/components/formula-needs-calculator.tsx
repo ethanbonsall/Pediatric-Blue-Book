@@ -320,14 +320,16 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
       if (!ingredient.row) return;
       
       const mlPrepared = getGramsOrMl(ingredient);
+      const parsedAmount = parseAmount(ingredient.amount);
+      const quantity = parseFloat(parsedAmount.amount) || 0;
+      const servingType = parsedAmount.servingType;
       
       if (ingredient.type === "Powder") {
         // For powder: np100 values are per 100ml of prepared formula
         const multiplier = mlPrepared / 100;
-        
+
         // Map nutrient names to np100 column names
         const nutrientMap: Record<string, string> = {
-          "Energy Needs": "calories",
           "Protein": "np100_total_protein_g",
           "Carbohydrates": "np100_total_carbohydrate_g",
           "Fats": "np100_total_fat_g",
@@ -367,24 +369,35 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
           const value = ingredient.row[columnName] as number;
           if (value != null && !isNaN(value)) {
             if (!totals[nutrientName]) totals[nutrientName] = 0;
-            totals[nutrientName] += (value * multiplier);
+            totals[nutrientName] += value * multiplier;
           }
         });
-        
-        // Calculate calories from macros if not directly available
-        if (!totals["Energy Needs"]) {
-          const proteinCal = (totals["Protein"] || 0) * 4;
-          const carbCal = (totals["Carbohydrates"] || 0) * 4;
-          const fatCal = (totals["Fats"] || 0) * 9;
-          totals["Energy Needs"] = proteinCal + carbCal + fatCal;
+
+        const caloriesPerGram = (ingredient.row.calories_per_gram as number) || 0;
+        const gramsPerServing =
+          servingType === "Scoop"
+            ? ((ingredient.row.grams_per_scoop as number) || 0)
+            : servingType === "Teaspoon"
+              ? ((ingredient.row.grams_per_teaspoon as number) || 0)
+              : servingType === "Tablespoon"
+                ? ((ingredient.row.grams_per_tablespoon as number) || 0)
+                : servingType === "Cup"
+                  ? ((ingredient.row.grams_per_cup as number) || 0)
+                  : 0;
+        const totalGrams = gramsPerServing * quantity;
+        const calories = totalGrams * caloriesPerGram;
+        if (calories > 0) {
+          if (!totals["Energy Needs"]) totals["Energy Needs"] = 0;
+          totals["Energy Needs"] += calories;
         }
       } else {
+        const caloriesPerMl = (ingredient.row.calories_per_ml as number) || 0;
+
         // For liquid: npc values are per container
         const amountPerCarton = (ingredient.row.amount_per_carton_ml as number) || 1;
         const multiplier = mlPrepared / amountPerCarton;
-        
+
         const nutrientMap: Record<string, string> = {
-          "Energy Needs": "calories",
           "Protein": "total_protein_g",
           "Carbohydrates": "total_carbohydrate_g",
           "Fats": "total_fat_g",
@@ -424,14 +437,14 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
           const value = ingredient.row[columnName] as number;
           if (value != null && !isNaN(value)) {
             if (!totals[nutrientName]) totals[nutrientName] = 0;
-            totals[nutrientName] += (value * multiplier);
+            totals[nutrientName] += value * multiplier;
           }
         });
-        
-        // Calculate calories if not directly available
-        if (!totals["Energy Needs"] && ingredient.row) {
-          const caloriesPerMl = (ingredient.row.calories_per_ml as number) || 0;
-          totals["Energy Needs"] = caloriesPerMl * mlPrepared;
+
+        const calories = caloriesPerMl * mlPrepared;
+        if (calories > 0) {
+          if (!totals["Energy Needs"]) totals["Energy Needs"] = 0;
+          totals["Energy Needs"] += calories;
         }
       }
     });
