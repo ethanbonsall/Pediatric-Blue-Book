@@ -149,7 +149,7 @@ const AdminTable = () => {
             <span className="font-semibold">Filter By:</span>
             <Select onValueChange={(value) => setFilterBy(value)}>
               <SelectTrigger className="w-40 bg-white rounded-xl text-text">
-                <SelectValue defaultValue="Approved" placeholder="Approved" />
+                <SelectValue defaultValue="All" placeholder="All" />
               </SelectTrigger>
               <SelectContent className="bg-white w-fit rounded">
                 <SelectGroup className="bg-white">
@@ -310,7 +310,7 @@ const AdminTable = () => {
       {/* Edit Product Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative">
+          <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative overflow-y-auto max-h-[80%]">
             {/* Close button */}
             <button
               onClick={() => setIsEditModalOpen(false)}
@@ -324,30 +324,32 @@ const AdminTable = () => {
               {selectedProduct?.product || "Product"} Information
             </h2>
             <p className="text-sm text-gray-600 mb-6">
-              Make changes to the product data
+              Make changes to the product data.
             </p>
 
             {/* Form Fields */}
 
-            {fields.map((field) => (
-              <div key={field.id}>
-                <label className="block text-sm font-medium mt-2 mb-1">
-                  {field.field}
-                </label>
-                <input
-                  type="text"
-                  value={fieldValue}
-                  onChange={handleFieldValueChange}
-                  placeholder={
-                    textOnlyFields.includes(selectedField)
-                      ? "Enter new value"
-                      : "Enter new value"
-                  }
-                  disabled={!selectedField}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                />
-              </div>
-            ))}
+            {columns
+              .slice(1)
+              .filter((column) => column != "active" && column != "approved")
+              .map((column) => (
+                <div key={column}>
+                  <label className="block text-sm font-medium mt-2 mb-1">
+                    {column}
+                  </label>
+                  <input
+                    type="text"
+                    value={fieldValue}
+                    onChange={handleFieldValueChange}
+                    placeholder={
+                      textOnlyFields.includes(selectedField)
+                        ? "Enter new value"
+                        : "Enter new value"
+                    }
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                  />
+                </div>
+              ))}
 
             {/* Action Buttons */}
             <div className="flex gap-3 mt-6">
@@ -372,8 +374,8 @@ const AdminTable = () => {
       )}
       {/* Add New Product Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
+          <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative overflow-y-auto max-h-[80%]">
             {/* Close button */}
             <button
               onClick={() => setIsAddModalOpen(false)}
@@ -386,28 +388,29 @@ const AdminTable = () => {
             <h2 className="text-xl font-semibold mb-2">
               {selectedProduct?.product || "Product"} Information
             </h2>
-            <p className="text-sm text-gray-600 mb-6">Create new product</p>
+            <p className="text-sm text-gray-600 mb-6">Create new product.</p>
 
             {/* Form Fields */}
-            {fields.map((field) => (
-              <div key={field.id}>
-                <label className="block text-sm font-medium mt-2 mb-1">
-                  {field.field}
-                </label>
-                <input
-                  type="text"
-                  value={fieldValue}
-                  onChange={handleFieldValueChange}
-                  placeholder={
-                    textOnlyFields.includes(selectedField)
-                      ? "Enter value"
-                      : "Enter value"
-                  }
-                  disabled={!selectedField}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                />
-              </div>
-            ))}
+            {columns
+              .filter((column) => column != "active" && column != "approved")
+              .map((column) => (
+                <div key={column}>
+                  <label className="block text-sm font-medium mt-2 mb-1">
+                    {column}
+                  </label>
+                  <input
+                    type="text"
+                    value={fieldValue}
+                    onChange={handleFieldValueChange}
+                    placeholder={
+                      textOnlyFields.includes(selectedField)
+                        ? "Enter value"
+                        : "Enter value"
+                    }
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                  />
+                </div>
+              ))}
 
             {/* Action Buttons */}
             <div className="flex gap-3 mt-6">
