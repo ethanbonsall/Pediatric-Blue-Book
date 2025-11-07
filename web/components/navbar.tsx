@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import PBB from "../public/transparent-logo.png";
-import { Apple, Calculator, Search } from "lucide-react";
+import { Apple, Calculator, Search, Table } from "lucide-react";
 import avatar from "../public/avatar.png";
 
 export default function Navbar() {
@@ -13,6 +13,10 @@ export default function Navbar() {
         <img src={PBB.src} alt="Pediatric Blue Book" className="h-full"></img>
       </Link>
       <div className="flex flex-row gap-x-3 lg:gap-x-7 text-2xl items-center font-medium text-background">
+        <Link href="/admin" className="lg:slide delay-[${i * 100}ms]">
+          <Table className="flex lg:hidden" />
+          <span className="hidden lg:flex">Admin Panel</span>
+        </Link>
         <Link
           href="#nutrient"
           className="lg:slide delay-[${i * 100}ms] transition-colors duration-150"
