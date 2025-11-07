@@ -9,31 +9,11 @@ import {
 } from "../components/ui/select";
 import Navbar from "@/components/navbar-profile";
 import Head from "next/head";
-import { Check, Plus, Power, ShieldCheck, ShieldMinus } from "lucide-react";
+import { Check, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { LiquidProductRow, PowderProductRow } from "@/lib/types";
 
-// Add type definition for Product
-interface LiquidProduct {
-  id?: number;
-  Product: string;
-  "Company/Brand": string;
-  Age: string;
-  "Protein Sources": string;
-  Approved: string;
-  Active: string;
-}
-
-interface PowderedProduct {
-  id?: number;
-  Product: string;
-  "Company/Brand": string;
-  Age: string;
-  "Protein Sources": string;
-  Approved: string;
-  Active: string;
-}
 interface Field {
   id?: number;
   field: string;
@@ -68,6 +48,7 @@ const AdminTable = () => {
 
   const getFormulas = async (ingredientType: string) => {
     setProductType(ingredientType);
+    console.log(productType);
 
     if (ingredientType == "Liquid") {
       const { data: liquidForm, error: liquidFormError } = await supabase
@@ -110,46 +91,6 @@ const AdminTable = () => {
   };
 
   // Retrieve powdered formulas + fields
-
-  // Sample data for demonstration
-  const sampleProducts: LiquidProduct[] = [
-    {
-      id: 1,
-      Product: "EleCare (for Infants)",
-      "Company/Brand": "Abbott",
-      Age: "0-12 months",
-      "Protein Sources": "Amino Acids",
-      Approved: "Y",
-      Active: "Y",
-    },
-    {
-      id: 2,
-      Product: "Beneprotein",
-      "Company/Brand": "Nutricia",
-      Age: "all",
-      "Protein Sources": "Whey protein isolate",
-      Approved: "Y",
-      Active: "N",
-    },
-    {
-      id: 3,
-      Product: "Product3",
-      "Company/Brand": "Company C",
-      Age: "4",
-      "Protein Sources": "Soy",
-      Approved: "N",
-      Active: "N",
-    },
-    {
-      id: 4,
-      Product: "Product4",
-      "Company/Brand": "Company D",
-      Age: "5",
-      "Protein Sources": "Casein",
-      Approved: "Y",
-      Active: "Y",
-    },
-  ];
 
   const fields: Field[] = [
     { id: 1, field: "Age" },
