@@ -45,7 +45,8 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const WATER_INGREDIENT: Ingredient = { name: "Water", type: "Liquid" };
+  const [ingredients, setIngredients] = useState<Ingredient[]>([WATER_INGREDIENT]);
   const [selectedIngredients, setSelectedIngredients] = useState<SelectedIngredient[]>([]);
   const [servings, setServings] = useState<number>(1);
 
@@ -73,7 +74,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
 
     setIngredients((prev) => {
       const map = new Map<string, Ingredient>();
-      [...prev, ...fetched].forEach((item) => map.set(item.name.toLowerCase(), item));
+      [...prev, WATER_INGREDIENT, ...fetched].forEach((item) => map.set(item.name.toLowerCase(), item));
       return Array.from(map.values());
     });
   };
@@ -135,7 +136,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
     let formatted: string;
     
     // For Energy Needs, extract just the calories
-    if (nutrientName === "Energy Needs") {
+    if (nutrientName === "Calories") {
       formatted = extractCalories(idealAmount);
     }
     // For Protein, Carbohydrates, and Fats, extract just the minimum gram amount
@@ -173,7 +174,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
         .filter(n => n.name !== "" && n.amount !== "") // Filter out empty entries
         .map(n => ({ name: n.name, amount: "" })) // Start with empty amounts (will be calculated from formulas)
     : [
-        { name: "Energy Needs", amount: "" },
+        { name: "Calories", amount: "" },
         { name: "Holliday-Segar", amount: "" },
         { name: "DRI Fluid", amount: "" },
         { name: "Protein", amount: "" },
@@ -266,27 +267,41 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
   };
 
   // Convert serving to grams (for powder) or ml (for liquid)
+  const isWaterIngredient = (ingredient: { name: string }) => ingredient.name.toLowerCase() === "water";
+
   const getGramsOrMl = (ingredient: SelectedIngredient): number => {
-    if (!ingredient.row) return 0;
-    
+    const isWater = isWaterIngredient(ingredient);
     const parsed = parseAmount(ingredient.amount);
     const quantity = parseFloat(parsed.amount) || 0;
     const servingType = parsed.servingType;
     
+    if (isWater) {
+      const mlPerServing = 
+        servingType === "Cup" ? 236.6 :
+        servingType === "Tablespoon" ? 14.8 :
+        servingType === "Teaspoon" ? 4.9 :
+        servingType === "Scoop" ? 30 :
+        0;
+      return quantity * mlPerServing;
+    }
+
+    const row = ingredient.row;
+    if (!row) return 0;
+
     if (ingredient.type === "Powder") {
       // Powder: use grams_per_* values
       const gramsPerServing = 
-        servingType === "Scoop" ? (ingredient.row.grams_per_scoop as number) || 0 :
-        servingType === "Teaspoon" ? (ingredient.row.grams_per_teaspoon as number) || 0 :
-        servingType === "Tablespoon" ? (ingredient.row.grams_per_tablespoon as number) || 0 :
-        servingType === "Cup" ? (ingredient.row.grams_per_cup as number) || 0 :
+        servingType === "Scoop" ? (row.grams_per_scoop as number) || 0 :
+        servingType === "Teaspoon" ? (row.grams_per_teaspoon as number) || 0 :
+        servingType === "Tablespoon" ? (row.grams_per_tablespoon as number) || 0 :
+        servingType === "Cup" ? (row.grams_per_cup as number) || 0 :
         0;
       
       // For np100 (per 100ml), we need to convert grams to ml of prepared formula
       // Assuming standard reconstitution: typically 1 scoop (8.5g) makes ~60ml
       // We can estimate using calories_per_gram if available, or use a standard ratio
       const grams = quantity * gramsPerServing;
-      const caloriesPerGram = (ingredient.row.calories_per_gram as number) || 0;
+      const caloriesPerGram = (row.calories_per_gram as number) || 0;
       
       // If we have calories_per_gram, we can estimate prepared volume
       // Standard formula is ~20 cal/oz = ~0.67 cal/ml, so ml = calories / 0.67
@@ -317,12 +332,26 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
     const totals: Record<string, number> = {};
     
     selectedIngredients.forEach((ingredient) => {
-      if (!ingredient.row) return;
+      const isWater = isWaterIngredient(ingredient);
+      const row = ingredient.row;
+      if (!row && !isWater) return;
       
       const mlPrepared = getGramsOrMl(ingredient);
       const parsedAmount = parseAmount(ingredient.amount);
       const quantity = parseFloat(parsedAmount.amount) || 0;
       const servingType = parsedAmount.servingType;
+
+      if (isWater) {
+        if (mlPrepared > 0) {
+          if (!totals["Holliday-Segar"]) totals["Holliday-Segar"] = 0;
+          totals["Holliday-Segar"] += mlPrepared;
+          if (!totals["DRI Fluid"]) totals["DRI Fluid"] = 0;
+          totals["DRI Fluid"] += mlPrepared / 1000;
+        }
+        return;
+      }
+
+      if (!row) return;
       
       if (ingredient.type === "Powder") {
         // For powder: np100 values are per 100ml of prepared formula
@@ -373,28 +402,28 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
           }
         });
 
-        const caloriesPerGram = (ingredient.row.calories_per_gram as number) || 0;
+        const caloriesPerGram = (row.calories_per_gram as number) || 0;
         const gramsPerServing =
           servingType === "Scoop"
-            ? ((ingredient.row.grams_per_scoop as number) || 0)
+            ? ((row.grams_per_scoop as number) || 0)
             : servingType === "Teaspoon"
-              ? ((ingredient.row.grams_per_teaspoon as number) || 0)
+              ? ((row.grams_per_teaspoon as number) || 0)
               : servingType === "Tablespoon"
-                ? ((ingredient.row.grams_per_tablespoon as number) || 0)
+                ? ((row.grams_per_tablespoon as number) || 0)
                 : servingType === "Cup"
-                  ? ((ingredient.row.grams_per_cup as number) || 0)
+                  ? ((row.grams_per_cup as number) || 0)
                   : 0;
         const totalGrams = gramsPerServing * quantity;
         const calories = totalGrams * caloriesPerGram;
         if (calories > 0) {
-          if (!totals["Energy Needs"]) totals["Energy Needs"] = 0;
-          totals["Energy Needs"] += calories;
+          if (!totals["Calories"]) totals["Calories"] = 0;
+          totals["Calories"] += calories;
         }
       } else {
-        const caloriesPerMl = (ingredient.row.calories_per_ml as number) || 0;
+        const caloriesPerMl = (row.calories_per_ml as number) || 0;
 
         // For liquid: npc values are per container
-        const amountPerCarton = (ingredient.row.amount_per_carton_ml as number) || 1;
+        const amountPerCarton = (row.amount_per_carton_ml as number) || 1;
         const multiplier = mlPrepared / amountPerCarton;
 
         const nutrientMap: Record<string, string> = {
@@ -433,8 +462,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
         };
         
         Object.entries(nutrientMap).forEach(([nutrientName, columnName]) => {
-          if (!ingredient.row) return;
-          const value = ingredient.row[columnName] as number;
+          const value = row[columnName] as number;
           if (value != null && !isNaN(value)) {
             if (!totals[nutrientName]) totals[nutrientName] = 0;
             totals[nutrientName] += value * multiplier;
@@ -443,8 +471,8 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
 
         const calories = caloriesPerMl * mlPrepared;
         if (calories > 0) {
-          if (!totals["Energy Needs"]) totals["Energy Needs"] = 0;
-          totals["Energy Needs"] += calories;
+          if (!totals["Calories"]) totals["Calories"] = 0;
+          totals["Calories"] += calories;
         }
       }
     });
@@ -704,7 +732,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
                 <div className="flex flex-row w-full text-lg lg:text-xl 2xl:text-2xl bg-primary-400 font-medium py-[1dvh] pl-[1dvw]">
                   <p className="w-[40%]">Nutrient</p>
                   <p className="w-[30%]">Amount</p>
-                  <p className="w-[30%]">Ideal</p>
+                  <p className="w-[30%]">DRI</p>
                 </div>
                 <hr className="w-full" />
               </div>
@@ -728,7 +756,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
                   if (calculatedValue > 0) {
                     // Determine unit based on nutrient name
                     let unit = "";
-                    if (nutrient.name === "Energy Needs") {
+                    if (nutrient.name === "Calories") {
                       unit = "cal";
                     } else if (nutrient.name === "Protein" || nutrient.name === "Carbohydrates" || nutrient.name === "Fats" || nutrient.name === "Fiber") {
                       unit = "g";
@@ -758,7 +786,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
                         let idealInSameUnit = idealNumeric;
                         
                         // Convert to base unit (mg for most, g for macros/calories)
-                        if (nutrient.name === "Energy Needs") {
+                        if (nutrient.name === "Calories") {
                           // Calories don't need conversion
                           calculatedInSameUnit = calculatedValue;
                           idealInSameUnit = idealNumeric;

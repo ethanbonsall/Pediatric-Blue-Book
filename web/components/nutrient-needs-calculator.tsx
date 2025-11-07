@@ -518,7 +518,7 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
       
       const calculatedNutrients: Nutrient[] = [
         {
-          name: "Energy Needs",
+          name: "Calories",
           amount: `${
             caloriesDisplay ? caloriesDisplay + " cal (" + caloriesPerKGDisplay + " cal/kg)" : ""
           }`,
@@ -587,7 +587,7 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
   // Setting nutrients into an array to be used in the table
   const nutrients = [
     {
-      name: "Energy Needs",
+      name: "Calories",
       amount: `${
         calories ? calories + " cal (" + caloriesPerKG + " cal/kg)" : ""
       }`,
