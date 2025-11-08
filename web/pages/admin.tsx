@@ -9,17 +9,14 @@ import {
 } from "../components/ui/select";
 import Navbar from "@/components/navbar-profile";
 import Head from "next/head";
-import { Check, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
+import { Check, Pencil, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { LiquidProductRow, PowderProductRow } from "@/lib/types";
 
-interface Field {
-  id?: number;
-  field: string;
-}
-
 const AdminTable = () => {
+  // New products with default fields for adding a new product feature
+
   const [filterBy, setFilterBy] = useState("Approved");
   const [columns, setColumns] = useState<
     (keyof LiquidProductRow | keyof PowderProductRow)[]
@@ -31,21 +28,70 @@ const AdminTable = () => {
   const [selectedProduct, setSelectedProduct] = useState<
     LiquidProductRow | PowderProductRow | null
   >(null);
-  const [selectedField, setSelectedField] = useState("");
-  const [fieldValue, setFieldValue] = useState("");
+  // const [fieldValue, setFieldValue] = useState("");
   const [isSuperUser, setIsSuperUser] = useState(true);
+  const [newProduct, setNewProduct] = useState<
+    Partial<LiquidProductRow | PowderProductRow>
+  >({});
+
+  // const [modifiedProduct, setModifiedProduct] = useState<
+  //   LiquidProductRow | PowderProductRow | null
+  // >(null);
+  // const [isDataAdmin, setIsDataAdmin] = useState(false);
   const [products, setProducts] = useState<
     LiquidProductRow[] | PowderProductRow[] | []
   >([]);
   type ColumnKeys = keyof LiquidProductRow | keyof PowderProductRow;
 
+  const textOnlyFields = [
+    "product",
+    "company_brand",
+    "age",
+    "protein_sources",
+    "carbohydrate_sources",
+    "fat_sources",
+    "specialty_ingredients",
+    "prebiotic_sources",
+    "probiotic_sources",
+    "notes",
+    "probiotic",
+    "allergens",
+    "np100_standard_volume",
+  ];
+
+  const calculatedFields = [
+    "np100_percent_cal_from_protein",
+    "np100_percent_cal_from_cho",
+    "np100_percent_cal_from_fat",
+    "np100_percent_free_water",
+    "npc_percent_free_water",
+    "npc_percent_cal_from_protein",
+    "npc_percent_cal_from_cho",
+    "npc_percent_cal_from_fat",
+  ];
+
   // Checking User permissions - FIXME
-  if (1 + 1 == 3) {
-    setIsSuperUser(false);
-  }
+  // async function getUserRole() {
+  //   const {
+  //     data: { user },
+  //   } = await supabase.auth.getUser();
+  //   if (user) {
+  //     const { data } = await supabase
+  //       .from("users")
+  //       .select("role")
+  //       .eq("id", user.id)
+  //       .single();
 
-  // Retrieve liquid formulas + fields
+  //     if (data!.role == "superuser") {
+  //       setIsSuperUser(true);
+  //     }
+  //     if (data!.role == "admin") {
+  //       setIsDataAdmin(true);
+  //     }
+  //   }
+  // }
 
+  // Retrieve formula data + fields, set calculated fields
   const getFormulas = async (ingredientType: string) => {
     setProductType(ingredientType);
     console.log(productType);
@@ -66,6 +112,36 @@ const AdminTable = () => {
               (key) => key != "id"
             ) as ColumnKeys[])
           : [];
+
+      // calculated fields for Liquid Products
+      for (const liquidProduct of liquidRows) {
+        liquidProduct.npc_percent_free_water = parseFloat(
+          (
+            liquidProduct.water_ml! / liquidProduct.amount_per_carton_ml!
+          ).toFixed(4)
+        );
+        liquidProduct.npc_percent_cal_from_protein = parseFloat(
+          (
+            (liquidProduct.total_protein_g! * 4) /
+            (liquidProduct.amount_per_carton_ml! *
+              liquidProduct.calories_per_ml!)
+          ).toFixed(4)
+        );
+        liquidProduct.npc_percent_cal_from_cho = parseFloat(
+          (
+            (liquidProduct.total_carbohydrate_g! * 4) /
+            (liquidProduct.amount_per_carton_ml! *
+              liquidProduct.calories_per_ml!)
+          ).toFixed(4)
+        );
+        liquidProduct.npc_percent_cal_from_fat = parseFloat(
+          (
+            (liquidProduct.total_fat_g! * 9) /
+            (liquidProduct.amount_per_carton_ml! *
+              liquidProduct.calories_per_ml!)
+          ).toFixed(4)
+        );
+      }
       setProducts(liquidRows);
       setColumns(liquidColumns);
     } else {
@@ -78,26 +154,42 @@ const AdminTable = () => {
       }
 
       const powderRows = (powderForm ?? []) as PowderProductRow[];
+
       const powderColumns =
         powderRows.length > 0
           ? (Object.keys(powderRows[0]).filter(
               (key) => key != "id"
             ) as ColumnKeys[])
           : [];
-      console.log(powderRows);
+
+      // calculated fields for Powder
+      for (const powderProduct of powderRows) {
+        powderProduct.np100_percent_cal_from_protein = parseFloat(
+          (
+            (powderProduct.np100_total_protein_g! * 4) /
+            (powderProduct.calories_per_gram! * 100)
+          ).toFixed(4)
+        );
+        powderProduct.np100_percent_cal_from_cho = parseFloat(
+          (
+            (powderProduct.np100_total_carbohydrate_g! * 4) /
+            (powderProduct.calories_per_gram! * 100)
+          ).toFixed(4)
+        );
+        powderProduct.np100_percent_cal_from_fat = parseFloat(
+          (
+            (powderProduct.np100_total_fat_g! * 4) /
+            (powderProduct.calories_per_gram! * 100)
+          ).toFixed(4)
+        );
+      }
+
       setProducts(powderRows);
       setColumns(powderColumns);
     }
   };
 
   // Retrieve powdered formulas + fields
-
-  const fields: Field[] = [
-    { id: 1, field: "Age" },
-    { id: 2, field: "Protein Sources" },
-    { id: 3, field: "Carbohydrate Sources" },
-    { id: 4, field: "Fiber Sources" },
-  ];
 
   const filteredProducts = products.filter((product) => {
     if (filterBy === "Approved") return product.approved === true;
@@ -107,28 +199,58 @@ const AdminTable = () => {
     return true;
   });
 
-  // Text-only fields
-  const textOnlyFields = ["Company/Brand", "Notes"];
+  // Handle field value change with validation and update new product
+  const handleFieldValueChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    column: string,
+    is_text: boolean
+  ) => {
+    let value = e.target.value;
 
-  // Handle field value change with validation
-  const handleFieldValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (textOnlyFields.includes(selectedField)) {
+    if (is_text) {
       // Allow only letters, spaces, and common punctuation for text fields
       const textValue = value.replace(/[^a-zA-Z\s.,'-]/g, "");
-      setFieldValue(textValue);
+      value = textValue;
     } else {
       // Allow only numbers and decimal point for numeric fields
       const numericValue = value
         .replace(/[^0-9.]/g, "")
         .replace(/(\..*?)\..*/g, "$1");
-      setFieldValue(numericValue);
+      value = numericValue;
+    }
+
+    setNewProduct((prev) => ({
+      ...prev,
+      [column]: value,
+    }));
+  };
+
+  // Adding new product to database
+
+  const insertNewProduct = async (isLiquid: boolean) => {
+    let table = "";
+    if (isLiquid) {
+      table = "liquid_ingredients";
+    } else {
+      table = "powder_ingredients";
+    }
+    setNewProduct((prev) => ({
+      ...prev,
+      approved: false,
+      active: false,
+    }));
+
+    const { error } = await supabase.from(table).insert(newProduct);
+    if (error) {
+      console.log("Error inserting row: ", error.message);
+    } else {
+      alert("Changes saved!");
     }
   };
 
   useEffect(() => {
     getFormulas("Liquid"); // Load liquid table by default
+    setIsSuperUser(true); // FIXME
   }, []);
 
   return (
@@ -259,12 +381,13 @@ const AdminTable = () => {
                         onClick={() => {
                           setSelectedProduct(product);
                           setIsEditModalOpen(true);
-                          setSelectedField("");
-                          setFieldValue("");
+                          // setFieldValue("");
                         }}
                         className="text-gray-600 hover:text-gray-900 ml-2"
                       >
-                        <span className="text-xl">⋯</span>
+                        <span className="text-xl">
+                          <Pencil />
+                        </span>
                       </button>
                     </div>
                   </td>
@@ -294,8 +417,7 @@ const AdminTable = () => {
               onClick={() => {
                 setSelectedProduct(null);
                 setIsAddModalOpen(true);
-                setSelectedField("");
-                setFieldValue("");
+                // setFieldValue("");
               }}
               variant="default"
               className="rounded-full"
@@ -338,11 +460,21 @@ const AdminTable = () => {
                     {column}
                   </label>
                   <input
-                    type="text"
-                    value={fieldValue}
-                    onChange={handleFieldValueChange}
+                    type={textOnlyFields.includes(column) ? "text" : "number"}
+                    value={
+                      (newProduct[
+                        column as keyof typeof newProduct
+                      ] as string) || ""
+                    }
+                    onChange={(e) =>
+                      handleFieldValueChange(
+                        e,
+                        column,
+                        textOnlyFields.includes(column)
+                      )
+                    }
                     placeholder={
-                      textOnlyFields.includes(selectedField)
+                      textOnlyFields.includes(column)
                         ? "Enter new value"
                         : "Enter new value"
                     }
@@ -392,20 +524,35 @@ const AdminTable = () => {
 
             {/* Form Fields */}
             {columns
-              .filter((column) => column != "active" && column != "approved")
+              .filter(
+                (column) =>
+                  column != "active" &&
+                  column != "approved" &&
+                  !calculatedFields.includes(column)
+              )
               .map((column) => (
                 <div key={column}>
                   <label className="block text-sm font-medium mt-2 mb-1">
                     {column}
                   </label>
                   <input
-                    type="text"
-                    value={fieldValue}
-                    onChange={handleFieldValueChange}
+                    type={textOnlyFields.includes(column) ? "text" : "number"}
+                    value={
+                      (newProduct[
+                        column as keyof typeof newProduct
+                      ] as string) || ""
+                    }
+                    onChange={(e) =>
+                      handleFieldValueChange(
+                        e,
+                        column,
+                        textOnlyFields.includes(column)
+                      )
+                    }
                     placeholder={
-                      textOnlyFields.includes(selectedField)
-                        ? "Enter value"
-                        : "Enter value"
+                      textOnlyFields.includes(column)
+                        ? "Enter text"
+                        : "Enter number"
                     }
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                   />
@@ -415,14 +562,18 @@ const AdminTable = () => {
             {/* Action Buttons */}
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => setIsAddModalOpen(false)}
+                onClick={() => {
+                  setNewProduct({});
+                  setIsAddModalOpen(false);
+                }}
                 className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  alert("Changes saved! (Demo only)");
+                  insertNewProduct(productType == "Liquid");
+                  setNewProduct({});
                   setIsAddModalOpen(false);
                 }}
                 className="flex-1 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"

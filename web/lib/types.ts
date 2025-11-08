@@ -34,7 +34,6 @@ export interface LiquidProductRow {
     calories_per_ml?: number | null;
     protein_sources?: string | null;
     carbohydrate_sources?: string | null;
-    fiber_sources?: string | null;
     fat_sources?: string | null;
     specialty_ingredients?: string | null;
     npc_percent_free_water?: number | null;
@@ -77,6 +76,8 @@ export interface LiquidProductRow {
     total_fat_g?: number | null;
     total_carbohydrate_g?: number | null;
     water_ml?: number | null;
+    prebiotic_sources?: string | null;
+    probiotic_sources?: string | null
 }
 
 
@@ -87,7 +88,6 @@ export interface PowderProductRow {
     age?: string | null;
     protein_sources?: string | null;
     carbohydrate_sources?: string | null;
-    fiber_sources?: string | null;
     fat_sources?: string | null;
     specialty_ingredients?: string | null;
     grams_per_scoop?: number | null;
@@ -98,7 +98,6 @@ export interface PowderProductRow {
     np100_total_protein_g?: number | null;
     np100_total_fat_g?: number | null;
     np100_total_carbohydrate_g?: number | null;
-    np100_water_ml?: number | null;
     np100_percent_free_water?: number | null;
     np100_percent_cal_from_protein?: number | null;
     np100_percent_cal_from_cho?: number | null;
@@ -135,6 +134,14 @@ export interface PowderProductRow {
     active?: boolean | null;
     approved?: boolean | null;
     probiotic?: string | null;
-    prebiotic?: string | null;
     allergens?: string | null;
+    displacement_ml_per_g?: number | null;
+    np100_water_ml_standard?: number | null;
+    prebiotic_sources?: string | null;
+    probiotic_sources?: string | null;
+    np100_standard_volume?: string | null;
+
+
+
+
 }
