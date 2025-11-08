@@ -575,7 +575,7 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
         { name: "Selenium", amount: nutrientsObj["Selenium"] || "" },
         { name: "Sodium", amount: nutrientsObj["Sodium"] || "" },
         { name: "Chloride", amount: nutrientsObj["Chloride"] || "" },
-        { name: "Fiber", amount: nutrientsObj["Fiber"] || "" },
+        { name: "Fiber (DGA)", amount: nutrientsObj["Fiber"] || "" },
       ];
       // Use setTimeout to ensure state updates are processed first
       setTimeout(() => {
@@ -637,8 +637,8 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
     { name: "Selenium", amount: `${selenium || ""}` },
     { name: "Sodium", amount: `${sodium || ""}` },
     { name: "Chloride", amount: `${chloride || ""}` },
-    { name: "Fiber", amount: `${fiber || ""}` },
-  ];
+    { name: "Fiber (DGA)", amount: `${fiber || ""}` },
+  ]; 
 
   return (
     <div

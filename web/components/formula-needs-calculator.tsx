@@ -208,7 +208,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
         { name: "Selenium", amount: "" },
         { name: "Sodium", amount: "" },
         { name: "Chloride", amount: "" },
-        { name: "Fiber", amount: "" },
+        { name: "Fiber (DGA)", amount: "" },
       ];
 
   const filteredIngredients = ingredients.filter(
@@ -390,7 +390,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
           "Selenium": "np100_selenium_mcg",
           "Sodium": "np100_sodium_mg",
           "Chloride": "np100_chloride_mg",
-          "Fiber": "fiber",
+          "Fiber (DGA)": "fiber",
         };
         
         Object.entries(nutrientMap).forEach(([nutrientName, columnName]) => {
@@ -458,7 +458,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
           "Selenium": "npc_selenium_mcg",
           "Sodium": "npc_sodium_mg",
           "Chloride": "npc_chloride_mg",
-          "Fiber": "fiber",
+          "Fiber (DGA)": "fiber",
         };
         
         Object.entries(nutrientMap).forEach(([nutrientName, columnName]) => {
@@ -656,9 +656,9 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
                         <Trash2 className="w-8" />
                       </button>
                       </div>
-                  <p className="w-1/4">Name</p>
-                  <p className="w-1/4">Type</p>
-                  <p className="w-1/4">Amount</p>
+                  <p className="w-2/5">Name</p>
+                  <p className="w-1/5">Type</p>
+                  <p className="w-1/5">Amount</p>
                   <div className="w-[12%] flex justify-end gap-2">
                     <button className="w-8">
                       <HeartIcon className="hover:fill-red-400" />
@@ -685,9 +685,9 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
                         )}
                       </button>
                     </div>
-                    <p className="w-1/4">{selectedIngredient.name}</p>
-                    <p className="w-1/4">{selectedIngredient.type}</p>
-                    <p className="w-1/4">{selectedIngredient.amount}</p>
+                    <p className="w-2/5">{selectedIngredient.name}</p>
+                    <p className="w-1/5">{selectedIngredient.type}</p>
+                    <p className="w-1/5">{selectedIngredient.amount}</p>
                     <div className="flex justify-end w-[12%]">
                       <button
                         onClick={() => handleEllipsisClick(selectedIngredient)}
@@ -758,7 +758,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
                     let unit = "";
                     if (nutrient.name === "Calories") {
                       unit = "cal";
-                    } else if (nutrient.name === "Protein" || nutrient.name === "Carbohydrates" || nutrient.name === "Fats" || nutrient.name === "Fiber") {
+                    } else if (nutrient.name === "Protein" || nutrient.name === "Carbohydrates" || nutrient.name === "Fats" || nutrient.name === "Fiber (DGA)") {
                       unit = "g";
                     } else if (nutrient.name === "Holliday-Segar" || nutrient.name === "DRI Fluid") {
                       unit = nutrient.name === "DRI Fluid" ? "L" : "mL";
@@ -790,7 +790,7 @@ const FormulaNeedsCalculator = ({ idealNutrients = [] }: FormulaNeedsCalculatorP
                           // Calories don't need conversion
                           calculatedInSameUnit = calculatedValue;
                           idealInSameUnit = idealNumeric;
-                        } else if (nutrient.name === "Protein" || nutrient.name === "Carbohydrates" || nutrient.name === "Fats" || nutrient.name === "Fiber") {
+                        } else if (nutrient.name === "Protein" || nutrient.name === "Carbohydrates" || nutrient.name === "Fats" || nutrient.name === "Fiber (DGA)") {
                           // Convert to grams
                           if (unit === "mg") calculatedInSameUnit = calculatedValue / 1000;
                           else if (unit === "mcg") calculatedInSameUnit = calculatedValue / 1000000;

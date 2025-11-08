@@ -29,37 +29,41 @@ const Popup = ({
     <div
       className={` ${
         popUp ? "fixed" : "hidden"
-      } flex flex-col h-fit w-fit gap-y-4 justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[47%] bg-primary-700 text-white p-4 lg:p-8 rounded-xl shadow-2xl z-50`}
+      } flex flex-col max-h-[80dvh] w-fit top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[53%] bg-primary-700 text-white p-4 lg:p-8 rounded-xl shadow-2xl z-50`}
     >
-      <button onClick={() => setPopUp(false)} className="mr-4">
+      <div className="flex justify-end">
+      <button onClick={() => setPopUp(false)} className="mr-2">
         <X />
       </button>
-      <p className="text-2xl lg:text-3xl 2xl:text-4xl">{product_name}</p>
+      </div>
+      <div className="flex flex-col flex-1 overflow-y-auto gap-y-4">
+      <p className="font-semibold text-2xl lg:text-3xl 2xl:text-4xl">{product_name}</p>
       <p className="text-lg lg:text-xl 2xl:text-2xl">
-        Recommended Age: {product_age}
+        <span className="font-medium">Recommended Age:</span> {product_age}
       </p>
-      <p className="text-lg lg:text-xl 2xl:text-2xl">Company: {company}</p>
+      <p className="text-lg lg:text-xl 2xl:text-2xl"><span className="font-medium">Company:</span> {company}</p>
       <p className="text-lg lg:text-xl 2xl:text-2xl">
-        PRO ({protein_percent}): {protein_source}
-      </p>
-
-      <p className="text-lg lg:text-xl 2xl:text-2xl">
-        Fat ({fat_percent}): {fat_source}
+        <span className="font-medium">PRO ({protein_percent}):</span> {protein_source}
       </p>
 
       <p className="text-lg lg:text-xl 2xl:text-2xl">
-        CHO ({carbohydrate_percent}): {carbohydrate_source}
+        <span className="font-medium">Fat ({fat_percent}):</span> {fat_source}
       </p>
-
-      <p className="text-lg lg:text-xl 2xl:text-2xl">Prebiotic: {prebiotic}</p>
-
-      <p className="text-lg lg:text-xl 2xl:text-2xl">Probiotic: {probiotic}</p>
 
       <p className="text-lg lg:text-xl 2xl:text-2xl">
-        Water (at standard dilution): {water_percent}
+        <span className="font-medium">CHO ({carbohydrate_percent}):</span> {carbohydrate_source}
       </p>
 
-      <p className="text-lg lg:text-xl 2xl:text-2xl">Allergens: {allergen}</p>
+      <p className="text-lg lg:text-xl 2xl:text-2xl"><span className="font-medium">Prebiotic:</span> {prebiotic}</p>
+
+      <p className="text-lg lg:text-xl 2xl:text-2xl"><span className="font-medium">Probiotic:</span> {probiotic}</p>
+
+      <p className="text-lg lg:text-xl 2xl:text-2xl">
+        <span className="font-medium">Water (at standard dilution):</span> {water_percent}
+      </p>
+
+      <p className="text-lg lg:text-xl 2xl:text-2xl"><span className="font-medium">Allergens:</span> {allergen}</p>
+    </div>
     </div>
   );
 };
