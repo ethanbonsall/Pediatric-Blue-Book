@@ -17,7 +17,7 @@ import { LiquidProductRow, PowderProductRow } from "@/lib/types";
 const AdminTable = () => {
   // New products with default fields for adding a new product feature
 
-  const [filterBy, setFilterBy] = useState("Approved");
+  const [filterBy, setFilterBy] = useState("All");
   const [columns, setColumns] = useState<
     (keyof LiquidProductRow | keyof PowderProductRow)[]
   >([]);
@@ -94,7 +94,6 @@ const AdminTable = () => {
   // Retrieve formula data + fields, set calculated fields
   const getFormulas = async (ingredientType: string) => {
     setProductType(ingredientType);
-    console.log(productType);
 
     if (ingredientType == "Liquid") {
       const { data: liquidForm, error: liquidFormError } = await supabase
@@ -151,6 +150,8 @@ const AdminTable = () => {
 
       if (powderFormError) {
         console.log("Error retrieving powder formulas: ", powderFormError);
+      } else {
+        console.log("Powder products!: ", powderForm.length);
       }
 
       const powderRows = (powderForm ?? []) as PowderProductRow[];
@@ -277,6 +278,12 @@ const AdminTable = () => {
                 <SelectGroup className="bg-white">
                   <SelectItem
                     className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="All"
+                  >
+                    All
+                  </SelectItem>
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
                     value="Approved"
                   >
                     Approved
@@ -298,12 +305,6 @@ const AdminTable = () => {
                     value="Inactive"
                   >
                     Inactive
-                  </SelectItem>
-                  <SelectItem
-                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                    value="All"
-                  >
-                    All
                   </SelectItem>
                 </SelectGroup>
               </SelectContent>
@@ -360,9 +361,9 @@ const AdminTable = () => {
         </div>
 
         {/* Product Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-96">
           <table className="w-full text-sm">
-            <thead className="border-b-2 bg-gray-50">
+            <thead className="border-b-2 bg-gray-50 sticky top-0 z-10">
               <tr className="text-left">
                 {columns!.map((column) => (
                   <th key={column} className="py-2 px-2 font-semibold">
@@ -373,7 +374,7 @@ const AdminTable = () => {
             </thead>
             <tbody>
               {filteredProducts?.map((product) => (
-                <tr key={product.id} className="border-b hover:bg-gray-50">
+                <tr key={product.id} className="border-b hover:bg-gray-50 ">
                   <td className="py-2 px-2">
                     <div className="flex items-center justify-between">
                       <span>{product.product || ""}</span>
