@@ -15,8 +15,6 @@ import { supabase } from "@/lib/supabase";
 import { LiquidProductRow, PowderProductRow } from "@/lib/types";
 
 const AdminTable = () => {
-  // New products with default fields for adding a new product feature
-
   const [filterBy, setFilterBy] = useState("All");
   const [columns, setColumns] = useState<
     (keyof LiquidProductRow | keyof PowderProductRow)[]
@@ -24,19 +22,18 @@ const AdminTable = () => {
   const [productType, setProductType] = useState("Liquid");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
   const [selectedProduct, setSelectedProduct] = useState<
     LiquidProductRow | PowderProductRow | null
   >(null);
-  // const [fieldValue, setFieldValue] = useState("");
+
+  const [editedFields, setEditedFields] = useState<
+    Partial<LiquidProductRow | PowderProductRow>
+  >({ approved: false, active: false });
   const [isSuperUser, setIsSuperUser] = useState(true);
   const [newProduct, setNewProduct] = useState<
     Partial<LiquidProductRow | PowderProductRow>
   >({});
 
-  // const [modifiedProduct, setModifiedProduct] = useState<
-  //   LiquidProductRow | PowderProductRow | null
-  // >(null);
   // const [isDataAdmin, setIsDataAdmin] = useState(false);
   const [products, setProducts] = useState<
     LiquidProductRow[] | PowderProductRow[] | []
@@ -200,8 +197,9 @@ const AdminTable = () => {
     return true;
   });
 
-  // Handle field value change with validation and update new product
-  const handleFieldValueChange = (
+  // Handle field value change with validation and update new product for Add Product functionality
+
+  const handleAddEntryFieldChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     column: string,
     is_text: boolean
@@ -210,8 +208,8 @@ const AdminTable = () => {
 
     if (is_text) {
       // Allow only letters, spaces, and common punctuation for text fields
-      const textValue = value.replace(/[^a-zA-Z\s.,'-]/g, "");
-      value = textValue;
+      // const textValue = value.replace(/[^a-zA-Z\s.,'-]/g, "");
+      value = value;
     } else {
       // Allow only numbers and decimal point for numeric fields
       const numericValue = value
@@ -223,6 +221,8 @@ const AdminTable = () => {
     setNewProduct((prev) => ({
       ...prev,
       [column]: value,
+      approved: false,
+      active: false,
     }));
   };
 
@@ -235,17 +235,74 @@ const AdminTable = () => {
     } else {
       table = "powder_ingredients";
     }
-    setNewProduct((prev) => ({
-      ...prev,
-      approved: false,
-      active: false,
-    }));
 
     const { error } = await supabase.from(table).insert(newProduct);
     if (error) {
       console.log("Error inserting row: ", error.message);
     } else {
       alert("Changes saved!");
+    }
+  };
+
+  // Handle field value change with validation and update list of edits for Edit Product functionality
+  const handleEditEntryFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    column: string,
+    is_text: boolean
+  ) => {
+    let value = e.target.value;
+
+    if (is_text) {
+      // Allow only letters, spaces, and common punctuation for text fields
+      // const textValue = value.replace(/[^a-zA-Z\s.,'-]/g, "");
+      value = value;
+    } else {
+      // Allow only numbers and decimal point for numeric fields
+      const numericValue = value
+        .replace(/[^0-9.]/g, "")
+        .replace(/(\..*?)\..*/g, "$1");
+      value = numericValue;
+    }
+
+    // Keep track of edited fields
+    setEditedFields((prev) => {
+      const newFields = { ...prev };
+
+      // Checks if user deleted entry from field --> shouldn't update field in this case
+      if (
+        value === "" &&
+        selectedProduct![column as keyof typeof selectedProduct] !== ""
+      ) {
+        delete newFields[column as keyof typeof selectedProduct];
+      }
+
+      return { ...newFields, [column]: value };
+    });
+  };
+
+  const editProduct = async (isLiquid: boolean) => {
+    let table = "";
+    if (isLiquid) {
+      table = "liquid_ingredients";
+    } else {
+      table = "powder_ingredients";
+    }
+
+    // If no fields edited
+    if (Object.keys(editedFields).length == 0) {
+      alert("No changes detected!");
+      setIsEditModalOpen(false);
+    } else {
+      const { error } = await supabase
+        .from(table)
+        .update(editedFields)
+        .eq("id", selectedProduct!.id);
+      if (error) {
+        console.log("Error editing row: ", error.message);
+      } else {
+        alert("Changes saved!");
+        setEditedFields({ active: false, approved: false });
+      }
     }
   };
 
@@ -382,6 +439,7 @@ const AdminTable = () => {
                         onClick={() => {
                           setSelectedProduct(product);
                           setIsEditModalOpen(true);
+                          console.log(product.id);
                           // setFieldValue("");
                         }}
                         className="text-gray-600 hover:text-gray-900 ml-2"
@@ -436,7 +494,10 @@ const AdminTable = () => {
           <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative overflow-y-auto max-h-[80%]">
             {/* Close button */}
             <button
-              onClick={() => setIsEditModalOpen(false)}
+              onClick={() => {
+                setEditedFields({ active: false, approved: false });
+                setIsEditModalOpen(false);
+              }}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
             >
               ×
@@ -454,7 +515,12 @@ const AdminTable = () => {
 
             {columns
               .slice(1)
-              .filter((column) => column != "active" && column != "approved")
+              .filter(
+                (column) =>
+                  column != "active" &&
+                  column != "approved" &&
+                  !calculatedFields.includes(column)
+              )
               .map((column) => (
                 <div key={column}>
                   <label className="block text-sm font-medium mt-2 mb-1">
@@ -463,12 +529,12 @@ const AdminTable = () => {
                   <input
                     type={textOnlyFields.includes(column) ? "text" : "number"}
                     value={
-                      (newProduct[
-                        column as keyof typeof newProduct
+                      (editedFields[
+                        column as keyof typeof editedFields
                       ] as string) || ""
                     }
                     onChange={(e) =>
-                      handleFieldValueChange(
+                      handleEditEntryFieldChange(
                         e,
                         column,
                         textOnlyFields.includes(column)
@@ -476,8 +542,8 @@ const AdminTable = () => {
                     }
                     placeholder={
                       textOnlyFields.includes(column)
-                        ? "Enter new value"
-                        : "Enter new value"
+                        ? "Enter text"
+                        : "Enter number"
                     }
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                   />
@@ -487,14 +553,17 @@ const AdminTable = () => {
             {/* Action Buttons */}
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => setIsEditModalOpen(false)}
+                onClick={() => {
+                  setEditedFields({ active: false, approved: false });
+                  setIsEditModalOpen(false);
+                }}
                 className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  alert("Changes saved! (Demo only)");
+                  editProduct(productType == "Liquid");
                   setIsEditModalOpen(false);
                 }}
                 className="flex-1 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"
@@ -511,7 +580,10 @@ const AdminTable = () => {
           <div className="bg-white rounded-lg shadow-xl w-96 p-6 relative overflow-y-auto max-h-[80%]">
             {/* Close button */}
             <button
-              onClick={() => setIsAddModalOpen(false)}
+              onClick={() => {
+                setNewProduct({});
+                setIsAddModalOpen(false);
+              }}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
             >
               ×
@@ -544,7 +616,7 @@ const AdminTable = () => {
                       ] as string) || ""
                     }
                     onChange={(e) =>
-                      handleFieldValueChange(
+                      handleAddEntryFieldChange(
                         e,
                         column,
                         textOnlyFields.includes(column)
