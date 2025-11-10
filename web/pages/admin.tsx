@@ -13,9 +13,11 @@ import { Check, Pencil, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { LiquidProductRow, PowderProductRow } from "@/lib/types";
+import router from "next/router";
 
 const AdminTable = () => {
   const [filterBy, setFilterBy] = useState("All");
+  const [isLoading, setIsLoading] = useState(true);
   const [columns, setColumns] = useState<
     (keyof LiquidProductRow | keyof PowderProductRow)[]
   >([]);
@@ -29,7 +31,7 @@ const AdminTable = () => {
   const [editedFields, setEditedFields] = useState<
     Partial<LiquidProductRow | PowderProductRow>
   >({ approved: false, active: false });
-  const [isSuperUser, setIsSuperUser] = useState(true);
+  const [isSuperUser, setIsSuperUser] = useState(false);
   const [newProduct, setNewProduct] = useState<
     Partial<LiquidProductRow | PowderProductRow>
   >({});
@@ -39,6 +41,10 @@ const AdminTable = () => {
     LiquidProductRow[] | PowderProductRow[] | []
   >([]);
   type ColumnKeys = keyof LiquidProductRow | keyof PowderProductRow;
+  const [actionMode, setActionMode] = useState("default"); // modes: approve, activate, deactivate, and default
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(
+    new Set()
+  ); // keep track of products that are selected to be approved/activated/etc.
 
   const textOnlyFields = [
     "product",
@@ -68,25 +74,44 @@ const AdminTable = () => {
   ];
 
   // Checking User permissions - FIXME
-  // async function getUserRole() {
-  //   const {
-  //     data: { user },
-  //   } = await supabase.auth.getUser();
-  //   if (user) {
-  //     const { data } = await supabase
-  //       .from("users")
-  //       .select("role")
-  //       .eq("id", user.id)
-  //       .single();
+  useEffect(() => {
+    const GetUserRole = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-  //     if (data!.role == "superuser") {
-  //       setIsSuperUser(true);
-  //     }
-  //     if (data!.role == "admin") {
-  //       setIsDataAdmin(true);
-  //     }
-  //   }
-  // }
+        if (!user) {
+          router.push("/login");
+          return;
+        }
+
+        if (user) {
+          const { data, error } = await supabase
+            .from("users")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+
+          if (error) {
+            console.error("Error fetching user role: ", error);
+            router.push("/login");
+            return;
+          }
+          if (data?.role === "superuser") {
+            setIsSuperUser(true);
+          }
+          if (data!.role !== "superuser" && data!.role !== "admin") {
+            router.push("/");
+            return;
+          }
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    GetUserRole();
+  }, []);
 
   // Retrieve formula data + fields, set calculated fields
   const getFormulas = async (ingredientType: string) => {
@@ -274,6 +299,7 @@ const AdminTable = () => {
         selectedProduct![column as keyof typeof selectedProduct] !== ""
       ) {
         delete newFields[column as keyof typeof selectedProduct];
+        return newFields;
       }
 
       return { ...newFields, [column]: value };
@@ -306,10 +332,67 @@ const AdminTable = () => {
     }
   };
 
+  // Handle product being selected for bulk action
+  const handleCheck = (productId: string) => {
+    setSelectedProducts((prev) => {
+      const newProducts = new Set(prev);
+      if (newProducts.has(productId)) {
+        // add product if row is checked
+        newProducts.delete(productId); // Remove if already selected
+      } else {
+        // Add if not selected
+        newProducts.add(productId);
+      }
+      return newProducts;
+    });
+  };
+
+  const saveBulkChanges = async () => {
+    let table = "";
+    if (productType == "Liquid") {
+      table = "liquid_ingredients";
+    } else {
+      table = "powder_ingredients";
+    }
+
+    let fieldToUpdate = "";
+    let value = true;
+    if (actionMode == "approve") {
+      fieldToUpdate = "approved";
+    }
+    if (actionMode == "activate") {
+      fieldToUpdate = "active";
+    }
+    if (actionMode == "deactivate") {
+      fieldToUpdate = "active";
+      value = false;
+    }
+
+    const { error } = await supabase
+      .from(table)
+      .update({ [fieldToUpdate]: value })
+      .in("id", Array.from(selectedProducts));
+    if (error) {
+      console.log("Error updated table with bulk action: ", error.message);
+    } else {
+      alert("Changes have been saved successfully.");
+      setSelectedProducts(new Set());
+      setActionMode("default");
+      await getFormulas(productType);
+    }
+  };
+
   useEffect(() => {
     getFormulas("Liquid"); // Load liquid table by default
-    setIsSuperUser(true); // FIXME
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full min-h-screen rounded-t-[20px] pb-8">
@@ -397,20 +480,26 @@ const AdminTable = () => {
         <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
           {isSuperUser ? (
             <div className="flex gap-[10%] ">
-              <Button
-                variant="default"
-                className="rounded-full bg-green-600"
-                size="sm"
-              >
-                <ShieldCheck /> Activate
-              </Button>
-              <Button
-                variant="default"
-                className="rounded-full bg-red-600"
-                size="sm"
-              >
-                <ShieldMinus /> Deactivate
-              </Button>
+              {(actionMode == "default" || actionMode == "activate") && (
+                <Button
+                  variant="default"
+                  className="rounded-full bg-green-600"
+                  size="sm"
+                  onClick={() => setActionMode("activate")}
+                >
+                  <ShieldCheck /> Activate
+                </Button>
+              )}
+              {(actionMode == "default" || actionMode == "deactivate") && (
+                <Button
+                  variant="default"
+                  className="rounded-full bg-red-600"
+                  size="sm"
+                  onClick={() => setActionMode("deactivate")}
+                >
+                  <ShieldMinus /> Deactivate
+                </Button>
+              )}
             </div>
           ) : (
             <></>
@@ -422,6 +511,11 @@ const AdminTable = () => {
           <table className="w-full text-sm">
             <thead className="border-b-2 bg-gray-50 sticky top-0 z-10">
               <tr className="text-left">
+                {actionMode != "default" && (
+                  <th className="py-2 px-2 font-semibold bg-gray-50 sticky left-0 z-20">
+                    Select All
+                  </th>
+                )}
                 {columns!.map((column) => (
                   <th key={column} className="py-2 px-2 font-semibold">
                     {column}
@@ -432,6 +526,30 @@ const AdminTable = () => {
             <tbody>
               {filteredProducts?.map((product) => (
                 <tr key={product.id} className="border-b hover:bg-gray-50 ">
+                  {actionMode != "default" && (
+                    <td>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={selectedProducts.has(product.id)} // Controlled by React state
+                          disabled={
+                            (actionMode === "approve" && product.approved) ||
+                            (actionMode === "activate" && product.active) ||
+                            (actionMode === "activate" && !product.approved) ||
+                            (actionMode === "deactivate" && !product.active) ||
+                            (actionMode === "activate" && !product.approved) ||
+                            actionMode === "default"
+                          }
+                          onChange={() => {
+                            handleCheck(product.id);
+                            console.log(selectedProducts);
+                          }} // Updates state on change
+                          className="disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                      </label>
+                    </td>
+                  )}
+
                   <td className="py-2 px-2">
                     <div className="flex items-center justify-between">
                       <span>{product.product || ""}</span>
@@ -440,7 +558,6 @@ const AdminTable = () => {
                           setSelectedProduct(product);
                           setIsEditModalOpen(true);
                           console.log(product.id);
-                          // setFieldValue("");
                         }}
                         className="text-gray-600 hover:text-gray-900 ml-2"
                       >
@@ -464,27 +581,64 @@ const AdminTable = () => {
         <div className="mt-4 flex justify-between items-center">
           {isSuperUser ? (
             <div>
-              <Button variant="default" className="rounded-full" size="sm">
-                <Check /> Approve
-              </Button>
+              {(actionMode == "default" || actionMode == "approve") && (
+                <Button
+                  variant="default"
+                  className="rounded-full"
+                  size="sm"
+                  onClick={() => setActionMode("approve")}
+                >
+                  <Check /> Approve
+                </Button>
+              )}
             </div>
           ) : (
             <></>
           )}
-          <div>
-            <Button
-              onClick={() => {
-                setSelectedProduct(null);
-                setIsAddModalOpen(true);
-                // setFieldValue("");
-              }}
-              variant="default"
-              className="rounded-full"
-              size="sm"
-            >
-              <Plus /> Add Entry
-            </Button>
-          </div>
+          {actionMode == "default" && (
+            <div>
+              <Button
+                onClick={() => {
+                  setSelectedProduct(null);
+                  setIsAddModalOpen(true);
+                }}
+                variant="default"
+                className="rounded-full"
+                size="sm"
+              >
+                <Plus /> Add Entry
+              </Button>
+            </div>
+          )}
+
+          {actionMode != "default" && (
+            <div className="flex gap-[10%] ">
+              <Button
+                variant="default"
+                className="rounded-full bg-green-700"
+                size="sm"
+                onClick={() => {
+                  saveBulkChanges();
+                }}
+                disabled={selectedProducts.size == 0}
+              >
+                Save Changes
+              </Button>
+
+              <Button
+                variant="outline"
+                className="rounded-full"
+                size="sm"
+                onClick={() => {
+                  setSelectedProducts(new Set());
+                  alert("Canceled changes successfully.");
+                  setActionMode("default");
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

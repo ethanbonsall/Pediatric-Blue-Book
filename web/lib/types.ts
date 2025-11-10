@@ -26,7 +26,7 @@ export type Ingredient = {
 };
 
 export interface LiquidProductRow {
-    id?: UUID;
+    id: UUID;
     product?: string | null;
     company_brand?: string | null;
     age?: string | null;
@@ -82,7 +82,7 @@ export interface LiquidProductRow {
 
 
 export interface PowderProductRow {
-    id?: UUID;
+    id: UUID;
     product?: string | null;
     company_brand?: string | null;
     age?: string | null;
