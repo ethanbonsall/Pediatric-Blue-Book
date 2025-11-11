@@ -12,7 +12,16 @@ import { supabase } from "@/lib/supabase";
 import { pdf } from "@react-pdf/renderer";
 import MyDocument from "./nutrient-needs-summary";
 
-const NutrientNeedsCalculator = () => {
+type Nutrient = {
+  name: string;
+  amount: string;
+};
+
+interface NutrientNeedsCalculatorProps {
+  onNutrientsCalculated?: (nutrients: Nutrient[]) => void;
+}
+
+const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalculatorProps) => {
   // Variables for user to use calculator
   let age_input_placeholder = "Years 0-17";
   let max_input_age = 17;
@@ -150,11 +159,6 @@ const NutrientNeedsCalculator = () => {
 
   // Tracks if calculate button has been hit
   const [hasCalculated, setHasCalculated] = useState(false);
-
-  type Nutrient = {
-    name: string;
-    amount: string;
-  };
 
   // Print nutrient PDF function for print button
   const printNutrientPDF = async (
@@ -500,15 +504,90 @@ const NutrientNeedsCalculator = () => {
 
     // Catchup calories calculations
     catchup_calories = calorie_needs * (ideal_weight_50 / weight_in_kg);
-    setCatchUpEnergy(Math.round(catchup_calories * 10) / 10);
+    const roundedCatchUp = Math.round(catchup_calories * 10) / 10;
+    setCatchUpEnergy(roundedCatchUp);
 
     setHasCalculated(true);
+
+    // Build nutrients array and call callback using the calculated values
+    if (onNutrientsCalculated) {
+      const caloriesDisplay = Math.round(calorie_needs * 10) / 10;
+      const caloriesPerKGDisplay = Math.round((calorie_needs / weight_in_kg) * 10) / 10;
+      const proteinDisplay = Math.round(protein_needs * 10) / 10;
+      const highProteinDisplay = Math.round(high_protein_needs * 10) / 10;
+      
+      const calculatedNutrients: Nutrient[] = [
+        {
+          name: "Calories",
+          amount: `${
+            caloriesDisplay ? caloriesDisplay + " cal (" + caloriesPerKGDisplay + " cal/kg)" : ""
+          }`,
+        },
+        {
+          name: "Holliday-Segar",
+          amount: `${holliday_segar_fluid ? Math.round(holliday_segar_fluid) + " mL" : ""}`,
+        },
+        { name: "DRI Fluid", amount: `${dri ? Math.round(dri * 10) / 10 + " L" : ""}` },
+        { name: "Protein", amount: `${proteinDisplay ? "≥ " + proteinDisplay + " g " + "(" + protein_per_kg + " g/kg" + ")": ""}` },
+        {
+          name: `${needsType == "Increased" ? "High Protein" : ""}`,
+          amount: `${
+            needsType == "Increased" && highProteinDisplay ? "≥ " + highProteinDisplay + " g" : ""
+          }`,
+        },
+        {
+          name: "Carbohydrates",
+          amount: infant 
+            ? `${carb_cutoff ? carb_cutoff + " g" : ""}`
+            : `${carb_lower_percentage ? carb_lower_percentage + " - " + carb_upper_percentage + " g" : ""}`,
+        },
+        { 
+          name: "Fats", 
+          amount: infant
+            ? `${fat_cutoff ? fat_cutoff + " g" : ""}`
+            : `${fat_lower_percentage ? fat_lower_percentage + " - " + fat_upper_percentage + " g" : ""}`,
+        },
+        { name: "Calcium", amount: nutrientsObj["Calcium"] || "" },
+        { name: "Iron", amount: nutrientsObj["Iron"] || "" },
+        { name: "Vitamin D", amount: nutrientsObj["Vitamin D"] || "" },
+        { name: "Potassium", amount: nutrientsObj["Potassium"] || "" },
+        { name: "Magnesium", amount: nutrientsObj["Magnesium"] || "" },
+        { name: "Zinc", amount: nutrientsObj["Zinc"] || "" },
+        { name: "Vitamin A", amount: nutrientsObj["Vitamin A"] || "" },
+        { name: "Vitamin E", amount: nutrientsObj["Vitamin E"] || "" },
+        { name: "Vitamin C", amount: nutrientsObj["Vitamin C"] || "" },
+        { name: "Vitamin K", amount: nutrientsObj["Vitamin K"] || "" },
+        { name: "Thiamin", amount: nutrientsObj["Thiamin"] || "" },
+        { name: "Riboflavin", amount: nutrientsObj["Riboflavin"] || "" },
+        { name: "Niacin", amount: nutrientsObj["Niacin"] || "" },
+        { name: "Vitamin B6", amount: nutrientsObj["Vitamin B6"] || "" },
+        { name: "Folate", amount: nutrientsObj["Folate"] || "" },
+        { name: "Vitamin B12", amount: nutrientsObj["Vitamin B12"] || "" },
+        { name: "Pantothenic Acid", amount: nutrientsObj["Pantothenic Acid"] || "" },
+        { name: "Biotin", amount: nutrientsObj["Biotin"] || "" },
+        { name: "Choline", amount: nutrientsObj["Choline"] || "" },
+        { name: "Chromium", amount: nutrientsObj["Chromium"] || "" },
+        { name: "Copper", amount: nutrientsObj["Copper"] || "" },
+        { name: "Fluoride", amount: nutrientsObj["Fluoride"] || "" },
+        { name: "Iodine", amount: nutrientsObj["Iodine"] || "" },
+        { name: "Manganese", amount: nutrientsObj["Manganese"] || "" },
+        { name: "Phosphorus", amount: nutrientsObj["Phosphorus"] || "" },
+        { name: "Selenium", amount: nutrientsObj["Selenium"] || "" },
+        { name: "Sodium", amount: nutrientsObj["Sodium"] || "" },
+        { name: "Chloride", amount: nutrientsObj["Chloride"] || "" },
+        { name: "Fiber (DGA)", amount: nutrientsObj["Fiber"] || "" },
+      ];
+      // Use setTimeout to ensure state updates are processed first
+      setTimeout(() => {
+        onNutrientsCalculated(calculatedNutrients);
+      }, 0);
+    }
   };
 
   // Setting nutrients into an array to be used in the table
   const nutrients = [
     {
-      name: "Energy Needs",
+      name: "Calories",
       amount: `${
         calories ? calories + " cal (" + caloriesPerKG + " cal/kg)" : ""
       }`,
@@ -558,8 +637,8 @@ const NutrientNeedsCalculator = () => {
     { name: "Selenium", amount: `${selenium || ""}` },
     { name: "Sodium", amount: `${sodium || ""}` },
     { name: "Chloride", amount: `${chloride || ""}` },
-    { name: "Fiber", amount: `${fiber || ""}` },
-  ];
+    { name: "Fiber (DGA)", amount: `${fiber || ""}` },
+  ]; 
 
   return (
     <div
@@ -922,8 +1001,8 @@ const NutrientNeedsCalculator = () => {
             <p className="text-lg xl:text-xl 2xl:text-2xl font-bold">
               Ideal Body Weight
             </p>
-            <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
-              <p className="font-semibold">
+            <div className="flex flex-row text-md lg:text-lg 2xl:text-3xl ">
+              <p className="font-[550]">
                 BMI (50th Percentile for age):&nbsp;
               </p>
               <p>
@@ -931,8 +1010,8 @@ const NutrientNeedsCalculator = () => {
                 {Math.round((idealWeight50 * 2.205 * 10) / 10)} lb)
               </p>
             </div>
-            <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl ">
-              <p className="font-semibold">
+            <div className="flex flex-row text-md lg:text-lg 2xl:text-3xl ">
+              <p className="font-[550]">
                 BMI (25th Percentile for age):&nbsp;
               </p>
               <p>
@@ -940,10 +1019,10 @@ const NutrientNeedsCalculator = () => {
                 {Math.round((idealWeight25 * 2.205 * 10) / 10)} lb)
               </p>
             </div>
-            <div className="flex flex-row text-lg lg:text-xl 2xl:text-3xl">
+            <div className="flex flex-row text-md lg:text-lg 2xl:text-3xl">
               { needsType == "Increased" ? (
                 <>
-                  <p className="font-semibold">Catch Up Needs:&nbsp;</p>
+                  <p className="font-[550]">Catch Up Needs:&nbsp;</p>
                   <p>{catchUpEnergy} cal</p>
                 </>
               ) : null}
