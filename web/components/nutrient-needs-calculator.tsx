@@ -266,8 +266,6 @@ if (sex === "Male") {
 // Convert height to cm if needed
 const height_cm = height_in_meters * 100;
 
-// EER formulas
-let calorie_needs = 0;
 
 // Ages 0–2.99
 if (sex === "Male" && age_in_years < 3) {
