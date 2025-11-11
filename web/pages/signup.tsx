@@ -92,7 +92,7 @@ const Index = () => {
       router.push("/");
     }
   };
-  let value = true;
+
 
   return (
     <>
