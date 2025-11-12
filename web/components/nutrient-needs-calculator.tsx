@@ -243,87 +243,136 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
       height_in_meters = height;
     }
 
-    // Physical Activity Level
-    let PA = 1;
 
-    if (sex === "Male") {
-      switch (activityLevel) {
-        case "Not Applicable":
-          PA = 1;
-          break;
-        case "Inactive":
-          PA = 1;
-          break;
-        case "Low Active":
-          PA = 1.13;
-          break;
-        case "Active":
-          PA = 1.26;
-          break;
-        case "Very Active":
-          PA = 1.42;
-          break;
-      }
-    } else {
-      switch (activityLevel) {
-        case "Not Applicable":
-          PA = 1;
-          break;
-        case "Inactive":
-          PA = 1;
-          break;
-        case "Low Active":
-          PA = 1.16;
-          break;
-        case "Active":
-          PA = 1.31;
-          break;
-        case "Very Active":
-          PA = 1.56;
-          break;
-      }
-    }
+// ECG — Energy Cost of Growth
+let ECG = 20;
+if (sex === "Male") {
+  if (age_in_years < 0.25) ECG = 200;
+  else if (age_in_years < 0.5) ECG = 50;
+  else if (age_in_years < 4) ECG = 20;
+  else if (age_in_years < 9) ECG = 15;
+  else if (age_in_years < 14) ECG = 25;
+  else ECG = 20;
+} else {
+  if (age_in_years < 0.25) ECG = 180;
+  else if (age_in_years < 0.5) ECG = 60;
+  else if (age_in_years < 1) ECG = 20;
+  else if (age_in_years < 9) ECG = 15;
+  else if (age_in_years < 14) ECG = 30;
+  else ECG = 20;
+}
 
-    // Calculating calorie needs
-    if (age_in_years < 0.25) {
-      calorie_needs = 89 * weight_in_kg - 100 + 175;
-    } else if (age_in_years < 0.5) {
-      calorie_needs = 89 * weight_in_kg - 100 + 56;
-    } else if (age_in_years < 1) {
-      calorie_needs = 89 * weight_in_kg - 100 + 22;
-    } else if (age_in_years < 3) {
-      calorie_needs = 89 * weight_in_kg - 100 + 20;
-    } else if (sex === "Male") {
-      if (age_in_years >= 3 && age_in_years <= 8) {
+
+// Convert height to cm if needed
+const height_cm = height_in_meters * 100;
+
+
+// Ages 0–2.99
+if (sex === "Male" && age_in_years < 3) {
+  calorie_needs =
+    -716.45 -
+    age_in_years +
+    17.82 * height_cm +
+    15.06 * weight_in_kg +
+    ECG;
+}
+
+if (sex === "Female" && age_in_years < 3) {
+  calorie_needs =
+    -69.15 +
+    80 * age_in_years +
+    2.65 * height_cm +
+    54.15 * weight_in_kg +
+    ECG;
+}
+
+// Ages 3–18.99
+if (age_in_years >= 3 && age_in_years < 19) {
+  if (sex === "Male") {
+    switch (activityLevel) {
+      case "Inactive":
         calorie_needs =
-          88.5 -
-          61.9 * age_in_years +
-          PA * (26.7 * weight_in_kg + 903 * height_in_meters) +
-          20;
-      } else if (age_in_years > 8 && age_in_years <= 18) {
+          -447.51 +
+          3.68 * age_in_years +
+          13.01 * height_cm +
+          13.15 * weight_in_kg +
+          ECG;
+        break;
+
+      case "Low Active":
         calorie_needs =
-          88.5 -
-          61.9 * age_in_years +
-          PA * (26.7 * weight_in_kg + 903 * height_in_meters) +
-          25;
-      }
-    } else if (sex === "Female") {
-      if (age_in_years >= 3 && age_in_years <= 8) {
+          19.12 +
+          3.68 * age_in_years +
+          8.62 * height_cm +
+          20.28 * weight_in_kg +
+          ECG;
+        break;
+
+      case "Active":
         calorie_needs =
-          135.3 -
-          30.8 * age_in_years +
-          PA * (10 * weight_in_kg + 934 * height_in_meters) +
-          20;
-      } else if (age_in_years > 8 && age_in_years <= 18) {
+          -388.19 +
+          3.68 * age_in_years +
+          12.66 * height_cm +
+          20.46 * weight_in_kg +
+          ECG;
+        break;
+
+      case "Very Active":
         calorie_needs =
-          135.3 -
-          30.8 * age_in_years +
-          PA * (10 * weight_in_kg + 934 * height_in_meters) +
-          20;
-      }
+          -671.75 +
+          3.68 * age_in_years +
+          15.38 * height_cm +
+          23.25 * weight_in_kg +
+          ECG;
+        break;
     }
-    setCalories(Math.round(calorie_needs * 10) / 10);
-    setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
+  }
+
+  if (sex === "Female") {
+    switch (activityLevel) {
+      case "Inactive":
+        calorie_needs =
+          55.59 -
+          22.25 * age_in_years +
+          8.43 * height_cm +
+          17.07 * weight_in_kg +
+          ECG;
+        break;
+
+      case "Low Active":
+        calorie_needs =
+          -297.54 -
+          22.25 * age_in_years +
+          12.77 * height_cm +
+          14.73 * weight_in_kg +
+          ECG;
+        break;
+
+      case "Active":
+        calorie_needs =
+          -189.55 -
+          22.25 * age_in_years +
+          11.74 * height_cm +
+          18.34 * weight_in_kg +
+          ECG;
+        break;
+
+      case "Very Active":
+        calorie_needs =
+          -709.59 -
+          22.25 * age_in_years +
+          18.22 * height_cm +
+          14.25 * weight_in_kg +
+          ECG;
+        break;
+    }
+  }
+}
+
+// Store results
+setCalories(Math.round(calorie_needs));
+setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
+
 
     // Getting 25th and 50th percentile BMI's from supabase for 2-18 and ideal weight directly for 0-2
     try {
