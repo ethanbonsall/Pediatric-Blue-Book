@@ -35,8 +35,12 @@ const Forgot = () => {
             <X className="text-white"></X>
           </button>
           <div className="p-8">
-          <h1 className="text-white font-bold md:text-xl lg:text-2xl 2xl:text-4xl pb-4">See you soon!</h1>
-          <p className="text-white">If you have an account, a reset link will be sent to your email.</p>
+            <h1 className="text-white font-bold md:text-xl lg:text-2xl 2xl:text-4xl pb-4">
+              See you soon!
+            </h1>
+            <p className="text-white">
+              If you have an account, a reset link will be sent to your email.
+            </p>
           </div>
         </div>
         <div className="flex flex-col justify-center bg-background text-text w-fit h-fit shadow-2xl p-8">
