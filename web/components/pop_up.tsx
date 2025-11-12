@@ -26,13 +26,16 @@ const Popup = ({
   ingredientType?: string;
 }) => {
   const s = selectedIngredient ?? {};
-  const product_name = (s.product as string) ?? (s.company_brand as string) ?? "?";
+  const product_name =
+    (s.product as string) ?? (s.company_brand as string) ?? "?";
   const product_age = (s.age as string) ?? (s.recommended_age as string) ?? "?";
-  const protein_percent = ((s.npc_percent_cal_from_protein as string) ?? "?") + "%";
+  const protein_percent =
+    ((s.npc_percent_cal_from_protein as string) ?? "?") + "%";
   const protein_source = (s.protein_sources as string) ?? "?";
   const fat_percent = ((s.npc_percent_cal_from_fat as string) ?? "?") + "%";
   const fat_source = (s.fat_sources as string) ?? "?";
-  const carbohydrate_percent = ((s.npc_percent_cal_from_cho as string) ?? "?") + "%";
+  const carbohydrate_percent =
+    ((s.npc_percent_cal_from_cho as string) ?? "?") + "%";
   const carbohydrate_source = (s.carbohydrate_sources as string) ?? "?";
   const prebiotic = (s.prebiotic as string) ?? "?";
   const probiotic = (s.probiotic as string) ?? "?";
@@ -48,13 +51,31 @@ const Popup = ({
     }
 
     const options = [
-      { value: "Scoop", label: "Scoop", available: Boolean(selectedIngredient?.grams_per_scoop) },
-      { value: "Teaspoon", label: "Teaspoon", available: Boolean(selectedIngredient?.grams_per_teaspoon) },
-      { value: "Tablespoon", label: "Tablespoon", available: Boolean(selectedIngredient?.grams_per_tablespoon) },
-      { value: "Cup", label: "Cup", available: Boolean(selectedIngredient?.grams_per_cup) },
+      {
+        value: "Scoop",
+        label: "Scoop",
+        available: Boolean(selectedIngredient?.grams_per_scoop),
+      },
+      {
+        value: "Teaspoon",
+        label: "Teaspoon",
+        available: Boolean(selectedIngredient?.grams_per_teaspoon),
+      },
+      {
+        value: "Tablespoon",
+        label: "Tablespoon",
+        available: Boolean(selectedIngredient?.grams_per_tablespoon),
+      },
+      {
+        value: "Cup",
+        label: "Cup",
+        available: Boolean(selectedIngredient?.grams_per_cup),
+      },
     ];
 
-    return options.filter((option) => option.available).map(({ value, label }) => ({ value, label }));
+    return options
+      .filter((option) => option.available)
+      .map(({ value, label }) => ({ value, label }));
   }, [isPowder, selectedIngredient]);
 
   const hasServingOptions = availableServingOptions.length > 0;
@@ -76,14 +97,26 @@ const Popup = ({
       setServing("1");
     }
 
-    if (initialAmount && availableServingOptions.some((option) => option.value === initialAmount.servingType)) {
+    if (
+      initialAmount &&
+      availableServingOptions.some(
+        (option) => option.value === initialAmount.servingType
+      )
+    ) {
       setServingType(initialAmount.servingType);
     } else if (hasServingOptions) {
       setServingType(availableServingOptions[0].value);
     } else {
       setServingType("");
     }
-  }, [popUp, selectedIngredient, initialAmount, isPowder, availableServingOptions, hasServingOptions]);
+  }, [
+    popUp,
+    selectedIngredient,
+    initialAmount,
+    isPowder,
+    availableServingOptions,
+    hasServingOptions,
+  ]);
 
   return (
     <div
@@ -97,14 +130,19 @@ const Popup = ({
         </button>
       </div>
       <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-y-4">
-        <p className="font-semibold text-2xl lg:text-3xl 2xl:text-4xl">{product_name}</p>
+        <p className="font-semibold text-2xl lg:text-3xl 2xl:text-4xl">
+          {product_name}
+        </p>
         <p className="text-lg lg:text-xl 2xl:text-2xl">
           <span className="font-medium">Recommended Age:</span> {product_age}
         </p>
-        <p className="text-lg lg:text-xl 2xl:text-2xl"><span className="font-medium">Company:</span> {company}</p>
+        <p className="text-lg lg:text-xl 2xl:text-2xl">
+          <span className="font-medium">Company:</span> {company}
+        </p>
 
         <p className="text-lg lg:text-xl 2xl:text-2xl">
-          <span className="font-medium">PRO ({protein_percent}):</span> {protein_source}
+          <span className="font-medium">PRO ({protein_percent}):</span>{" "}
+          {protein_source}
         </p>
 
         <p className="text-lg lg:text-xl 2xl:text-2xl">
@@ -112,18 +150,26 @@ const Popup = ({
         </p>
 
         <p className="text-lg lg:text-xl 2xl:text-2xl">
-          <span className="font-medium">CHO ({carbohydrate_percent}):</span> {carbohydrate_source}
+          <span className="font-medium">CHO ({carbohydrate_percent}):</span>{" "}
+          {carbohydrate_source}
         </p>
-
-        <p className="text-lg lg:text-xl 2xl:text-2xl"><span className="font-medium">Prebiotic:</span> {prebiotic}</p>
-
-        <p className="text-lg lg:text-xl 2xl:text-2xl"><span className="font-medium">Probiotic:</span> {probiotic}</p>
 
         <p className="text-lg lg:text-xl 2xl:text-2xl">
-          <span className="font-medium">Water (at standard dilution):</span> {water_percent}
+          <span className="font-medium">Prebiotic:</span> {prebiotic}
         </p>
 
-        <p className="text-lg lg:text-xl 2xl:text-2xl"><span className="font-medium">Allergens:</span> {allergens}</p>
+        <p className="text-lg lg:text-xl 2xl:text-2xl">
+          <span className="font-medium">Probiotic:</span> {probiotic}
+        </p>
+
+        <p className="text-lg lg:text-xl 2xl:text-2xl">
+          <span className="font-medium">Water (at standard dilution):</span>{" "}
+          {water_percent}
+        </p>
+
+        <p className="text-lg lg:text-xl 2xl:text-2xl">
+          <span className="font-medium">Allergens:</span> {allergens}
+        </p>
       </div>
       <div className="mt-4 flex flex-col gap-y-3">
         <div className="flex flex-row w-fit h-fit gap-x-2 items-center">
@@ -155,7 +201,11 @@ const Popup = ({
             disabled={!hasServingOptions}
           >
             <SelectTrigger className="w-[30dvw] md:w-[8dvw] lg:w-[10dvw] bg-white rounded text-text xl:text-lg 2xl:text-xl px-2 py-1 lg:px-4 lg:py-2">
-              <SelectValue placeholder={hasServingOptions ? availableServingOptions[0].label : "N/A"} />
+              <SelectValue
+                placeholder={
+                  hasServingOptions ? availableServingOptions[0].label : "N/A"
+                }
+              />
             </SelectTrigger>
             <SelectContent className="bg-white w-fit rounded">
               <SelectGroup className="bg-white">
@@ -173,7 +223,7 @@ const Popup = ({
           </Select>
         </div>
         <div className="flex flex-row justify-end">
-          <button 
+          <button
             disabled={!hasServingOptions || !servingType}
             onClick={() => {
               if (onAdd && servingType) {

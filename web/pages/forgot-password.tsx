@@ -40,7 +40,7 @@ const Forgot = () => {
           <p className="text-center text-5xl font-bold">
             Forgot Your Password?
           </p>
-          <form className="flex flex-col gap-y-6 pt-6 w-[500px] justify-center">
+          <form className="flex flex-col gap-y-6 pt-6 max-w-full w-[500px] justify-center">
             <label htmlFor="email" className="text-lg">
               Enter your email address below and we will send you a link to
               reset your password.
