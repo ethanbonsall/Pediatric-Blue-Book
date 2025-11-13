@@ -65,8 +65,8 @@ const FormulaNeedsCalculator = ({
   const getIngredients = async () => {
     // fetch rows for powder and liquid
     const [powderRes, liquidRes] = await Promise.all([
-      supabase.from("powder_ingredients").select("*"),
-      supabase.from("liquid_ingredients").select("*"),
+      supabase.from("powder_ingredients").select("*").eq("active", true),
+      supabase.from("liquid_ingredients").select("*").eq("active", true),
     ]);
 
     if (powderRes.error)

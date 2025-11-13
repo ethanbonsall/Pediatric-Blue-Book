@@ -29,17 +29,14 @@ const FormulaNeedsCalculator = () => {
   const [selectedIngredient, setSelectedIngredient] = useState<ProductRow | null>(null);
 
   const getIngredients = async () => {
-    // fetch rows for powder and liquid
+    // fetch rows for powder and liquid, only active products
     const [powderRes, liquidRes] = await Promise.all([
-      supabase.from("powder_ingredients").select("*"),
-      supabase.from("liquid_ingredients").select("*"),
+      supabase.from("powder_ingredients").select("*").eq("active", true),
+      supabase.from("liquid_ingredients").select("*").eq("active", true),
     ]);
-
 
     if (powderRes.error) console.error("powder_ingredients error:", powderRes.error);
     if (liquidRes.error) console.error("liquid_ingredients error:", liquidRes.error);
-
-    
 
     const powderRows: ProductRow[] = (powderRes.data ?? []) as ProductRow[];
     const liquidRows: ProductRow[] = (liquidRes.data ?? []) as ProductRow[];
@@ -53,8 +50,8 @@ const FormulaNeedsCalculator = () => {
       const map = new Map<string, Ingredient>();
       [...prev, ...fetched].forEach((item) => map.set(item.name.toLowerCase(), item));
       return Array.from(map.values());
-        });
-    };
+    });
+  };
 
   const filteredIngredients = ingredients.filter(
     (ingredient) =>
