@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { X } from "lucide-react";
 import Head from "next/head";
-import Link from "next/link";
+import router from "next/router";
 import { useState } from "react";
 
 const Reset = () => {
@@ -16,6 +16,14 @@ const Reset = () => {
       setPassword("");
       setShowNotification(true);
     }
+  }
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    router.push("/");
   }
 
   return (
@@ -59,12 +67,13 @@ const Reset = () => {
             >
               Set New Password
             </button>
-            <Link
-              href="/"
+            <button
+              type="button"
               className="text-lg self-center text-black font-semibold hover:text-gray-800"
+              onClick={handleSignOut}
             >
               Back To Login
-            </Link>
+            </button>
           </form>
         </div>
       </div>

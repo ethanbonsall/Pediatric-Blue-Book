@@ -29,18 +29,25 @@ const Forgot = () => {
         <div
           className={`${
             showNotification ? "fixed" : "hidden"
-          } top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-[50dvw] xl:w-[25dvw] bg-primary p-4 rounded text-md md:text-lg lg:text-xl z-50 gap-y-6`}
+          } top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-[50dvw] xl:w-[25dvw] bg-primary p-4 rounded text-md md:text-lg lg:text-xl z-50 gap-y-6 `}
         >
           <button onClick={() => setShowNotification(false)}>
-            <X></X>
+            <X className="text-white"></X>
           </button>
-          <p>If you have an account, a reset link will be sent to your email</p>
+          <div className="p-8">
+            <h1 className="text-white font-bold md:text-xl lg:text-2xl 2xl:text-4xl pb-4">
+              See you soon!
+            </h1>
+            <p className="text-white">
+              If you have an account, a reset link will be sent to your email.
+            </p>
+          </div>
         </div>
         <div className="flex flex-col justify-center bg-background text-text w-fit h-fit shadow-2xl p-8">
           <p className="text-center text-5xl font-bold">
             Forgot Your Password?
           </p>
-          <form className="flex flex-col gap-y-6 pt-6 w-[500px] justify-center">
+          <form className="flex flex-col gap-y-6 pt-6 max-w-full w-[500px] justify-center">
             <label htmlFor="email" className="text-lg">
               Enter your email address below and we will send you a link to
               reset your password.
