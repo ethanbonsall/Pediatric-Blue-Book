@@ -12,21 +12,23 @@ const Popup = ({
 }) => {
   const s = selectedIngredient ?? {};
   const product_name =
-    (s.product as string) ?? (s.company_brand as string) ?? "?";
-  const product_age = (s.age as string) ?? (s.recommended_age as string) ?? "?";
+    (s.product as string) ?? (s.company_brand as string) ?? "None";
+  const product_age =
+    (s.age as string) ?? (s.recommended_age as string) ?? "None";
   const protein_percent =
-    ((s.npc_percent_cal_from_protein as string) ?? "?") + "%";
-  const protein_source = (s.protein_sources as string) ?? "?";
-  const fat_percent = ((s.npc_percent_cal_from_fat as string) ?? "?") + "%";
-  const fat_source = (s.fat_sources as string) ?? "?";
+    ((s.npc_percent_cal_from_protein as string) ?? "0") + "%";
+  const protein_source = (s.protein_sources as string) ?? "None";
+  const fat_percent = ((s.npc_percent_cal_from_fat as string) ?? "0") + "%";
+  const fat_source = (s.fat_sources as string) ?? "None";
   const carbohydrate_percent =
-    ((s.npc_percent_cal_from_cho as string) ?? "?") + "%";
-  const carbohydrate_source = (s.carbohydrate_sources as string) ?? "?";
-  const prebiotic = (s.prebiotic as string) ?? "?";
-  const probiotic = (s.probiotic as string) ?? "?";
-  const water_percent = ((s.npc_percent_free_water as string) ?? "?") + "%";
-  const allergen = (s.allergens as string) ?? "?";
-  const company = (s.company_brand as string) ?? (s.company as string) ?? "?";
+    ((s.npc_percent_cal_from_cho as string) ?? "0") + "%";
+  const carbohydrate_source = (s.carbohydrate_sources as string) ?? "None";
+  const prebiotic = (s.prebiotic as string) ?? "None";
+  const probiotic = (s.probiotic as string) ?? "None";
+  const water_percent = ((s.npc_percent_free_water as string) ?? "0") + "%";
+  const allergen = (s.allergens as string) ?? "None";
+  const company =
+    (s.company_brand as string) ?? (s.company as string) ?? "None";
 
   return (
     <div
