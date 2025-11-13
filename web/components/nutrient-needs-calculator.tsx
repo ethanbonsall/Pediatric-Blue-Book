@@ -560,7 +560,7 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
 
     // Build nutrients array and call callback using the calculated values
     if (onNutrientsCalculated) {
-      const caloriesDisplay = Math.round(calorie_needs * 10) / 10;
+      const caloriesDisplay = Math.round(calorie_needs);
       const caloriesPerKGDisplay = Math.round((calorie_needs / weight_in_kg) * 10) / 10;
       const proteinDisplay = Math.round(protein_needs * 10) / 10;
       const highProteinDisplay = Math.round(high_protein_needs * 10) / 10;
