@@ -59,45 +59,45 @@ const FormulaNeedsCalculator = ({
   const [servings, setServings] = useState<number>(1);
 
   useEffect(() => {
+    const getIngredients = async () => {
+      // fetch rows for powder and liquid
+      const [powderRes, liquidRes] = await Promise.all([
+        supabase.from("powder_ingredients").select("*").eq("active", true),
+        supabase.from("liquid_ingredients").select("*").eq("active", true),
+      ]);
+
+      if (powderRes.error)
+        console.error("powder_ingredients error:", powderRes.error);
+      if (liquidRes.error)
+        console.error("liquid_ingredients error:", liquidRes.error);
+
+      const powderRows: ProductRow[] = (powderRes.data ?? []) as ProductRow[];
+      const liquidRows: ProductRow[] = (liquidRes.data ?? []) as ProductRow[];
+
+      const fetched: Ingredient[] = [
+        ...powderRows.map((r) => ({
+          name: (r.product ?? "").toString().trim(),
+          type: "Powder",
+          row: r,
+        })),
+        ...liquidRows.map((r) => ({
+          name: (r.product ?? "").toString().trim(),
+          type: "Liquid",
+          row: r,
+        })),
+      ].filter((it) => it.name.length > 0);
+
+      setIngredients((prev) => {
+        const map = new Map<string, Ingredient>();
+        [...prev, WATER_INGREDIENT, ...fetched].forEach((item) =>
+          map.set(item.name.toLowerCase(), item)
+        );
+        return Array.from(map.values());
+      });
+    };
+
     getIngredients();
   }, []);
-
-  const getIngredients = async () => {
-    // fetch rows for powder and liquid
-    const [powderRes, liquidRes] = await Promise.all([
-      supabase.from("powder_ingredients").select("*").eq("active", true),
-      supabase.from("liquid_ingredients").select("*").eq("active", true),
-    ]);
-
-    if (powderRes.error)
-      console.error("powder_ingredients error:", powderRes.error);
-    if (liquidRes.error)
-      console.error("liquid_ingredients error:", liquidRes.error);
-
-    const powderRows: ProductRow[] = (powderRes.data ?? []) as ProductRow[];
-    const liquidRows: ProductRow[] = (liquidRes.data ?? []) as ProductRow[];
-
-    const fetched: Ingredient[] = [
-      ...powderRows.map((r) => ({
-        name: (r.product ?? "").toString().trim(),
-        type: "Powder",
-        row: r,
-      })),
-      ...liquidRows.map((r) => ({
-        name: (r.product ?? "").toString().trim(),
-        type: "Liquid",
-        row: r,
-      })),
-    ].filter((it) => it.name.length > 0);
-
-    setIngredients((prev) => {
-      const map = new Map<string, Ingredient>();
-      [...prev, WATER_INGREDIENT, ...fetched].forEach((item) =>
-        map.set(item.name.toLowerCase(), item)
-      );
-      return Array.from(map.values());
-    });
-  };
 
   // Extract minimum gram amount for Protein, Carbohydrates, and Fats
   const extractMinGrams = (amountString: string): string => {
