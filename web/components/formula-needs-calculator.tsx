@@ -60,7 +60,7 @@ const FormulaNeedsCalculator = ({
 
   useEffect(() => {
     getIngredients();
-  }, );
+  }, []);
 
   const getIngredients = async () => {
     // fetch rows for powder and liquid
