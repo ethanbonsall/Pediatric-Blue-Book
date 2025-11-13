@@ -1023,7 +1023,7 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
               Needs are based on the selected needs type
             </p>
           </>
-          <div className="flex flex-col w-full border rounded-[20px] max-h-[70vh] overflow-y-auto no-scrollbar relative">
+          <div className="flex flex-col w-full border rounded-l-[20px] max-h-[70vh] overflow-y-auto no-scrollbar relative">
             <div className="sticky top-0">
               <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh] font-semibold bg-white">
                 <p className="w-[50%] ">Nutrient</p>
