@@ -485,13 +485,13 @@ const AdminTable = () => {
                     className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
                     value="az"
                   >
-                    Name A - Z
+                    Product Name A - Z
                   </SelectItem>
                   <SelectItem
                     className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
                     value="za"
                   >
-                    Name Z - A
+                    Product Name Z - A
                   </SelectItem>
                 </SelectGroup>
               </SelectContent>
