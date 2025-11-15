@@ -40,6 +40,7 @@ const AdminTable = () => {
   const [products, setProducts] = useState<
     LiquidProductRow[] | PowderProductRow[] | []
   >([]);
+  const [sortOrder, setSortOrder] = useState("none");
   type ColumnKeys = keyof LiquidProductRow | keyof PowderProductRow;
   const [actionMode, setActionMode] = useState("default"); // modes: approve, activate, deactivate, and default
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(
@@ -222,6 +223,18 @@ const AdminTable = () => {
     return true;
   });
 
+  // Sort by product name
+  const sortedProducts =
+    sortOrder === "none"
+      ? filteredProducts
+      : [...filteredProducts].sort((a, b) => {
+          const aName = String(a.product ?? "").toLowerCase();
+          const bName = String(b.product ?? "").toLowerCase();
+          if (aName < bName) return sortOrder === "az" ? -1 : 1;
+          if (aName > bName) return sortOrder === "az" ? 1 : -1;
+          return 0;
+        });
+
   // Handle field value change with validation and update new product for Add Product functionality
 
   const handleAddEntryFieldChange = (
@@ -394,6 +407,9 @@ const AdminTable = () => {
     );
   }
 
+  // find the index of the fat_sources column so we can apply a minWidth to both header and cells
+  const fatIndex = columns ? columns.findIndex((c) => String(c) === "fat_sources") : -1;
+
   return (
     <div className="flex flex-col w-full min-h-screen rounded-t-[20px] pb-8">
       <Head>
@@ -452,6 +468,37 @@ const AdminTable = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <span className="font-semibold">Sort:</span>
+            <Select onValueChange={(value) => setSortOrder(value)}>
+              <SelectTrigger className="w-40 bg-white rounded-xl text-text">
+                <SelectValue defaultValue="none" placeholder="None" />
+              </SelectTrigger>
+              <SelectContent className="bg-white w-fit rounded">
+                <SelectGroup className="bg-white">
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="none"
+                  >
+                    None
+                  </SelectItem>
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="az"
+                  >
+                    Product Name A - Z
+                  </SelectItem>
+                  <SelectItem
+                    className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
+                    value="za"
+                  >
+                    Product Name Z - A
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-4">
             <span className="font-semibold">Ingredient Type: </span>
             <Select onValueChange={(value) => getFormulas(value)}>
               <SelectTrigger className="w-40 bg-white rounded-xl text-text">
@@ -477,7 +524,7 @@ const AdminTable = () => {
           </div>
         </div>
 
-        <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
+  <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
           {isSuperUser ? (
             <div className="flex gap-[10%] ">
               {(actionMode == "default" || actionMode == "activate") && (
@@ -508,26 +555,30 @@ const AdminTable = () => {
 
         {/* Product Table */}
         <div className="overflow-x-auto overflow-y-auto max-h-96">
-          <table className="w-full text-sm">
-            <thead className="border-b-2 bg-gray-50 sticky top-0 z-10">
+          <table className="w-full text-sm table-auto border-collapse">
+            <thead className="sticky top-0 z-10">
               <tr className="text-left">
                 {actionMode != "default" && (
-                  <th className="py-2 px-2 font-semibold bg-gray-50 sticky left-0 z-20">
+                  <th className="py-5 px-2 font-semibold bg-gray-50 sticky top-0 left-0 z-30 border-gray-300 border-l-0">
                     Select All
                   </th>
                 )}
-                {columns!.map((column) => (
-                  <th key={column} className="py-2 px-2 font-semibold">
+                {columns!.map((column, idx) => (
+                  <th
+                    key={column}
+                    className="py-2 px-10 font-semibold top-0 z-30 bg-gray-50 text-left border border-gray-300 border-t-0 border-l-0 border-r-0 border-b-2"
+                    style={idx === fatIndex ? { minWidth: "20rem" } : undefined}
+                  >
                     {column}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filteredProducts?.map((product) => (
-                <tr key={product.id} className="border-b hover:bg-gray-50 ">
+              {sortedProducts?.map((product) => (
+                <tr key={product.id} className="text-right hover:bg-gray-50 ">
                   {actionMode != "default" && (
-                    <td>
+                    <td className="border border-gray-200 py-2 px-2 border-l-0">
                       <label>
                         <input
                           type="checkbox"
@@ -550,7 +601,7 @@ const AdminTable = () => {
                     </td>
                   )}
 
-                  <td className="py-2 px-2">
+                  <td className={`py-2 px-2 border text-left border-gray-200 ${actionMode === "default" ? "border-l-0" : ""}`}>
                     <div className="flex items-center justify-between">
                       <span>{product.product || ""}</span>
                       <button
@@ -567,8 +618,15 @@ const AdminTable = () => {
                       </button>
                     </div>
                   </td>
-                  {columns?.slice(1).map((column) => (
-                    <td key={String(column)} className="py-2 px-2">
+                  {columns?.slice(1).map((column, restIdx) => (
+                    <td
+                      key={String(column)}
+                      className={`py-2 px-2 border border-gray-200 ${
+                        restIdx === (columns!.slice(1).length - 1) ? "border-r-0" : ""
+                      }`}
+                      // adjust for the sliced index: original index = restIdx + 1
+                      style={restIdx + 1 === fatIndex ? { minWidth: "15rem" } : undefined}
+                    >
                       {String(product[column as keyof typeof product] ?? "")}
                     </td>
                   ))}
