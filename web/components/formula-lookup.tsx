@@ -61,7 +61,7 @@ const FormulaNeedsCalculator = () => {
 
   return (
     <div
-      className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 rounded-t-[20px] pb-2"
+      className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 rounded-t-[20px]"
       id="formula_lookup"
     >
   <Popup popUp={popUp} setPopUp={setPopUp} selectedIngredient={selectedIngredient} />
@@ -177,6 +177,16 @@ const FormulaNeedsCalculator = () => {
           </div>
         </div>
       </div>
+      {/* Contact info */}
+        <div className="bg-white mt-6 w-full p-6">
+          <div className="max-w-6xl mx-auto">
+            <h3 className="text-2xl font-semibold mb-2">Contact</h3>
+            <p className="text-sm mb-1">
+              For support or feedback, email <a className="underline text-blue-600" href="mailto:lisa.richardson.msrd@gmail.com">lisa.richardson.msrd@gmail.com</a>
+            </p>
+            <p className="text-sm mb-1">Website: </p>
+          </div>
+        </div>
     </div>
   );
 };
