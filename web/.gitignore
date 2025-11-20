@@ -44,4 +44,5 @@ next-env.d.ts
 # artillery load test reports
 *.artillery-report.json
 *.artillery-report.html
-load-test-report.json
+login-report.json
+lookup-report.json

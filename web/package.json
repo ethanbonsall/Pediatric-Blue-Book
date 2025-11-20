@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:load": "dotenv -e .env.local -- artillery run load-test.yml", 
-    "test:load:report": "dotenv -e .env.local -- artillery run --output load-test-report.json load-test.yml && artillery report load-test-report.json"
-
+    "test:load:login": "dotenv -e .env.local -- artillery run load-test-login.yml",
+    "test:load:login:report": "dotenv -e .env.local -- artillery run --output login-report.json load-test-login.yml && artillery report login-report.json",
+    "test:load:lookup": "dotenv -e .env.local -- artillery run load-test-lookup.yml",
+    "test:load:lookup:report": "dotenv -e .env.local -- artillery run --output lookup-report.json load-test-lookup.yml && artillery report lookup-report.json",
+    "test:load:both": "npm run test:load:login && npm run test:load:lookup"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",

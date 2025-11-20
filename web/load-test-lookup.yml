@@ -1,0 +1,43 @@
+config:
+  target: "{{ $processEnvironment.NEXT_PUBLIC_SUPABASE_URL }}"
+  phases:
+    - duration: 60
+      arrivalCount: 30
+      name: "Warm-up: ~5 concurrent"
+    - duration: 180
+      arrivalCount: 108
+      name: "Sustained: ~10-15 concurrent"
+
+  defaults:
+    headers:
+      User-Agent: "Artillery Load Test"
+      apikey: "{{ $processEnvironment.NEXT_PUBLIC_SUPABASE_ANON_KEY }}"
+      Content-Type: "application/json"
+
+  http:
+    timeout: 30
+
+scenarios:
+  - name: "Formula database queries"
+    flow:
+      # Simulate fetching powder ingredients
+      - get:
+          url: "/rest/v1/powder_ingredients?active=eq.true&select=*"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+      # Simulate fetching liquid ingredients
+      - get:
+          url: "/rest/v1/liquid_ingredients?active=eq.true&select=*"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+      # Simulate searching for a specific product
+      - get:
+          url: "/rest/v1/powder_ingredients?active=eq.true&product=ilike.*beneprotein*&select=*"
+          headers:
+            apikey: "{{ $processEnvironment.NEXT_PUBLIC_SUPABASE_ANON_KEY }}"
+          expect:
+            - statusCode: 200

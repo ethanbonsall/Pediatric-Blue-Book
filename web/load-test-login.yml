@@ -13,7 +13,7 @@ config:
       apikey: "{{ $processEnvironment.NEXT_PUBLIC_SUPABASE_ANON_KEY }}"
 
 scenarios:
-  - name: "User login and formula lookup"
+  - name: "User login"
     flow:
       - get:
           url: "/"
