@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:load:login": "dotenv -e .env.local -- artillery run load-test-login.yml",
+    "test:load:login:report": "dotenv -e .env.local -- artillery run --output login-report.json load-test-login.yml && artillery report login-report.json",
+    "test:load:lookup": "dotenv -e .env.local -- artillery run load-test-lookup.yml",
+    "test:load:lookup:report": "dotenv -e .env.local -- artillery run --output lookup-report.json load-test-lookup.yml && artillery report lookup-report.json",
+    "test:load:both": "npm run test:load:login && npm run test:load:lookup"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",
@@ -41,6 +46,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "artillery": "^2.0.27",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
