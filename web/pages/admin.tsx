@@ -161,35 +161,6 @@ const AdminTable = () => {
             ) as ColumnKeys[])
           : [];
 
-      // calculated fields for Liquid Products
-      for (const liquidProduct of liquidRows) {
-        liquidProduct.npc_percent_free_water = parseFloat(
-          (
-            liquidProduct.water_ml! / liquidProduct.amount_per_carton_ml!
-          ).toFixed(4)
-        );
-        liquidProduct.npc_percent_cal_from_protein = parseFloat(
-          (
-            (liquidProduct.total_protein_g! * 4) /
-            (liquidProduct.amount_per_carton_ml! *
-              liquidProduct.calories_per_ml!)
-          ).toFixed(4)
-        );
-        liquidProduct.npc_percent_cal_from_cho = parseFloat(
-          (
-            (liquidProduct.total_carbohydrate_g! * 4) /
-            (liquidProduct.amount_per_carton_ml! *
-              liquidProduct.calories_per_ml!)
-          ).toFixed(4)
-        );
-        liquidProduct.npc_percent_cal_from_fat = parseFloat(
-          (
-            (liquidProduct.total_fat_g! * 9) /
-            (liquidProduct.amount_per_carton_ml! *
-              liquidProduct.calories_per_ml!)
-          ).toFixed(4)
-        );
-      }
       setProducts(liquidRows);
       setColumns(liquidColumns);
     } else {
@@ -211,28 +182,6 @@ const AdminTable = () => {
               (key) => key != "id"
             ) as ColumnKeys[])
           : [];
-
-      // calculated fields for Powder
-      for (const powderProduct of powderRows) {
-        powderProduct.np100_percent_cal_from_protein = parseFloat(
-          (
-            (powderProduct.np100_total_protein_g! * 4) /
-            (powderProduct.calories_per_gram! * 100)
-          ).toFixed(4)
-        );
-        powderProduct.np100_percent_cal_from_cho = parseFloat(
-          (
-            (powderProduct.np100_total_carbohydrate_g! * 4) /
-            (powderProduct.calories_per_gram! * 100)
-          ).toFixed(4)
-        );
-        powderProduct.np100_percent_cal_from_fat = parseFloat(
-          (
-            (powderProduct.np100_total_fat_g! * 4) /
-            (powderProduct.calories_per_gram! * 100)
-          ).toFixed(4)
-        );
-      }
 
       setProducts(powderRows);
       setColumns(powderColumns);
@@ -305,6 +254,7 @@ const AdminTable = () => {
       console.log("Error inserting row: ", error.message);
     } else {
       alert("Changes saved!");
+      getFormulas("Liquid");
     }
   };
 
@@ -333,9 +283,6 @@ const AdminTable = () => {
       const newFields = { ...prev };
 
       // Always store empty string if user clears the field
-      if (value === "") {
-        return { ...newFields, [column]: "" };
-      }
 
       return { ...newFields, [column]: value };
     });
@@ -349,20 +296,33 @@ const AdminTable = () => {
       table = "powder_ingredients";
     }
 
+    const READ_ONLY_FIELDS = [
+      "npc_percent_cal_from_protein",
+      "npc_percent_cal_from_fat",
+      "npc_percent_cal_from_cho",
+      "npc_percent_free_water",
+    ];
+    const sanitized = Object.fromEntries(
+      Object.entries(editedFields).filter(
+        ([key]) => !READ_ONLY_FIELDS.includes(key)
+      )
+    );
+
     // If no fields edited
-    if (Object.keys(editedFields).length == 0) {
+    if (Object.keys(sanitized).length == 0) {
       alert("No changes detected!");
       setIsEditModalOpen(false);
     } else {
       const { error } = await supabase
         .from(table)
-        .update(editedFields)
+        .update(sanitized)
         .eq("id", selectedProduct!.id);
       if (error) {
         console.log("Error editing row: ", error.message);
       } else {
         alert("Changes saved!");
         setEditedFields({ active: false, approved: false });
+        getFormulas(productType);
       }
     }
   };
@@ -640,7 +600,10 @@ const AdminTable = () => {
                             Object.fromEntries(
                               Object.keys(product).map((key) => [
                                 key,
-                                product[key as keyof typeof product] ?? "",
+                                product[key as keyof typeof product] ??
+                                  (textOnlyFields.includes(key)
+                                    ? ""
+                                    : undefined),
                               ])
                             )
                           );
@@ -794,7 +757,7 @@ const AdminTable = () => {
                         ? editedFields[column as keyof typeof editedFields]
                         : selectedProduct?.[
                             column as keyof typeof selectedProduct
-                          ] ?? ""
+                          ] ?? undefined
                     )}
                     onChange={(e) =>
                       handleEditEntryFieldChange(
@@ -881,7 +844,7 @@ const AdminTable = () => {
                     value={
                       (newProduct[
                         column as keyof typeof newProduct
-                      ] as string) || ""
+                      ] as string) || undefined
                     }
                     onChange={(e) =>
                       handleAddEntryFieldChange(
@@ -916,6 +879,7 @@ const AdminTable = () => {
                   insertNewProduct(productType == "Liquid");
                   setNewProduct({});
                   setIsAddModalOpen(false);
+                  getFormulas(productType);
                 }}
                 className="flex-1 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"
               >
