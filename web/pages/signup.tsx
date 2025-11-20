@@ -27,7 +27,6 @@ const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const pop_up_email = "https://www.knowingnutritionhub.com/bluebook";
   const passwordsMatch = password === confirmPassword;
   const allFieldsFilled =
     firstName && title && email && password && confirmPassword != "";
