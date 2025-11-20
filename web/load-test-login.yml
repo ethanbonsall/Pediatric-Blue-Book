@@ -1,0 +1,36 @@
+config:
+  target: "https://www.pediatricbluebook.com/"
+  phases:
+    - duration: 60
+      arrivalCount: 30 # Warm up with 30 users over 1 min
+      name: "Warm-up"
+    - duration: 180
+      arrivalCount: 90 # 90 users over 3 min = 0.5/sec
+      name: "Sustained"
+  defaults:
+    headers:
+      User-Agent: "Artillery Load Test"
+      apikey: "{{ $processEnvironment.NEXT_PUBLIC_SUPABASE_ANON_KEY }}"
+
+scenarios:
+  - name: "User login"
+    flow:
+      - get:
+          url: "/"
+          expect:
+            - statusCode: [200, 308]
+      - post:
+          url: "{{ $processEnvironment.NEXT_PUBLIC_SUPABASE_URL }}/auth/v1/token?grant_type=password"
+          headers:
+            apikey: "{{ $processEnvironment.NEXT_PUBLIC_SUPABASE_ANON_KEY }}"
+            Content-Type: "application/json"
+          json:
+            email: "{{ $processEnvironment.LOAD_TEST_USER_EMAIL }}"
+            password: "{{ $processEnvironment.LOAD_TEST_USER_PASSWORD }}"
+          capture:
+            - json: "$.access_token"
+              as: "accessToken"
+          expect:
+            - statusCode: [200, 429]
+            - contentType: json
+            - hasProperty: access_token
