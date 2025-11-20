@@ -154,8 +154,7 @@ const FormulaNeedsCalculator = ({
   // Format ideal amount based on nutrient type and divide by servings
   const formatIdealAmount = (
     nutrientName: string,
-    idealAmount: string,
-    servingsPerDay: number
+    idealAmount: string
   ): string => {
     if (!idealAmount) return "";
 
@@ -179,10 +178,10 @@ const FormulaNeedsCalculator = ({
     }
 
     // Divide by servings if servings > 1
-    if (servingsPerDay > 1 && formatted) {
+    if (formatted) {
       const numericValue = parseAmountValue(formatted);
       if (numericValue !== null) {
-        const dividedValue = numericValue / servingsPerDay;
+        const dividedValue = numericValue;
 
         // Extract unit - everything after the first number (with optional whitespace)
         const unitMatch = formatted.match(/\d+(?:\.\d+)?\s*(.+)$/);
@@ -315,14 +314,16 @@ const FormulaNeedsCalculator = ({
 
     if (isWater) {
       const mlPerServing =
-        servingType === "Cup"
+        servingType == "mL"
+          ? 1
+          : servingType == "oz"
+          ? 29.57
+          : servingType === "Cup"
           ? 236.6
           : servingType === "Tablespoon"
           ? 14.8
           : servingType === "Teaspoon"
           ? 4.9
-          : servingType === "Scoop"
-          ? 30
           : 0;
       return quantity * mlPerServing;
     }
@@ -356,14 +357,16 @@ const FormulaNeedsCalculator = ({
     } else {
       // Liquid: convert serving type to ml
       const mlPerServing =
-        servingType === "Cup"
+        servingType == "mL"
+          ? 1
+          : servingType == "oz"
+          ? 29.57
+          : servingType === "Cup"
           ? 236.6 // US cup = 236.6ml
           : servingType === "Tablespoon"
           ? 14.8 // 1 tbsp = 14.8ml
           : servingType === "Teaspoon"
           ? 4.9 // 1 tsp = 4.9ml
-          : servingType === "Scoop"
-          ? 30 // Approximate for scoop in liquid context
           : 0;
 
       return quantity * mlPerServing;
@@ -479,7 +482,7 @@ const FormulaNeedsCalculator = ({
           Potassium: "npc_potassium_mg",
           Magnesium: "npc_magnesium_mg",
           Zinc: "npc_zinc_mg",
-          "Vitamin A": "npc_vitamin_a_mcg_re",
+          "Vitamin A": "npc_vitamin_a_mcg",
           "Vitamin E": "npc_vitamin_e_mg",
           "Vitamin C": "npc_vitamin_c_mg",
           "Vitamin K": "npc_vitamin_k_mcg",
@@ -525,7 +528,7 @@ const FormulaNeedsCalculator = ({
     // Divide by servings per day
     Object.keys(totals).forEach((key) => {
       if (servings > 0) {
-        totals[key] = totals[key] / servings;
+        totals[key] = totals[key] * servings;
       }
     });
 
@@ -548,7 +551,7 @@ const FormulaNeedsCalculator = ({
       (ideal) => ideal.name === nutrient.name
     );
     const formattedIdeal = idealNutrient
-      ? formatIdealAmount(nutrient.name, idealNutrient.amount, servings)
+      ? formatIdealAmount(nutrient.name, idealNutrient.amount)
       : "";
 
     let calculatedValue = calculatedNutrients[nutrient.name] || 0;
@@ -887,7 +890,7 @@ const FormulaNeedsCalculator = ({
                     selectedIngredients.reduce(
                       (total, ingredient) => total + getGramsOrMl(ingredient),
                       0
-                    ) / servings
+                    ) * servings
                   )}{" "}
                   mL
                 </p>
@@ -902,7 +905,7 @@ const FormulaNeedsCalculator = ({
                     )?.formattedAmount
                   }
                 </p>
-                <p className="text-sm mt-2 font-semibold">Water</p>
+                <p className="text-sm mt-2 font-semibold">Free Water</p>
               </div>
             </div>
           </div>

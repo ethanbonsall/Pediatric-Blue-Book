@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Select,
   SelectTrigger,
@@ -31,17 +32,20 @@ const Popup = ({
     (s.product as string) ?? (s.company_brand as string) ?? "None";
   const product_age =
     (s.age as string) ?? (s.recommended_age as string) ?? "None";
-  const protein_percent =
-    ((s.npc_percent_cal_from_protein as string) ?? "0") + "%";
+  const round1 = (value: any) =>
+    isNaN(Number(value)) ? "0%" : `${Number(value).toFixed(1)}%`;
+
+  const protein_percent = round1(s.npc_percent_cal_from_protein);
+  const carbohydrate_percent = round1(s.npc_percent_cal_from_cho);
+  const water_percent = round1(s.npc_percent_free_water);
+  const fat_percent = round1(s.npc_percent_cal_from_fat);
   const protein_source = (s.protein_sources as string) ?? "None";
-  const fat_percent = ((s.npc_percent_cal_from_fat as string) ?? "0") + "%";
   const fat_source = (s.fat_sources as string) ?? "None";
-  const carbohydrate_percent =
-    ((s.npc_percent_cal_from_cho as string) ?? "0") + "%";
+
   const carbohydrate_source = (s.carbohydrate_sources as string) ?? "None";
   const prebiotic = (s.prebiotic as string) ?? "None";
   const probiotic = (s.probiotic as string) ?? "None";
-  const water_percent = ((s.npc_percent_free_water as string) ?? "0") + "%";
+
   const allergens = (s.allergens as string) ?? "None";
   const company =
     (s.company_brand as string) ?? (s.company as string) ?? "None";
@@ -52,6 +56,10 @@ const Popup = ({
 
   function convertToMl(quantity: number, servingType: string) {
     switch (servingType) {
+      case "mL":
+        return quantity;
+      case "oz":
+        return Math.round(quantity * 29.57 * 10) / 10;
       case "Cup":
         return quantity * 236.6;
       case "Tablespoon":
@@ -68,6 +76,8 @@ const Popup = ({
   const availableServingOptions = useMemo(() => {
     if (!isPowder) {
       return [
+        { value: "mL", label: "mL" },
+        { value: "oz", label: "Ounces" },
         { value: "Teaspoon", label: "Teaspoon" },
         { value: "Tablespoon", label: "Tablespoon" },
         { value: "Cup", label: "Cup" },

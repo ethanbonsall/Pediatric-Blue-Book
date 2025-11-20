@@ -111,7 +111,7 @@ const MyDocument = ({ nutrients, ideal50, ideal25, catchUp }) => {
             <TableRow
               key={index}
               label={nutrient.name}
-              value={nutrient.amount}
+              value={nutrient.amount.replace(/≥/g, "")}
               isEven={index % 2 === 0}
             />
           ))}

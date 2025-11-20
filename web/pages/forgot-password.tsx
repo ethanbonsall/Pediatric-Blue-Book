@@ -12,6 +12,7 @@ const Forgot = () => {
       redirectTo: "https://www.pediatricbluebook.com/reset-password",
     });
     if (error) {
+      alert(error);
       console.error("reset email error", error);
       return { ok: false, error };
     }
