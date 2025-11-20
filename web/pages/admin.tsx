@@ -60,7 +60,6 @@ const AdminTable = () => {
     "notes",
     "probiotic",
     "allergens",
-    "np100_standard_volume",
   ];
 
   const calculatedFields = [
@@ -319,6 +318,7 @@ const AdminTable = () => {
         .eq("id", selectedProduct!.id);
       if (error) {
         console.log("Error editing row: ", error.message);
+        console.log("With edited fields: ", sanitized);
       } else {
         alert("Changes saved!");
         setEditedFields({ active: false, approved: false });
