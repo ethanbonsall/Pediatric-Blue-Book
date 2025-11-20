@@ -177,14 +177,18 @@ const FormulaNeedsCalculator = () => {
           </div>
         </div>
       </div>
-      {/* Contact info */}
+      {/* Contact and Disclaimer Bar */}
         <div className="bg-white mt-6 w-full p-6">
           <div className="max-w-6xl mx-auto">
-            <h3 className="text-2xl font-semibold mb-2">Contact</h3>
-            <p className="text-sm mb-1">
-              For support or feedback, email <a className="underline text-blue-600" href="mailto:lisa.richardson.msrd@gmail.com">lisa.richardson.msrd@gmail.com</a>
+            <h3 className="text-2xl font-semibold mb-2">DISCLAIMER:</h3>
+            <p className="text-sm mb-1"> 
+              All information contained in and produced by the Pediatric Nutrition Blue Book system is provided only as a reference aid for healthcare professionals. The information contained in the system is not intended to be (nor should it be used as) a replacement for professional clinical judgement.
+              No one should rely on information on this website as a substitute for professional medical advice, diagnosis, or treatment.
+              Click here for full notice and disclaimer <a href="/Privacy.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">https://www.pediatricbluebook.com/Privacy.pdf</a> 
             </p>
-            <p className="text-sm mb-1">Website: </p>
+            <p className="text-sm mb-1">For more information or to report corrections see:  
+              <a href="KnowingNutritionHub.com/BlueBook" className="text-blue-600 underline"> KnowingNutritionHub.com/BlueBook</a></p>
+            <p className="text-sm mb-2">© 2025 Lisa Richardson (DBA Knowing Nutrition) and the Development Team at UNC</p>
           </div>
         </div>
     </div>
