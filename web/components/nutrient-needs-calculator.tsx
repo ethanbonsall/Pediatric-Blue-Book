@@ -386,20 +386,14 @@ const NutrientNeedsCalculator = ({
       const weightPercentile = data[0];
 
       //Calculating Ideal Weight
-      if (age_in_years < 2) {
-        setidealWeight25(Math.round(weightPercentile.p25 * 10) / 10);
-        setIdealWeight50(Math.round(weightPercentile.p50 * 10) / 10);
-        ideal_weight_25 = weightPercentile.p25;
-        ideal_weight_50 = weightPercentile.p50;
-      } else {
-        ideal_weight_25 =
-          height_in_meters * height_in_meters * weightPercentile.p25;
-        ideal_weight_50 =
-          height_in_meters * height_in_meters * weightPercentile.p50;
 
-        setidealWeight25(Math.round(ideal_weight_25 * 10) / 10);
-        setIdealWeight50(Math.round(ideal_weight_50 * 10) / 10);
-      }
+      ideal_weight_25 =
+        height_in_meters * height_in_meters * weightPercentile.p25;
+      ideal_weight_50 =
+        height_in_meters * height_in_meters * weightPercentile.p50;
+
+      setidealWeight25(Math.round(ideal_weight_25 * 10) / 10);
+      setIdealWeight50(Math.round(ideal_weight_50 * 10) / 10);
     } catch (err) {
       console.error("Error fetching weight data:", err);
     }
