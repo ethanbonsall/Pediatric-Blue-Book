@@ -27,7 +27,6 @@ const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const pop_up_email = "Lisa@KnowingNutritionHub.com";
   const passwordsMatch = password === confirmPassword;
   const allFieldsFilled =
     firstName && title && email && password && confirmPassword != "";
@@ -93,14 +92,13 @@ const Index = () => {
     }
   };
 
-
   return (
     <>
       <Head>
         <title>PBB | Sign Up</title>
       </Head>
       <div className="bg-gradient-to-tr from-primary to-background flex flex-col items-center justify-center w-full font-roboto min-h-screen">
-        { signUp && allFieldsFilled && passwordsMatch ? (
+        {signUp && allFieldsFilled && passwordsMatch ? (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-[50dvw] 2xl:w-[25dvw] bg-background p-4 rounded text-md md:text-lg lg:text-xl z-50">
             <button className="self-start" onClick={() => setSignUp(false)}>
               <X />
@@ -125,21 +123,42 @@ const Index = () => {
               formula. The developers do not endorse or recommend any specific
               product included in this website.
             </p>
-            <p className="mb-4 ">{`To report corrections, please contact: ${pop_up_email}`}</p>
-            
+            <p className="mb-4 ">To report corrections, please go to: <a
+                  href="https://www.knowingnutritionhub.com/bluebook"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handlePolicyClick}
+                  className="text-blue-600 underline"
+                >
+                  knowingnutritionhub.com/bluebook
+                </a></p>
+
             <div className="flex flex-row text-center items-center justify-center gap-x-1 md:gap-x-2 mb-4 text-sm md:text-xl">
-            
-              <p>I have read and agree to <a
-          href="/Privacy.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={handlePolicyClick}
-          className="text-blue-600 underline"
-        >these terms and conditions</a></p>
+              <p>
+                I have read and agree to{" "}
+                <a
+                  href="/Privacy.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handlePolicyClick}
+                  className="text-blue-600 underline"
+                >
+                  these terms and conditions
+                </a>
+              </p>
               <button
-                className="bg-background border-black border-2 aspect-square h-[2dvh] rounded"
-                disabled={!policyClick}
-                onClick={() => setTermsAccepted(!termsAccepted)}
+                className="bg-background border-black border-2 aspect-square h-[2dvh] rounded 
+             disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => {
+                  if (!policyClick) {
+                    alert(
+                      "Please click the link and read the policy before continuing."
+                    );
+                    return;
+                  }
+
+                  setTermsAccepted(!termsAccepted);
+                }}
               >
                 {termsAccepted ? (
                   <Check className="w-auto h-[1.7dvh] bg-white rounded" />
@@ -283,7 +302,7 @@ const Index = () => {
             </div>
             <div className="flex flex-col text-left w-full">
               <p className="text-xl xl:text-2xl mb-2 font-medium text-white">
-                Confrim Password
+                Confirm Password
               </p>
 
               <input

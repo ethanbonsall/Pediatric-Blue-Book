@@ -74,6 +74,32 @@ const AdminTable = () => {
     "npc_percent_cal_from_fat",
   ];
 
+  function formatColumnName(column: string): string {
+    // Replace underscores with spaces
+    let name = column.replace(/_/g, " ").toLowerCase().trim();
+
+    // Extract possible unit at the end
+    const unitMatch = name.match(/\b(g|mg|mcg|ml)$/);
+
+    let unit = unitMatch ? unitMatch[1] : null;
+
+    // Remove the unit from the main name
+    if (unit) {
+      name = name.replace(new RegExp(`\\b${unit}$`), "").trim();
+    }
+
+    // Capitalize each word in the main name
+    const formattedName = name.replace(/\b\w/g, (c) => c.toUpperCase());
+
+    // Format the unit
+    if (unit) {
+      if (unit === "ml") unit = "mL"; // special case
+      return `${formattedName} (${unit})`;
+    }
+
+    return formattedName;
+  }
+
   // Checking User permissions - FIXME
   useEffect(() => {
     const GetUserRole = async () => {
@@ -306,13 +332,9 @@ const AdminTable = () => {
     setEditedFields((prev) => {
       const newFields = { ...prev };
 
-      // Checks if user deleted entry from field --> shouldn't update field in this case
-      if (
-        value === "" &&
-        selectedProduct![column as keyof typeof selectedProduct] !== ""
-      ) {
-        delete newFields[column as keyof typeof selectedProduct];
-        return newFields;
+      // Always store empty string if user clears the field
+      if (value === "") {
+        return { ...newFields, [column]: "" };
       }
 
       return { ...newFields, [column]: value };
@@ -408,7 +430,9 @@ const AdminTable = () => {
   }
 
   // find the index of the fat_sources column so we can apply a minWidth to both header and cells
-  const fatIndex = columns ? columns.findIndex((c) => String(c) === "fat_sources") : -1;
+  const fatIndex = columns
+    ? columns.findIndex((c) => String(c) === "fat_sources")
+    : -1;
 
   return (
     <div className="flex flex-col w-full min-h-screen rounded-t-[20px] pb-8">
@@ -470,7 +494,7 @@ const AdminTable = () => {
           <div className="flex items-center gap-4">
             <span className="font-semibold">Sort:</span>
             <Select onValueChange={(value) => setSortOrder(value)}>
-              <SelectTrigger className="w-40 bg-white rounded-xl text-text">
+              <SelectTrigger className="w-50 bg-white rounded-xl text-text">
                 <SelectValue defaultValue="none" placeholder="None" />
               </SelectTrigger>
               <SelectContent className="bg-white w-fit rounded">
@@ -524,7 +548,7 @@ const AdminTable = () => {
           </div>
         </div>
 
-  <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
+        <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
           {isSuperUser ? (
             <div className="flex gap-[10%] ">
               {(actionMode == "default" || actionMode == "activate") && (
@@ -566,10 +590,10 @@ const AdminTable = () => {
                 {columns!.map((column, idx) => (
                   <th
                     key={column}
-                    className="py-2 px-10 font-semibold top-0 z-30 bg-gray-50 text-left border border-gray-300 border-t-0 border-l-0 border-r-0 border-b-2"
+                    className="py-2 px-10 font-semibold top-0 z-30 bg-gray-50 text-left border border-gray-300 text-nowrap border-t-0 border-l-0 border-r-0 border-b-2"
                     style={idx === fatIndex ? { minWidth: "20rem" } : undefined}
                   >
-                    {column}
+                    {formatColumnName(column)}
                   </th>
                 ))}
               </tr>
@@ -601,14 +625,27 @@ const AdminTable = () => {
                     </td>
                   )}
 
-                  <td className={`py-2 px-2 border text-left border-gray-200 ${actionMode === "default" ? "border-l-0" : ""}`}>
+                  <td
+                    className={`py-2 px-2 border text-left border-gray-200 ${
+                      actionMode === "default" ? "border-l-0" : ""
+                    }`}
+                  >
                     <div className="flex items-center justify-between">
                       <span>{product.product || ""}</span>
                       <button
                         onClick={() => {
                           setSelectedProduct(product);
+
+                          setEditedFields(
+                            Object.fromEntries(
+                              Object.keys(product).map((key) => [
+                                key,
+                                product[key as keyof typeof product] ?? "",
+                              ])
+                            )
+                          );
+
                           setIsEditModalOpen(true);
-                          console.log(product.id);
                         }}
                         className="text-gray-600 hover:text-gray-900 ml-2"
                       >
@@ -622,10 +659,16 @@ const AdminTable = () => {
                     <td
                       key={String(column)}
                       className={`py-2 px-2 border border-gray-200 ${
-                        restIdx === (columns!.slice(1).length - 1) ? "border-r-0" : ""
+                        restIdx === columns!.slice(1).length - 1
+                          ? "border-r-0"
+                          : ""
                       }`}
                       // adjust for the sliced index: original index = restIdx + 1
-                      style={restIdx + 1 === fatIndex ? { minWidth: "15rem" } : undefined}
+                      style={
+                        restIdx + 1 === fatIndex
+                          ? { minWidth: "15rem" }
+                          : undefined
+                      }
                     >
                       {String(product[column as keyof typeof product] ?? "")}
                     </td>
@@ -689,7 +732,6 @@ const AdminTable = () => {
                 size="sm"
                 onClick={() => {
                   setSelectedProducts(new Set());
-                  alert("Canceled changes successfully.");
                   setActionMode("default");
                 }}
               >
@@ -719,8 +761,14 @@ const AdminTable = () => {
             <h2 className="text-xl font-semibold mb-2">
               {selectedProduct?.product || "Product"} Information
             </h2>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-gray-600 mb-2">
               Make changes to the product data.
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              NPC = Nutrients Per Container
+            </p>
+            <p className="text-sm text-gray-600 mb-6">
+              NP100 = Nutrients Per 100 kcal
             </p>
 
             {/* Form Fields */}
@@ -736,15 +784,18 @@ const AdminTable = () => {
               .map((column) => (
                 <div key={column}>
                   <label className="block text-sm font-medium mt-2 mb-1">
-                    {column}
+                    {formatColumnName(column)}
                   </label>
                   <input
                     type={textOnlyFields.includes(column) ? "text" : "number"}
-                    value={
-                      (editedFields[
-                        column as keyof typeof editedFields
-                      ] as string) || ""
-                    }
+                    value={String(
+                      editedFields[column as keyof typeof editedFields] !==
+                        undefined
+                        ? editedFields[column as keyof typeof editedFields]
+                        : selectedProduct?.[
+                            column as keyof typeof selectedProduct
+                          ] ?? ""
+                    )}
                     onChange={(e) =>
                       handleEditEntryFieldChange(
                         e,
@@ -805,8 +856,13 @@ const AdminTable = () => {
             <h2 className="text-xl font-semibold mb-2">
               {selectedProduct?.product || "Product"} Information
             </h2>
-            <p className="text-sm text-gray-600 mb-6">Create new product.</p>
-
+            <p className="text-sm text-gray-600 mb-2">Create new product.</p>
+            <p className="text-sm text-gray-600 mb-2">
+              NPC = Nutrients Per Container
+            </p>
+            <p className="text-sm text-gray-600 mb-6">
+              NP100 = Nutrients Per 100 kcal
+            </p>
             {/* Form Fields */}
             {columns
               .filter(
@@ -818,7 +874,7 @@ const AdminTable = () => {
               .map((column) => (
                 <div key={column}>
                   <label className="block text-sm font-medium mt-2 mb-1">
-                    {column}
+                    {formatColumnName(column)}
                   </label>
                   <input
                     type={textOnlyFields.includes(column) ? "text" : "number"}

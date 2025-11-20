@@ -14,11 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Eye, EyeOff } from "lucide-react";
 
 const Profile = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [originalUsername, setOriginalUsername] = useState("");
   const [originalTitle, setOriginalTitle] = useState("");
@@ -65,6 +66,49 @@ const Profile = () => {
     setSignedIn(false);
     router.push("/");
   }
+
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This cannot be undone."
+    );
+    if (!confirmDelete) return;
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      alert("Unable to find user session.");
+      return;
+    }
+
+    const userId = user.id;
+
+    const { error: profileError } = await supabase
+      .from("users")
+      .delete()
+      .eq("id", userId);
+
+    if (profileError) {
+      alert("Error deleting profile: " + profileError.message);
+      return;
+    }
+
+    const res = await fetch("/api/delete-user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+
+    const json = await res.json();
+    if (json.error) {
+      alert("Error deleting auth user: " + json.error);
+      return;
+    }
+
+    handleSignOut();
+  };
 
   async function getUser() {
     const {
@@ -129,7 +173,7 @@ const Profile = () => {
       </Head>
       <Navbar />
       <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-bl from-primary-50 to-primary-400">
-        <div className="flex flex-col bg-background text-text min-w-[80dvw] md:min-w-[50dvw] max-w-[100dvw] h-fit shadow-2xl p-8 rounded-xl  text-start">
+        <div className="flex flex-col bg-background text-text min-w-[80dvw] md:min-w-[20dvw] max-w-[100dvw] h-fit shadow-2xl p-8 rounded-xl  text-start">
           <h1 className="text-4xl font-bold mb-4 text-center">Profile</h1>
           <img
             src={avatar.src}
@@ -185,7 +229,7 @@ const Profile = () => {
                 }}
               >
                 <SelectTrigger className="w-full bg-white rounded text-text px-4 py-2">
-                  <SelectValue placeholder="Select an occupation" />
+                  <SelectValue placeholder={originalTitle} />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
                   <SelectGroup className="bg-white">
@@ -229,16 +273,33 @@ const Profile = () => {
 
           <div className="mb-4">
             <label className="block text-md font-medium">Password</label>
+
             {edit ? (
-              <input
-                className="border p-2 rounded w-full"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  className="border p-2 rounded w-full pr-10"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2
+              text-gray-600 hover:text-gray-900
+              transition-all duration-200
+              ease-out
+              active:scale-100"
+                >
+                  {showPassword ? <Eye /> : <EyeOff />}
+                </button>
+              </div>
             ) : (
               <p className="text-lg font-light">●●●●●●●●●</p>
             )}
           </div>
+
           <div className="flex flex-row justify-center">
             <button
               onClick={() => {
@@ -247,14 +308,14 @@ const Profile = () => {
                 setTitle(originalTitle);
                 setPassword("");
               }}
-              className="bg-primary-500 text-white px-4 py-2 rounded w-[20dvw] min-w-fit"
+              className="bg-primary-500 text-white px-4 py-2 rounded w-[12dvw] min-w-fit"
             >
               {edit ? "Cancel" : "Edit"}
             </button>
             <button
               className={`${
                 edit ? "block ml-2" : "hidden"
-              } bg-primary-500 text-white px-4 py-2 rounded w-[20dvw] min-w-fit`}
+              } bg-primary-500 text-white px-4 py-2 rounded w-[12dvw] min-w-fit`}
               onClick={() => {
                 if (passwordValid || password.length === 0) {
                   updateUser();
@@ -271,9 +332,19 @@ const Profile = () => {
               onClick={handleSignOut}
               className={`${
                 edit ? "hidden" : "block"
-              } bg-red-600 text-white px-4 py-2 rounded ml-2 w-[20dvw] min-w-fit`}
+              } bg-gray-700 text-white px-4 py-2 rounded ml-2 w-[12dvw] min-w-fit`}
             >
               Logout
+            </button>
+          </div>
+          <div className="w-full flex items-center justify-center mt-2">
+            <button
+              onClick={handleDeleteAccount}
+              className={`${
+                edit ? "hidden" : "block"
+              } bg-red-600 hover:bg-red-700 text-white w-fit md:w-full px-4 py-2 rounded `}
+            >
+              Delete Account
             </button>
           </div>
         </div>
