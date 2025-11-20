@@ -1138,12 +1138,6 @@ const NutrientNeedsCalculator = ({
               {isGenerating ? "Generating..." : "Print Out"}
             </button>
           </div>
-          <Link
-            href="/user-guide"
-            className="flex uppercase w-fit bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 2xl:px-6 2xl:py-3 rounded text-nowrap text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl mt-2 font-semibold"
-          >
-            User Guide
-          </Link>
         </div>
       </div>
     </div>

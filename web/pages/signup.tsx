@@ -295,7 +295,7 @@ const Index = () => {
             </div>
             <div className="flex flex-col text-left w-full">
               <p className="text-xl xl:text-2xl mb-2 font-medium text-white">
-                Confrim Password
+                Confirm Password
               </p>
 
               <input
