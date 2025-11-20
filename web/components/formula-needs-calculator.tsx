@@ -210,6 +210,7 @@ const FormulaNeedsCalculator = ({
           { name: "Protein", amount: "" },
           { name: "Carbohydrates", amount: "" },
           { name: "Fats", amount: "" },
+          { name: "Fiber (DGA)", amount: "" },
           { name: "Calcium", amount: "" },
           { name: "Iron", amount: "" },
           { name: "Vitamin D", amount: "" },
@@ -238,7 +239,6 @@ const FormulaNeedsCalculator = ({
           { name: "Selenium", amount: "" },
           { name: "Sodium", amount: "" },
           { name: "Chloride", amount: "" },
-          { name: "Fiber (DGA)", amount: "" },
         ];
 
   const filteredIngredients = ingredients.filter(
@@ -476,6 +476,7 @@ const FormulaNeedsCalculator = ({
           Protein: "total_protein_g",
           Carbohydrates: "total_carbohydrate_g",
           Fats: "total_fat_g",
+          "Fiber (DGA)": "fiber",
           Calcium: "npc_calcium_mg",
           Iron: "npc_iron_mg",
           "Vitamin D": "npc_vitamin_d_mcg",
@@ -504,7 +505,6 @@ const FormulaNeedsCalculator = ({
           Selenium: "npc_selenium_mcg",
           Sodium: "npc_sodium_mg",
           Chloride: "npc_chloride_mg",
-          "Fiber (DGA)": "fiber",
           "Holliday-Segar": "water_ml",
           "DRI Fluid": "water_ml",
         };

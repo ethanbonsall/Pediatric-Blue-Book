@@ -49,6 +49,7 @@ const NutrientNeedsCalculator = ({
   let carb_lower_percentage = 0;
   let carb_upper_percentage = 0;
   let protein_per_kg = 0;
+  let reduced_calories = 0;
 
   // Variables needed to get have calculator be functional
 
@@ -118,6 +119,7 @@ const NutrientNeedsCalculator = ({
   const [driFluid, setDriFluid] = useState<number>(0);
   const [catchUpEnergy, setCatchUpEnergy] = useState<number>(0);
   const [proteinPerKg, setProteinPerKg] = useState<number>(0);
+  const [reducedCalorieNeeds, setReducedCalorieNeeds] = useState<number>(0);
 
   // Sets up nutrient needs object
   const nutrientsObj: Record<string, string> = {};
@@ -549,6 +551,8 @@ const NutrientNeedsCalculator = ({
 
     // Catchup calories calculations
     catchup_calories = calorie_needs * (ideal_weight_50 / weight_in_kg);
+    reduced_calories = calorie_needs * (ideal_weight_25 / weight_in_kg);
+    setReducedCalorieNeeds(Math.round(reduced_calories));
     const roundedCatchUp = Math.round(catchup_calories);
     setCatchUpEnergy(roundedCatchUp);
 
@@ -677,7 +681,17 @@ const NutrientNeedsCalculator = ({
     },
     {
       name: `${needsType == "Increased" ? "Catch-Up Calories" : ""}`,
-      amount: `${catchUpEnergy ? catchUpEnergy + " cal " : ""}`,
+      amount: `${
+        needsType == "Increased" && catchUpEnergy ? catchUpEnergy + " cal " : ""
+      }`,
+    },
+    {
+      name: `${needsType == "Reduced" ? "Reduced Calories" : ""}`,
+      amount: `${
+        needsType == "Reduced" && reducedCalorieNeeds
+          ? reducedCalorieNeeds + " cal "
+          : ""
+      }`,
     },
     {
       name: "Holliday-Segar",
