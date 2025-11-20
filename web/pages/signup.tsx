@@ -27,7 +27,7 @@ const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const pop_up_email = "Lisa@KnowingNutritionHub.com";
+  const pop_up_email = "https://www.knowingnutritionhub.com/bluebook";
   const passwordsMatch = password === confirmPassword;
   const allFieldsFilled =
     firstName && title && email && password && confirmPassword != "";
@@ -124,7 +124,7 @@ const Index = () => {
               formula. The developers do not endorse or recommend any specific
               product included in this website.
             </p>
-            <p className="mb-4 ">{`To report corrections, please contact: ${pop_up_email}`}</p>
+            <p className="mb-4 ">{`To report corrections, please go to: ${pop_up_email}`}</p>
 
             <div className="flex flex-row text-center items-center justify-center gap-x-1 md:gap-x-2 mb-4 text-sm md:text-xl">
               <p>
