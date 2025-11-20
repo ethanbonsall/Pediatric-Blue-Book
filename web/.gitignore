@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# artillery load test reports
+*.artillery-report.json
+*.artillery-report.html
+load-test-report.json
