@@ -19,18 +19,22 @@ const CalorieCircle = ({
   const percent = Math.min(Math.max((amount / (ideal || 1)) * 100, 0), 100);
 
   const color = isBelowThreshold ? "#b91c1c" : "#15803d";
-  const radius = 80;
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const radius = isMobile ? 40 : 80;
+  const strokeWidth = isMobile ? 6 : 10;
+
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - percent / 100);
 
   return (
-    <div className="relative w-48 h-48">
+    <div className="relative w-24 h-24  md:w-48 md:h-48">
       <svg className="w-full h-full">
         <circle
           cx="50%"
           cy="50%"
           r={radius}
-          strokeWidth="10"
+          strokeWidth={strokeWidth}
           stroke="lightgray"
           fill="none"
           className="transition-all duration-700"
@@ -42,7 +46,7 @@ const CalorieCircle = ({
           cx="50%"
           cy="50%"
           r={radius}
-          strokeWidth="10"
+          strokeWidth={strokeWidth}
           stroke={color}
           fill="none"
           strokeDasharray={circumference}
@@ -53,7 +57,7 @@ const CalorieCircle = ({
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <p className="text-2xl font-semibold">{formattedAmount}</p>
+        <p className="text-lg md:text-2xl font-semibold">{formattedAmount}</p>
         <p className="text-xs text-gray-600">{formattedIdeal}</p>
       </div>
     </div>

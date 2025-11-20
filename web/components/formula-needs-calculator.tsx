@@ -885,7 +885,7 @@ const FormulaNeedsCalculator = ({
               </div>
 
               <div className="flex-1 flex flex-col items-center justify-center">
-                <p className="text-3xl font-bold">
+                <p className="text-xl md:text-3xl font-bold">
                   {Math.round(
                     selectedIngredients.reduce(
                       (total, ingredient) => total + getGramsOrMl(ingredient),
@@ -898,7 +898,7 @@ const FormulaNeedsCalculator = ({
               </div>
 
               <div className="flex-1 flex flex-col items-center justify-center">
-                <p className="text-3xl font-bold">
+                <p className="text-xl md:text-3xl font-bold">
                   {
                     displayedNutrients.find(
                       (nutrient) => nutrient.name === "Holliday-Segar"
