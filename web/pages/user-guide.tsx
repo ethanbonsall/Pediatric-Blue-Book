@@ -4,7 +4,7 @@ import Navbar from "@/components/navbar-profile";
 import React from "react";
 
 export default function UserGuidePage() {
-  const website = "https://pediatricbluebook.com";
+  const website = "https://knowingnutritionhub.com/bluebook";
   return (
     <main className="min-h-screen bg-background text-black mb-8">
       <Navbar />
