@@ -124,7 +124,15 @@ const Index = () => {
               formula. The developers do not endorse or recommend any specific
               product included in this website.
             </p>
-            <p className="mb-4 ">{`To report corrections, please go to: ${pop_up_email}`}</p>
+            <p className="mb-4 ">To report corrections, please go to: <a
+                  href="https://www.knowingnutritionhub.com/bluebook"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handlePolicyClick}
+                  className="text-blue-600 underline"
+                >
+                  knowingnutritionhub.com/bluebook
+                </a></p>
 
             <div className="flex flex-row text-center items-center justify-center gap-x-1 md:gap-x-2 mb-4 text-sm md:text-xl">
               <p>
