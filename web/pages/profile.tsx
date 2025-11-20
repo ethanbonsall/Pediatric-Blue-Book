@@ -342,7 +342,7 @@ const Profile = () => {
               onClick={handleDeleteAccount}
               className={`${
                 edit ? "hidden" : "block"
-              } bg-red-600 hover:bg-red-700 text-white w-[12dvw] px-4 py-2 rounded ml-2`}
+              } bg-red-600 hover:bg-red-700 text-white w-fit md:w-full px-4 py-2 rounded `}
             >
               Delete Account
             </button>
