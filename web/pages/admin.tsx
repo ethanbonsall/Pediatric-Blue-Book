@@ -164,7 +164,7 @@ const AdminTable = () => {
       setColumns(liquidColumns);
     } else {
       const { data: powderForm, error: powderFormError } = await supabase
-        .from("powder_ingredients")
+        .from("powder_ingredients_backup")
         .select("*");
 
       if (powderFormError) {
@@ -245,15 +245,61 @@ const AdminTable = () => {
     if (isLiquid) {
       table = "liquid_ingredients";
     } else {
-      table = "powder_ingredients";
+      table = "powder_ingredients_backup";
     }
 
-    const { error } = await supabase.from(table).insert(newProduct);
+    // checking that all required fields have been filled out
+
+    const allowedEmptyFields = isLiquid
+      ? []
+      : ["grams_per_teaspoon", "grams_per_tablespoon", "grams_per_cup"];
+
+    const editableColumns = columns.filter(
+      (column) =>
+        column != "active" &&
+        column != "approved" &&
+        !calculatedFields.includes(column)
+    );
+
+    const requiredColumns = editableColumns.filter(
+      (column) => !allowedEmptyFields.includes(column)
+    );
+
+    const missingFields = requiredColumns.filter((column) => {
+      const value = newProduct[column as keyof typeof newProduct];
+
+      // Check if field is missing or empty
+      return value === null || value === undefined || value === "";
+    });
+    if (missingFields.length > 0) {
+      alert(
+        `Please fill out the following required fields:\n\n${missingFields
+          .map((f) => `• ${f}`)
+          .join("\n")}`
+      );
+      return;
+    }
+    const cleanedProduct = { ...newProduct };
+
+    allowedEmptyFields.forEach((field) => {
+      const value = cleanedProduct[field as keyof typeof cleanedProduct];
+
+      // If field is empty string, remove it or set to null
+      if (value === "" || value === null || value === undefined) {
+        delete cleanedProduct[field as keyof typeof cleanedProduct];
+      }
+    });
+    console.log(cleanedProduct);
+
+    // Insert cleaned data into database
+    const { error } = await supabase.from(table).insert(cleanedProduct);
     if (error) {
-      console.log("Error inserting row: ", error.message);
+      alert("Error inserting row: " + error.message);
     } else {
       alert("Changes saved!");
-      getFormulas("Liquid");
+      setNewProduct({});
+      setIsAddModalOpen(false);
+      getFormulas(productType);
     }
   };
 
@@ -292,7 +338,7 @@ const AdminTable = () => {
     if (isLiquid) {
       table = "liquid_ingredients";
     } else {
-      table = "powder_ingredients";
+      table = "powder_ingredients_backup";
     }
 
     const READ_ONLY_FIELDS = [
@@ -312,6 +358,8 @@ const AdminTable = () => {
       alert("No changes detected!");
       setIsEditModalOpen(false);
     } else {
+      sanitized.active = "false";
+      sanitized.approved = "false";
       const { error } = await supabase
         .from(table)
         .update(sanitized)
@@ -320,7 +368,7 @@ const AdminTable = () => {
         console.log("Error editing row: ", error.message);
       } else {
         alert("Changes saved!");
-        setEditedFields({ active: false, approved: false });
+        setEditedFields({});
         getFormulas(productType);
       }
     }
@@ -346,7 +394,7 @@ const AdminTable = () => {
     if (productType == "Liquid") {
       table = "liquid_ingredients";
     } else {
-      table = "powder_ingredients";
+      table = "powder_ingredients_backup";
     }
 
     let fieldToUpdate = "";
@@ -736,7 +784,6 @@ const AdminTable = () => {
             {/* Form Fields */}
 
             {columns
-              .slice(1)
               .filter(
                 (column) =>
                   column != "active" &&
@@ -876,9 +923,6 @@ const AdminTable = () => {
               <button
                 onClick={() => {
                   insertNewProduct(productType == "Liquid");
-                  setNewProduct({});
-                  setIsAddModalOpen(false);
-                  getFormulas(productType);
                 }}
                 className="flex-1 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"
               >
