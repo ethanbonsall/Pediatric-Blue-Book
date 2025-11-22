@@ -145,7 +145,7 @@ const AdminTable = () => {
 
     if (ingredientType == "Liquid") {
       const { data: liquidForm, error: liquidFormError } = await supabase
-        .from("liquid_ingredients")
+        .from("liquid_ingredient")
         .select("*");
 
       if (liquidFormError) {
@@ -164,7 +164,7 @@ const AdminTable = () => {
       setColumns(liquidColumns);
     } else {
       const { data: powderForm, error: powderFormError } = await supabase
-        .from("powder_ingredients_backup")
+        .from("powder_ingredient")
         .select("*");
 
       if (powderFormError) {
@@ -238,17 +238,15 @@ const AdminTable = () => {
     }));
   };
 
-  // Adding new product to database
+  // checking that all required fields have been filled out
 
   const insertNewProduct = async (isLiquid: boolean) => {
     let table = "";
     if (isLiquid) {
-      table = "liquid_ingredients";
+      table = "liquid_ingredient";
     } else {
-      table = "powder_ingredients_backup";
+      table = "powder_ingredient";
     }
-
-    // checking that all required fields have been filled out
 
     const allowedEmptyFields = isLiquid
       ? []
@@ -289,11 +287,12 @@ const AdminTable = () => {
         delete cleanedProduct[field as keyof typeof cleanedProduct];
       }
     });
-    console.log(cleanedProduct);
 
     // Insert cleaned data into database
     const { error } = await supabase.from(table).insert(cleanedProduct);
+
     if (error) {
+      console.log("Error inserting row: ", error.message);
       alert("Error inserting row: " + error.message);
     } else {
       alert("Changes saved!");
@@ -336,9 +335,9 @@ const AdminTable = () => {
   const editProduct = async (isLiquid: boolean) => {
     let table = "";
     if (isLiquid) {
-      table = "liquid_ingredients";
+      table = "liquid_ingredient";
     } else {
-      table = "powder_ingredients_backup";
+      table = "powder_ingredient";
     }
 
     const READ_ONLY_FIELDS = [
@@ -392,9 +391,9 @@ const AdminTable = () => {
   const saveBulkChanges = async () => {
     let table = "";
     if (productType == "Liquid") {
-      table = "liquid_ingredients";
+      table = "liquid_ingredient";
     } else {
-      table = "powder_ingredients_backup";
+      table = "powder_ingredient";
     }
 
     let fieldToUpdate = "";
@@ -624,7 +623,6 @@ const AdminTable = () => {
                           }
                           onChange={() => {
                             handleCheck(product.id);
-                            console.log(selectedProducts);
                           }} // Updates state on change
                           className="disabled:cursor-not-allowed disabled:opacity-50"
                         />

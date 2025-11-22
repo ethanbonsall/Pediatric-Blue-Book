@@ -68,7 +68,7 @@ export interface LiquidProductRow {
     npc_selenium_mcg?: number | null;
     npc_chromium_mcg?: number | null;
     npc_molybdenum_mcg?: number | null;
-    npc_cooper_mg?: number | null;
+    npc_copper_mg?: number | null;
     notes?: string | null;
     active?: boolean | null;
     approved?: boolean | null;
