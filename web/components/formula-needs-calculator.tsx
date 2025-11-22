@@ -664,7 +664,7 @@ const FormulaNeedsCalculator = ({
         nutrient.name === "Calories" ||
         Number.isInteger(calculatedValue) ||
         nutrient.name === "Reduced Calories" ||
-        nutrient.name === "Catch Up Calories" ||
+        nutrient.name === "Catch-Up Calories" ||
         nutrient.name === "Holliday-Segar"
       ) {
         roundedValue = Math.round(calculatedValue);
