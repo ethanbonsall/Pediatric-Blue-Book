@@ -312,6 +312,8 @@ const AdminTable = () => {
       alert("No changes detected!");
       setIsEditModalOpen(false);
     } else {
+      sanitized.active = "false";
+      sanitized.approved = "false";
       const { error } = await supabase
         .from(table)
         .update(sanitized)
@@ -320,7 +322,7 @@ const AdminTable = () => {
         console.log("Error editing row: ", error.message);
       } else {
         alert("Changes saved!");
-        setEditedFields({ active: false, approved: false });
+        setEditedFields({});
         getFormulas(productType);
       }
     }
@@ -736,7 +738,6 @@ const AdminTable = () => {
             {/* Form Fields */}
 
             {columns
-              .slice(1)
               .filter(
                 (column) =>
                   column != "active" &&
