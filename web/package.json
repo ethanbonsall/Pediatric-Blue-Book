@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-     "test:load:login": "dotenv -e .env.local -- artillery run load-test-login.yml",
+    "test:load:login": "dotenv -e .env.local -- artillery run load-test-login.yml",
     "test:load:login:report": "dotenv -e .env.local -- artillery run --output login-report.json load-test-login.yml && artillery report login-report.json",
     "test:load:lookup": "dotenv -e .env.local -- artillery run load-test-lookup.yml",
     "test:load:lookup:report": "dotenv -e .env.local -- artillery run --output lookup-report.json load-test-lookup.yml && artillery report lookup-report.json",
