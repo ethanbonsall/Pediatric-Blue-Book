@@ -82,6 +82,8 @@ const NutrientNeedsCalculator = ({
   // Nutrients
   const [calories, setCalories] = useState<number>(0);
   const [caloriesPerKG, setCaloriesPerKG] = useState<number>(0);
+  const [reducedCaloriesPerKG, setReducedCaloriesPerKG] = useState<number>(0);
+  const [catchupCalroiesPerKG, setCatchupCaloriesPerKG] = useState<number>(0);
   const [vitaminA, setVitaminA] = useState("");
   const [vitaminC, setVitaminC] = useState("");
   const [vitaminD, setVitaminD] = useState("");
@@ -549,6 +551,12 @@ const NutrientNeedsCalculator = ({
     setReducedCalorieNeeds(Math.round(reduced_calories));
     const roundedCatchUp = Math.round(catchup_calories);
     setCatchUpEnergy(roundedCatchUp);
+    setCatchupCaloriesPerKG(
+      Math.round((catchup_calories / weight_in_kg) * 10) / 10
+    );
+    setReducedCaloriesPerKG(
+      Math.round((reduced_calories / weight_in_kg) * 10) / 10
+    );
 
     setHasCalculated(true);
 
@@ -571,7 +579,19 @@ const NutrientNeedsCalculator = ({
         },
         {
           name: "Catch-Up Calories",
-          amount: `${catchUpEnergy ? catchUpEnergy + " cal " : ""}`,
+          amount: `${
+            needsType == "Increased" && catchUpEnergy
+              ? catchUpEnergy + " cal "
+              : ""
+          }`,
+        },
+        {
+          name: "Reduced Calories",
+          amount: `${
+            needsType == "Reduced" && reducedCalorieNeeds
+              ? reducedCalorieNeeds + " cal "
+              : ""
+          }`,
         },
         {
           name: "Holliday-Segar",
@@ -676,14 +696,16 @@ const NutrientNeedsCalculator = ({
     {
       name: `${needsType == "Increased" ? "Catch-Up Calories" : ""}`,
       amount: `${
-        needsType == "Increased" && catchUpEnergy ? catchUpEnergy + " cal " : ""
+        needsType == "Increased" && catchUpEnergy
+          ? catchUpEnergy + " cal (" + catchupCalroiesPerKG + " cal/kg)"
+          : ""
       }`,
     },
     {
       name: `${needsType == "Reduced" ? "Reduced Calories" : ""}`,
       amount: `${
         needsType == "Reduced" && reducedCalorieNeeds
-          ? reducedCalorieNeeds + " cal "
+          ? reducedCalorieNeeds + " cal (" + reducedCaloriesPerKG + " cal/kg)"
           : ""
       }`,
     },
