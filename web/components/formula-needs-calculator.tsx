@@ -717,6 +717,19 @@ const FormulaNeedsCalculator = ({
       isBelowThreshold,
     };
   });
+  const calorieForCalc = parseFloat(
+    displayedNutrients.find((n) => n.name === "Calories")?.formattedAmount ||
+      "0"
+  );
+
+  const totalVolume = Math.round(
+    selectedIngredients.reduce(
+      (total, ingredient) => total + getVolume(ingredient),
+      0
+    ) * servings
+  );
+
+  const kcalPerMl = totalVolume > 0 ? calorieForCalc / totalVolume : 0;
 
   return (
     <>
@@ -969,6 +982,10 @@ const FormulaNeedsCalculator = ({
                   mL
                 </p>
                 <p className="text-sm mt-2 font-semibold">Total Volume</p>
+                <p className="text-sm mt-1">
+                  {kcalPerMl.toFixed(1)} kcal/mL ({(kcalPerMl * 30).toFixed(1)}{" "}
+                  kcal/oz)
+                </p>
               </div>
 
               <div className="flex-1 flex flex-col items-center justify-center">
