@@ -11,6 +11,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { pdf } from "@react-pdf/renderer";
 import MyDocument from "./nutrient-needs-summary";
+import { BookOpenText } from "lucide-react";
 
 type Nutrient = {
   name: string;
@@ -1170,6 +1171,12 @@ const NutrientNeedsCalculator = ({
           </div>
         </div>
       </div>
+      {/* User manual floating button (bottom-right) */}
+      <Link href="/user-guide" className="fixed bottom-6 right-6 z-50">
+        <div className="bg-primary-600 hover:bg-primary-700 text-white rounded-full p-3 shadow-lg flex items-center justify-center">
+          <BookOpenText className="w-6 h-6" />
+        </div>
+      </Link>
     </div>
   );
 };
