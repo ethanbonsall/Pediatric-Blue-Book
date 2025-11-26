@@ -20,6 +20,8 @@ import Popup from "./pop_up";
 import { supabase } from "@/lib/supabase";
 import type { ProductRow, Ingredient } from "@/lib/types";
 import CalorieCircle from "./CalorieCircle";
+import FormulaDocument from "./formula-summary";
+import { pdf } from "@react-pdf/renderer";
 
 type Nutrient = {
   name: string;
@@ -57,6 +59,10 @@ const FormulaNeedsCalculator = ({
     SelectedIngredient[]
   >([]);
   const [servings, setServings] = useState<number>(1);
+  // Tracks if formula summary PDF is being generated
+  const [isGenerating, setIsGenerating] = useState(false);
+  // Tracks if user has started adding ingredients for PDF generation
+  const [hasMixed, setHasMixed] = useState(false);
 
   useEffect(() => {
     const getIngredients = async () => {
@@ -269,6 +275,7 @@ const FormulaNeedsCalculator = ({
     setChecked((prev) => [...prev, false]);
     setPopUp(false);
     setSelectedIngredientForPopup(null);
+    setHasMixed(true);
   };
 
   const handlePlusClick = (ingredient: Ingredient) => {
@@ -731,6 +738,49 @@ const FormulaNeedsCalculator = ({
 
   const kcalPerMl = totalVolume > 0 ? calorieForCalc / totalVolume : 0;
 
+  const printFormulaPDF = async (
+    selectedIngredients: SelectedIngredient[],
+    servings: number
+  ) => {
+    setIsGenerating(true);
+
+    try {
+      const totalVolume = Math.round(
+        selectedIngredients.reduce(
+          (total, ingredient) => total + getVolume(ingredient),
+          0
+        ) * servings
+      );
+
+      // Create array of nutrients
+      const nutrientArray = displayedNutrients.map((n) => ({
+        name: n.name,
+
+        formattedAmount: n.formattedAmount || "",
+        formattedIdeal: n.formattedIdeal || "",
+      }));
+
+      const blob = await pdf(
+        <FormulaDocument
+          selectedIngredients={selectedIngredients}
+          servings={servings}
+          calculatedNutrients={nutrientArray}
+          totalVolume={totalVolume}
+        />
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "formula_summary.pdf";
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating PDF: ", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <>
       <div
@@ -1057,6 +1107,15 @@ const FormulaNeedsCalculator = ({
                     </div>
                   ))}
                 </div>
+              </div>
+              <div className="flex justify-end w-full mb-4">
+                <button
+                  onClick={() => printFormulaPDF(selectedIngredients, servings)}
+                  disabled={isGenerating || !hasMixed}
+                  className="mt-4 flex w-fit disabled:opacity-50 bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 2xl:px-6 2xl:py-3 text-nowrap items-center rounded text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
+                >
+                  {isGenerating ? "Generating..." : "Print Out"}
+                </button>
               </div>
             </div>
           </div>
