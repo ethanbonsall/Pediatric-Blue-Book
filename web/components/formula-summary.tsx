@@ -1,5 +1,24 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
+export interface SelectedIngredient {
+  name: string;
+  amount: string | number;
+}
+
+export interface CalculatedNutrient {
+  name: string;
+  amount?: string | number;
+  formattedAmount?: string | number;
+  formattedIdeal?: string | number;
+}
+
+export interface FormulaDocumentProps {
+  selectedIngredients: SelectedIngredient[];
+  servings: number;
+  calculatedNutrients: CalculatedNutrient[];
+  totalVolume: number;
+}
+
 // Create styles
 const styles = StyleSheet.create({
   page: {
@@ -76,7 +95,15 @@ const styles = StyleSheet.create({
   },
 });
 
-const TableRow = ({ label, value, isEven }) => (
+const TableRow = ({
+  label,
+  value,
+  isEven,
+}: {
+  label: string;
+  value: string | number;
+  isEven: boolean;
+}) => (
   <View
     style={[styles.tableRow, isEven ? styles.tableRowEven : styles.tableRowOdd]}
     wrap={false}
@@ -91,7 +118,17 @@ const TableRow = ({ label, value, isEven }) => (
 );
 
 // Three-column row for Calculated Nutrients table
-const TableRowThree = ({ label, value, dri, isEven }) => (
+const TableRowThree = ({
+  label,
+  value,
+  dri,
+  isEven,
+}: {
+  label: string;
+  value: string | number;
+  dri: string | number;
+  isEven: boolean;
+}) => (
   <View
     style={[styles.tableRow, isEven ? styles.tableRowEven : styles.tableRowOdd]}
     wrap={false}
@@ -109,13 +146,18 @@ const TableRowThree = ({ label, value, dri, isEven }) => (
 );
 
 // Create Document Component
-
-const FormulaDocument = ({ selectedIngredients = [], servings = 1, calculatedNutrients, totalVolume}) => {
+const FormulaDocument = ({
+  selectedIngredients,
+  servings,
+  calculatedNutrients,
+  totalVolume,
+}: FormulaDocumentProps) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <Text style={styles.header}>Formula Summary</Text>
         <Text>Produces {servings} servings</Text>
+
         <Text style={styles.subheader}>Formula Mix</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
@@ -126,13 +168,17 @@ const FormulaDocument = ({ selectedIngredients = [], servings = 1, calculatedNut
               <Text style={styles.tableHeaderText}>Amount</Text>
             </View>
           </View>
-          {selectedIngredients && selectedIngredients.length > 0 &&
-            selectedIngredients
-              .filter((n) => n.name && n.name.trim() !== "")
-              .map((ing, index) => (
-                <TableRow key={index} label={ing.name} value={ing.amount || ""} isEven={index % 2 === 0} />
-                
-              ))}
+
+          {selectedIngredients
+            .filter((n) => n.name.trim() !== "")
+            .map((ing, index) => (
+              <TableRow
+                key={index}
+                label={ing.name}
+                value={ing.amount}
+                isEven={index % 2 === 0}
+              />
+            ))}
         </View>
 
         <Text style={styles.subheader}>Calculated Nutrients</Text>
@@ -145,26 +191,27 @@ const FormulaDocument = ({ selectedIngredients = [], servings = 1, calculatedNut
               <Text style={styles.tableHeaderText}>Amount</Text>
             </View>
             <View style={{ width: "20%", padding: 10 }}>
-                <Text style={styles.tableHeaderText}>DRI</Text>
+              <Text style={styles.tableHeaderText}>DRI</Text>
             </View>
           </View>
-          {calculatedNutrients && calculatedNutrients.length > 0 &&
-            calculatedNutrients
-              .filter((n) => n.name && n.name.trim() !== "")
-              .map((n, index) => (
-                <TableRowThree
-                  key={index}
-                  label={n.name}
-                  value={(n.formattedAmount || n.amount || "").toString().replace(/≥/g, "")}
-                  dri={n.formattedIdeal || ""}
-                  isEven={index % 2 === 0}
-                />
-              ))}
 
+          {calculatedNutrients
+            .filter((n) => n.name.trim() !== "")
+            .map((n, index) => (
+              <TableRowThree
+                key={index}
+                label={n.name}
+                value={(n.formattedAmount ?? n.amount ?? "")
+                  .toString()
+                  .replace(/≥/g, "")}
+                dri={n.formattedIdeal ?? ""}
+                isEven={index % 2 === 0}
+              />
+            ))}
         </View>
 
-            <Text style={styles.text}>Servings (per day): {servings}</Text>
-            <Text style={styles.text}>Total Prepared Volume: {totalVolume} mL</Text>
+        <Text style={styles.text}>Servings (per day): {servings}</Text>
+        <Text style={styles.text}>Total Prepared Volume: {totalVolume} mL</Text>
       </Page>
     </Document>
   );

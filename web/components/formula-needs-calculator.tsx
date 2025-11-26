@@ -63,7 +63,6 @@ const FormulaNeedsCalculator = ({
   const [isGenerating, setIsGenerating] = useState(false);
   // Tracks if user has started adding ingredients for PDF generation
   const [hasMixed, setHasMixed] = useState(false);
-  
 
   useEffect(() => {
     const getIngredients = async () => {
@@ -746,12 +745,17 @@ const FormulaNeedsCalculator = ({
     setIsGenerating(true);
 
     try {
-      const totalVolume = Math.round(selectedIngredients.reduce((total, ingredient) => total + getVolume(ingredient),0) * servings);
+      const totalVolume = Math.round(
+        selectedIngredients.reduce(
+          (total, ingredient) => total + getVolume(ingredient),
+          0
+        ) * servings
+      );
 
       // Create array of nutrients
       const nutrientArray = displayedNutrients.map((n) => ({
         name: n.name,
-        
+
         formattedAmount: n.formattedAmount || "",
         formattedIdeal: n.formattedIdeal || "",
       }));
@@ -776,7 +780,6 @@ const FormulaNeedsCalculator = ({
       setIsGenerating(false);
     }
   };
-  
 
   return (
     <>
@@ -1105,14 +1108,14 @@ const FormulaNeedsCalculator = ({
                   ))}
                 </div>
               </div>
-                <div className="flex justify-end w-full mb-4">
+              <div className="flex justify-end w-full mb-4">
                 <button
-                onClick={() => printFormulaPDF(selectedIngredients, servings)}
-                disabled={isGenerating || !hasMixed}
-                className="mt-4 flex w-fit disabled:opacity-50 bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 2xl:px-6 2xl:py-3 text-nowrap items-center rounded text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
-              >
-                {isGenerating ? "Generating..." : "Print Out"}
-              </button>
+                  onClick={() => printFormulaPDF(selectedIngredients, servings)}
+                  disabled={isGenerating || !hasMixed}
+                  className="mt-4 flex w-fit disabled:opacity-50 bg-primary-600 hover:bg-primary-700 transition-all px-2 py-1 lg:px-4 lg:py-2 2xl:px-6 2xl:py-3 text-nowrap items-center rounded text-white text-center text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold"
+                >
+                  {isGenerating ? "Generating..." : "Print Out"}
+                </button>
               </div>
             </div>
           </div>
