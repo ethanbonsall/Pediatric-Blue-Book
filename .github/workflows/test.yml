@@ -41,12 +41,6 @@ jobs:
       working-directory: ./web
       run: npm test -- --coverage --watchAll=false
 
-    - name: Verify coverage files
-      working-directory: ./web
-      run: |
-        ls -la coverage/ || echo "Coverage directory not found"
-        find coverage -type f || echo "No coverage files found"
-
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
       if: always()
