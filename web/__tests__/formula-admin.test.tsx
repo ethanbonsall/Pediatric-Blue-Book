@@ -53,7 +53,7 @@ const setupAdminMocks = (options: {
       return {
         select: jest.fn(() => mockRoleBuilder),
       }
-    } else if (table === 'liquid_ingredients') {
+    } else if (table === 'liquid_ingredient') {
       return {
         select: jest.fn(() => Promise.resolve({
           data: liquidData,
@@ -65,7 +65,7 @@ const setupAdminMocks = (options: {
           in: jest.fn(() => Promise.resolve({ error: null })),
         })),
       }
-    } else if (table === 'powder_ingredients') {
+    } else if (table === 'powder_ingredient') {
       return {
         select: jest.fn(() => Promise.resolve({
           data: powderData,
