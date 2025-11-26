@@ -24,7 +24,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: web/package-lock.json
+        cache-dependency-path: web/package.json
 
     - name: Install dependencies
       working-directory: ./web
@@ -42,23 +42,34 @@ jobs:
     - name: Verify coverage files exist
       working-directory: ./web
       run: |
-        if [ ! -d "coverage" ]; then
-          echo "Error: coverage directory not found"
+        echo "=== Current directory ==="
+        pwd
+        echo "=== Listing web directory ==="
+        ls -la
+        echo "=== Checking for coverage directory ==="
+        if [ -d "coverage" ]; then
+          echo "Coverage directory found:"
+          ls -la coverage/
+          echo "=== Checking for lcov.info ==="
+          if [ -f "coverage/lcov.info" ]; then
+            echo "✓ coverage/lcov.info found"
+            echo "File size: $(wc -l < coverage/lcov.info) lines"
+          else
+            echo "✗ Error: coverage/lcov.info not found"
+            echo "Files in coverage directory:"
+            find coverage -type f || echo "No files found"
+            exit 1
+          fi
+        else
+          echo "✗ Error: coverage directory not found"
           exit 1
         fi
-        if [ ! -f "coverage/lcov.info" ]; then
-          echo "Error: coverage/lcov.info not found"
-          ls -la coverage/ || echo "Coverage directory is empty"
-          exit 1
-        fi
-        echo "Coverage files found:"
-        ls -la coverage/
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
-      if: always() && github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request'
       with:
-        directory: ./web/coverage
+        files: ./web/coverage/lcov.info
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
