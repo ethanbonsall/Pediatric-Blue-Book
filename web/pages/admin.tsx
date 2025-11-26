@@ -60,7 +60,6 @@ const AdminTable = () => {
     "notes",
     "probiotic",
     "allergens",
-    "np100_standard_volume",
   ];
 
   const calculatedFields = [
@@ -73,6 +72,32 @@ const AdminTable = () => {
     "npc_percent_cal_from_cho",
     "npc_percent_cal_from_fat",
   ];
+
+  function formatColumnName(column: string): string {
+    // Replace underscores with spaces
+    let name = column.replace(/_/g, " ").toLowerCase().trim();
+
+    // Extract possible unit at the end
+    const unitMatch = name.match(/\b(g|mg|mcg|ml)$/);
+
+    let unit = unitMatch ? unitMatch[1] : null;
+
+    // Remove the unit from the main name
+    if (unit) {
+      name = name.replace(new RegExp(`\\b${unit}$`), "").trim();
+    }
+
+    // Capitalize each word in the main name
+    const formattedName = name.replace(/\b\w/g, (c) => c.toUpperCase());
+
+    // Format the unit
+    if (unit) {
+      if (unit === "ml") unit = "mL"; // special case
+      return `${formattedName} (${unit})`;
+    }
+
+    return formattedName;
+  }
 
   // Checking User permissions - FIXME
   useEffect(() => {
@@ -120,7 +145,7 @@ const AdminTable = () => {
 
     if (ingredientType == "Liquid") {
       const { data: liquidForm, error: liquidFormError } = await supabase
-        .from("liquid_ingredients")
+        .from("liquid_ingredient")
         .select("*");
 
       if (liquidFormError) {
@@ -135,40 +160,11 @@ const AdminTable = () => {
             ) as ColumnKeys[])
           : [];
 
-      // calculated fields for Liquid Products
-      for (const liquidProduct of liquidRows) {
-        liquidProduct.npc_percent_free_water = parseFloat(
-          (
-            liquidProduct.water_ml! / liquidProduct.amount_per_carton_ml!
-          ).toFixed(4)
-        );
-        liquidProduct.npc_percent_cal_from_protein = parseFloat(
-          (
-            (liquidProduct.total_protein_g! * 4) /
-            (liquidProduct.amount_per_carton_ml! *
-              liquidProduct.calories_per_ml!)
-          ).toFixed(4)
-        );
-        liquidProduct.npc_percent_cal_from_cho = parseFloat(
-          (
-            (liquidProduct.total_carbohydrate_g! * 4) /
-            (liquidProduct.amount_per_carton_ml! *
-              liquidProduct.calories_per_ml!)
-          ).toFixed(4)
-        );
-        liquidProduct.npc_percent_cal_from_fat = parseFloat(
-          (
-            (liquidProduct.total_fat_g! * 9) /
-            (liquidProduct.amount_per_carton_ml! *
-              liquidProduct.calories_per_ml!)
-          ).toFixed(4)
-        );
-      }
       setProducts(liquidRows);
       setColumns(liquidColumns);
     } else {
       const { data: powderForm, error: powderFormError } = await supabase
-        .from("powder_ingredients")
+        .from("powder_ingredient")
         .select("*");
 
       if (powderFormError) {
@@ -185,28 +181,6 @@ const AdminTable = () => {
               (key) => key != "id"
             ) as ColumnKeys[])
           : [];
-
-      // calculated fields for Powder
-      for (const powderProduct of powderRows) {
-        powderProduct.np100_percent_cal_from_protein = parseFloat(
-          (
-            (powderProduct.np100_total_protein_g! * 4) /
-            (powderProduct.calories_per_gram! * 100)
-          ).toFixed(4)
-        );
-        powderProduct.np100_percent_cal_from_cho = parseFloat(
-          (
-            (powderProduct.np100_total_carbohydrate_g! * 4) /
-            (powderProduct.calories_per_gram! * 100)
-          ).toFixed(4)
-        );
-        powderProduct.np100_percent_cal_from_fat = parseFloat(
-          (
-            (powderProduct.np100_total_fat_g! * 4) /
-            (powderProduct.calories_per_gram! * 100)
-          ).toFixed(4)
-        );
-      }
 
       setProducts(powderRows);
       setColumns(powderColumns);
@@ -264,21 +238,67 @@ const AdminTable = () => {
     }));
   };
 
-  // Adding new product to database
+  // checking that all required fields have been filled out
 
   const insertNewProduct = async (isLiquid: boolean) => {
     let table = "";
     if (isLiquid) {
-      table = "liquid_ingredients";
+      table = "liquid_ingredient";
     } else {
-      table = "powder_ingredients";
+      table = "powder_ingredient";
     }
 
-    const { error } = await supabase.from(table).insert(newProduct);
+    const allowedEmptyFields = isLiquid
+      ? []
+      : ["grams_per_teaspoon", "grams_per_tablespoon", "grams_per_cup"];
+
+    const editableColumns = columns.filter(
+      (column) =>
+        column != "active" &&
+        column != "approved" &&
+        !calculatedFields.includes(column)
+    );
+
+    const requiredColumns = editableColumns.filter(
+      (column) => !allowedEmptyFields.includes(column)
+    );
+
+    const missingFields = requiredColumns.filter((column) => {
+      const value = newProduct[column as keyof typeof newProduct];
+
+      // Check if field is missing or empty
+      return value === null || value === undefined || value === "";
+    });
+    if (missingFields.length > 0) {
+      alert(
+        `Please fill out the following required fields:\n\n${missingFields
+          .map((f) => `• ${f}`)
+          .join("\n")}`
+      );
+      return;
+    }
+    const cleanedProduct = { ...newProduct };
+
+    allowedEmptyFields.forEach((field) => {
+      const value = cleanedProduct[field as keyof typeof cleanedProduct];
+
+      // If field is empty string, remove it or set to null
+      if (value === "" || value === null || value === undefined) {
+        delete cleanedProduct[field as keyof typeof cleanedProduct];
+      }
+    });
+
+    // Insert cleaned data into database
+    const { error } = await supabase.from(table).insert(cleanedProduct);
+
     if (error) {
       console.log("Error inserting row: ", error.message);
+      alert("Error inserting row: " + error.message);
     } else {
       alert("Changes saved!");
+      setNewProduct({});
+      setIsAddModalOpen(false);
+      getFormulas(productType);
     }
   };
 
@@ -306,14 +326,7 @@ const AdminTable = () => {
     setEditedFields((prev) => {
       const newFields = { ...prev };
 
-      // Checks if user deleted entry from field --> shouldn't update field in this case
-      if (
-        value === "" &&
-        selectedProduct![column as keyof typeof selectedProduct] !== ""
-      ) {
-        delete newFields[column as keyof typeof selectedProduct];
-        return newFields;
-      }
+      // Always store empty string if user clears the field
 
       return { ...newFields, [column]: value };
     });
@@ -322,25 +335,40 @@ const AdminTable = () => {
   const editProduct = async (isLiquid: boolean) => {
     let table = "";
     if (isLiquid) {
-      table = "liquid_ingredients";
+      table = "liquid_ingredient";
     } else {
-      table = "powder_ingredients";
+      table = "powder_ingredient";
     }
 
+    const READ_ONLY_FIELDS = [
+      "npc_percent_cal_from_protein",
+      "npc_percent_cal_from_fat",
+      "npc_percent_cal_from_cho",
+      "npc_percent_free_water",
+    ];
+    const sanitized = Object.fromEntries(
+      Object.entries(editedFields).filter(
+        ([key]) => !READ_ONLY_FIELDS.includes(key)
+      )
+    );
+
     // If no fields edited
-    if (Object.keys(editedFields).length == 0) {
+    if (Object.keys(sanitized).length == 0) {
       alert("No changes detected!");
       setIsEditModalOpen(false);
     } else {
+      sanitized.active = "false";
+      sanitized.approved = "false";
       const { error } = await supabase
         .from(table)
-        .update(editedFields)
+        .update(sanitized)
         .eq("id", selectedProduct!.id);
       if (error) {
         console.log("Error editing row: ", error.message);
       } else {
         alert("Changes saved!");
-        setEditedFields({ active: false, approved: false });
+        setEditedFields({});
+        getFormulas(productType);
       }
     }
   };
@@ -363,9 +391,9 @@ const AdminTable = () => {
   const saveBulkChanges = async () => {
     let table = "";
     if (productType == "Liquid") {
-      table = "liquid_ingredients";
+      table = "liquid_ingredient";
     } else {
-      table = "powder_ingredients";
+      table = "powder_ingredient";
     }
 
     let fieldToUpdate = "";
@@ -408,7 +436,9 @@ const AdminTable = () => {
   }
 
   // find the index of the fat_sources column so we can apply a minWidth to both header and cells
-  const fatIndex = columns ? columns.findIndex((c) => String(c) === "fat_sources") : -1;
+  const fatIndex = columns
+    ? columns.findIndex((c) => String(c) === "fat_sources")
+    : -1;
 
   return (
     <div className="flex flex-col w-full min-h-screen rounded-t-[20px] pb-8">
@@ -470,7 +500,7 @@ const AdminTable = () => {
           <div className="flex items-center gap-4">
             <span className="font-semibold">Sort:</span>
             <Select onValueChange={(value) => setSortOrder(value)}>
-              <SelectTrigger className="w-40 bg-white rounded-xl text-text">
+              <SelectTrigger className="w-50 bg-white rounded-xl text-text">
                 <SelectValue defaultValue="none" placeholder="None" />
               </SelectTrigger>
               <SelectContent className="bg-white w-fit rounded">
@@ -524,7 +554,7 @@ const AdminTable = () => {
           </div>
         </div>
 
-  <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
+        <div className="w-full max-w-full mb-4 mt-4 flex justify-between items-end">
           {isSuperUser ? (
             <div className="flex gap-[10%] ">
               {(actionMode == "default" || actionMode == "activate") && (
@@ -566,10 +596,10 @@ const AdminTable = () => {
                 {columns!.map((column, idx) => (
                   <th
                     key={column}
-                    className="py-2 px-10 font-semibold top-0 z-30 bg-gray-50 text-left border border-gray-300 border-t-0 border-l-0 border-r-0 border-b-2"
+                    className="py-2 px-10 font-semibold top-0 z-30 bg-gray-50 text-left border border-gray-300 text-nowrap border-t-0 border-l-0 border-r-0 border-b-2"
                     style={idx === fatIndex ? { minWidth: "20rem" } : undefined}
                   >
-                    {column}
+                    {formatColumnName(column)}
                   </th>
                 ))}
               </tr>
@@ -593,7 +623,6 @@ const AdminTable = () => {
                           }
                           onChange={() => {
                             handleCheck(product.id);
-                            console.log(selectedProducts);
                           }} // Updates state on change
                           className="disabled:cursor-not-allowed disabled:opacity-50"
                         />
@@ -601,14 +630,30 @@ const AdminTable = () => {
                     </td>
                   )}
 
-                  <td className={`py-2 px-2 border text-left border-gray-200 ${actionMode === "default" ? "border-l-0" : ""}`}>
+                  <td
+                    className={`py-2 px-2 border text-left border-gray-200 ${
+                      actionMode === "default" ? "border-l-0" : ""
+                    }`}
+                  >
                     <div className="flex items-center justify-between">
                       <span>{product.product || ""}</span>
                       <button
                         onClick={() => {
                           setSelectedProduct(product);
+
+                          setEditedFields(
+                            Object.fromEntries(
+                              Object.keys(product).map((key) => [
+                                key,
+                                product[key as keyof typeof product] ??
+                                  (textOnlyFields.includes(key)
+                                    ? ""
+                                    : undefined),
+                              ])
+                            )
+                          );
+
                           setIsEditModalOpen(true);
-                          console.log(product.id);
                         }}
                         className="text-gray-600 hover:text-gray-900 ml-2"
                       >
@@ -622,10 +667,16 @@ const AdminTable = () => {
                     <td
                       key={String(column)}
                       className={`py-2 px-2 border border-gray-200 ${
-                        restIdx === (columns!.slice(1).length - 1) ? "border-r-0" : ""
+                        restIdx === columns!.slice(1).length - 1
+                          ? "border-r-0"
+                          : ""
                       }`}
                       // adjust for the sliced index: original index = restIdx + 1
-                      style={restIdx + 1 === fatIndex ? { minWidth: "15rem" } : undefined}
+                      style={
+                        restIdx + 1 === fatIndex
+                          ? { minWidth: "15rem" }
+                          : undefined
+                      }
                     >
                       {String(product[column as keyof typeof product] ?? "")}
                     </td>
@@ -689,7 +740,6 @@ const AdminTable = () => {
                 size="sm"
                 onClick={() => {
                   setSelectedProducts(new Set());
-                  alert("Canceled changes successfully.");
                   setActionMode("default");
                 }}
               >
@@ -719,14 +769,19 @@ const AdminTable = () => {
             <h2 className="text-xl font-semibold mb-2">
               {selectedProduct?.product || "Product"} Information
             </h2>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-gray-600 mb-2">
               Make changes to the product data.
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              NPC = Nutrients Per Container
+            </p>
+            <p className="text-sm text-gray-600 mb-6">
+              NP100 = Nutrients Per 100 kcal
             </p>
 
             {/* Form Fields */}
 
             {columns
-              .slice(1)
               .filter(
                 (column) =>
                   column != "active" &&
@@ -736,15 +791,18 @@ const AdminTable = () => {
               .map((column) => (
                 <div key={column}>
                   <label className="block text-sm font-medium mt-2 mb-1">
-                    {column}
+                    {formatColumnName(column)}
                   </label>
                   <input
                     type={textOnlyFields.includes(column) ? "text" : "number"}
-                    value={
-                      (editedFields[
-                        column as keyof typeof editedFields
-                      ] as string) || ""
-                    }
+                    value={String(
+                      editedFields[column as keyof typeof editedFields] !==
+                        undefined
+                        ? editedFields[column as keyof typeof editedFields]
+                        : selectedProduct?.[
+                            column as keyof typeof selectedProduct
+                          ] ?? undefined
+                    )}
                     onChange={(e) =>
                       handleEditEntryFieldChange(
                         e,
@@ -805,8 +863,13 @@ const AdminTable = () => {
             <h2 className="text-xl font-semibold mb-2">
               {selectedProduct?.product || "Product"} Information
             </h2>
-            <p className="text-sm text-gray-600 mb-6">Create new product.</p>
-
+            <p className="text-sm text-gray-600 mb-2">Create new product.</p>
+            <p className="text-sm text-gray-600 mb-2">
+              NPC = Nutrients Per Container
+            </p>
+            <p className="text-sm text-gray-600 mb-6">
+              NP100 = Nutrients Per 100 kcal
+            </p>
             {/* Form Fields */}
             {columns
               .filter(
@@ -818,14 +881,14 @@ const AdminTable = () => {
               .map((column) => (
                 <div key={column}>
                   <label className="block text-sm font-medium mt-2 mb-1">
-                    {column}
+                    {formatColumnName(column)}
                   </label>
                   <input
                     type={textOnlyFields.includes(column) ? "text" : "number"}
                     value={
                       (newProduct[
                         column as keyof typeof newProduct
-                      ] as string) || ""
+                      ] as string) || undefined
                     }
                     onChange={(e) =>
                       handleAddEntryFieldChange(
@@ -858,8 +921,6 @@ const AdminTable = () => {
               <button
                 onClick={() => {
                   insertNewProduct(productType == "Liquid");
-                  setNewProduct({});
-                  setIsAddModalOpen(false);
                 }}
                 className="flex-1 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"
               >

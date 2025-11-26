@@ -22,21 +22,21 @@ scenarios:
     flow:
       # Simulate fetching powder ingredients
       - get:
-          url: "/rest/v1/powder_ingredients?active=eq.true&select=*"
+          url: "/rest/v1/powder_ingredient?active=eq.true&select=*"
           expect:
             - statusCode: 200
             - contentType: json
 
       # Simulate fetching liquid ingredients
       - get:
-          url: "/rest/v1/liquid_ingredients?active=eq.true&select=*"
+          url: "/rest/v1/liquid_ingredient?active=eq.true&select=*"
           expect:
             - statusCode: 200
             - contentType: json
 
       # Simulate searching for a specific product
       - get:
-          url: "/rest/v1/powder_ingredients?active=eq.true&product=ilike.*beneprotein*&select=*"
+          url: "/rest/v1/powder_ingredient?active=eq.true&product=ilike.*beneprotein*&select=*"
           headers:
             apikey: "{{ $processEnvironment.NEXT_PUBLIC_SUPABASE_ANON_KEY }}"
           expect:

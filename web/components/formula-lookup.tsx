@@ -22,30 +22,43 @@ const FormulaNeedsCalculator = () => {
   const [popUp, setPopUp] = useState(false);
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [selectedIngredient, setSelectedIngredient] = useState<ProductRow | null>(null);
+  const [selectedIngredient, setSelectedIngredient] =
+    useState<ProductRow | null>(null);
 
   useEffect(() => {
     const getIngredients = async () => {
       // fetch rows for powder and liquid, only active products
       const [powderRes, liquidRes] = await Promise.all([
-        supabase.from("powder_ingredients").select("*").eq("active", true),
-        supabase.from("liquid_ingredients").select("*").eq("active", true),
+        supabase.from("powder_ingredient").select("*").eq("active", true),
+        supabase.from("liquid_ingredient").select("*").eq("active", true),
       ]);
 
-      if (powderRes.error) console.error("powder_ingredients error:", powderRes.error);
-      if (liquidRes.error) console.error("liquid_ingredients error:", liquidRes.error);
+      if (powderRes.error)
+        console.error("powder_ingredients error:", powderRes.error);
+      if (liquidRes.error)
+        console.error("liquid_ingredients error:", liquidRes.error);
 
       const powderRows: ProductRow[] = (powderRes.data ?? []) as ProductRow[];
       const liquidRows: ProductRow[] = (liquidRes.data ?? []) as ProductRow[];
 
       const fetched: Ingredient[] = [
-        ...powderRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Powder", row: r })),
-        ...liquidRows.map((r) => ({ name: (r.product ?? "").toString().trim(), type: "Liquid", row: r })),
+        ...powderRows.map((r) => ({
+          name: (r.product ?? "").toString().trim(),
+          type: "Powder",
+          row: r,
+        })),
+        ...liquidRows.map((r) => ({
+          name: (r.product ?? "").toString().trim(),
+          type: "Liquid",
+          row: r,
+        })),
       ].filter((it) => it.name.length > 0);
 
       setIngredients((prev) => {
         const map = new Map<string, Ingredient>();
-        [...prev, ...fetched].forEach((item) => map.set(item.name.toLowerCase(), item));
+        [...prev, ...fetched].forEach((item) =>
+          map.set(item.name.toLowerCase(), item)
+        );
         return Array.from(map.values());
       });
     };
@@ -61,10 +74,14 @@ const FormulaNeedsCalculator = () => {
 
   return (
     <div
-      className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 rounded-t-[20px] pb-2"
+      className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-primary-500 to-primary-700 rounded-t-[20px]"
       id="formula_lookup"
     >
-  <Popup popUp={popUp} setPopUp={setPopUp} selectedIngredient={selectedIngredient} />
+      <Popup
+        popUp={popUp}
+        setPopUp={setPopUp}
+        selectedIngredient={selectedIngredient}
+      />
       <p className="text-3xl lg:text-5xl 2xl:text-6xl font-semibold text-white w-fit rounded-[20px] p-2 mt-4 ml-[2dvw] mb-[2dvh]">
         Formula Lookup
       </p>
@@ -137,15 +154,14 @@ const FormulaNeedsCalculator = () => {
                     : "hidden"
                 }`}
               >
-                
                 {filteredIngredients.map((ingredient, index) => (
                   <div key={index}>
                     <button
                       className="w-full normal-case font-medium h-fit transition-all duration-200"
                       onClick={() => {
-                          setSelectedIngredient(ingredient.row ?? null);
-                          setPopUp(true);
-                        }}
+                        setSelectedIngredient(ingredient.row ?? null);
+                        setPopUp(true);
+                      }}
                     >
                       <div className="flex flex-row text-lg lg:text-xl 2xl:text-2xl pl-[1dvw] py-[1dvh] text-start items-center hover:bg-gray-50">
                         <p className="w-2/5">{ingredient.name}</p>
@@ -175,6 +191,43 @@ const FormulaNeedsCalculator = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      {/* Contact and Disclaimer Bar */}
+      <div className="bg-white mt-6 w-full p-6">
+        <div className="max-w-6xl mx-auto">
+          <h3 className="text-2xl font-semibold mb-2">DISCLAIMER:</h3>
+          <p className="text-sm mb-1">
+            All information contained in and produced by the Pediatric Nutrition
+            Blue Book system is provided only as a reference aid for healthcare
+            professionals. The information contained in the system is not
+            intended to be (nor should it be used as) a replacement for
+            professional clinical judgement. No one should rely on information
+            on this website as a substitute for professional medical advice,
+            diagnosis, or treatment. Click here for full notice and disclaimer{" "}
+            <a
+              href="/Privacy.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              https://www.pediatricbluebook.com/Privacy.pdf
+            </a>
+          </p>
+          <p className="text-sm mb-1">
+            For more information or to report corrections see:
+            <a
+              href="KnowingNutritionHub.com/BlueBook"
+              className="text-blue-600 underline"
+            >
+              {" "}
+              KnowingNutritionHub.com/BlueBook
+            </a>
+          </p>
+          <p className="text-sm mb-2">
+            © 2025 Lisa Richardson (DBA Knowing Nutrition) and the Development
+            Team at UNC
+          </p>
         </div>
       </div>
     </div>

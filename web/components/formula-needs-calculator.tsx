@@ -62,10 +62,9 @@ const FormulaNeedsCalculator = ({
     const getIngredients = async () => {
       // fetch rows for powder and liquid
       const [powderRes, liquidRes] = await Promise.all([
-        supabase.from("powder_ingredients").select("*").eq("active", true),
-        supabase.from("liquid_ingredients").select("*").eq("active", true),
+        supabase.from("powder_ingredient").select("*").eq("active", true),
+        supabase.from("liquid_ingredient").select("*").eq("active", true),
       ]);
-
       if (powderRes.error)
         console.error("powder_ingredients error:", powderRes.error);
       if (liquidRes.error)
@@ -154,8 +153,7 @@ const FormulaNeedsCalculator = ({
   // Format ideal amount based on nutrient type and divide by servings
   const formatIdealAmount = (
     nutrientName: string,
-    idealAmount: string,
-    servingsPerDay: number
+    idealAmount: string
   ): string => {
     if (!idealAmount) return "";
 
@@ -179,10 +177,10 @@ const FormulaNeedsCalculator = ({
     }
 
     // Divide by servings if servings > 1
-    if (servingsPerDay > 1 && formatted) {
+    if (formatted) {
       const numericValue = parseAmountValue(formatted);
       if (numericValue !== null) {
-        const dividedValue = numericValue / servingsPerDay;
+        const dividedValue = numericValue;
 
         // Extract unit - everything after the first number (with optional whitespace)
         const unitMatch = formatted.match(/\d+(?:\.\d+)?\s*(.+)$/);
@@ -211,6 +209,7 @@ const FormulaNeedsCalculator = ({
           { name: "Protein", amount: "" },
           { name: "Carbohydrates", amount: "" },
           { name: "Fats", amount: "" },
+          { name: "Fiber (DGA)", amount: "" },
           { name: "Calcium", amount: "" },
           { name: "Iron", amount: "" },
           { name: "Vitamin D", amount: "" },
@@ -239,7 +238,6 @@ const FormulaNeedsCalculator = ({
           { name: "Selenium", amount: "" },
           { name: "Sodium", amount: "" },
           { name: "Chloride", amount: "" },
-          { name: "Fiber (DGA)", amount: "" },
         ];
 
   const filteredIngredients = ingredients.filter(
@@ -315,14 +313,82 @@ const FormulaNeedsCalculator = ({
 
     if (isWater) {
       const mlPerServing =
-        servingType === "Cup"
+        servingType == "mL"
+          ? 1
+          : servingType == "oz"
+          ? 29.57
+          : servingType === "Cup"
           ? 236.6
           : servingType === "Tablespoon"
           ? 14.8
           : servingType === "Teaspoon"
           ? 4.9
-          : servingType === "Scoop"
-          ? 30
+          : 0;
+      return quantity * mlPerServing;
+    }
+
+    const row = ingredient.row;
+    if (!row) return 0;
+
+    if (ingredient.type === "Powder") {
+      // Powder: use grams_per_* values
+      const gramsPerServing =
+        servingType === "Scoop"
+          ? (row.grams_per_scoop as number) || 0
+          : servingType === "Teaspoon"
+          ? (row.grams_per_teaspoon as number) || 0
+          : servingType === "Tablespoon"
+          ? (row.grams_per_tablespoon as number) || 0
+          : servingType === "Cup"
+          ? (row.grams_per_cup as number) || 0
+          : 0;
+
+      // For np100 (per 100ml), we need to convert grams to ml of prepared formula
+      // Assuming standard reconstitution: typically 1 scoop (8.5g) makes ~60ml
+      // We can estimate using calories_per_gram if available, or use a standard ratio
+
+      // If we have calories_per_gram, we can estimate prepared volume
+      // Standard formula is ~20 cal/oz = ~0.67 cal/ml, so ml = calories / 0.67
+      // Or: if calories_per_gram = 5, then 8.5g = 42.5 cal, prepared = 42.5/0.67 = 63ml
+
+      return Math.round(gramsPerServing * quantity);
+    } else {
+      // Liquid: convert serving type to ml
+      const mlPerServing =
+        servingType == "mL"
+          ? 1
+          : servingType == "oz"
+          ? 29.57
+          : servingType === "Cup"
+          ? 236.6 // US cup = 236.6ml
+          : servingType === "Tablespoon"
+          ? 14.8 // 1 tbsp = 14.8ml
+          : servingType === "Teaspoon"
+          ? 4.9 // 1 tsp = 4.9ml
+          : 0;
+
+      return quantity * mlPerServing;
+    }
+  };
+
+  const getVolume = (ingredient: SelectedIngredient): number => {
+    const isWater = isWaterIngredient(ingredient);
+    const parsed = parseAmount(ingredient.amount);
+    const quantity = parseFloat(parsed.amount) || 0;
+    const servingType = parsed.servingType;
+
+    if (isWater) {
+      const mlPerServing =
+        servingType == "mL"
+          ? 1
+          : servingType == "oz"
+          ? 29.57
+          : servingType === "Cup"
+          ? 236.6
+          : servingType === "Tablespoon"
+          ? 14.8
+          : servingType === "Teaspoon"
+          ? 4.9
           : 0;
       return quantity * mlPerServing;
     }
@@ -356,14 +422,16 @@ const FormulaNeedsCalculator = ({
     } else {
       // Liquid: convert serving type to ml
       const mlPerServing =
-        servingType === "Cup"
+        servingType == "mL"
+          ? 1
+          : servingType == "oz"
+          ? 29.57
+          : servingType === "Cup"
           ? 236.6 // US cup = 236.6ml
           : servingType === "Tablespoon"
           ? 14.8 // 1 tbsp = 14.8ml
           : servingType === "Teaspoon"
           ? 4.9 // 1 tsp = 4.9ml
-          : servingType === "Scoop"
-          ? 30 // Approximate for scoop in liquid context
           : 0;
 
       return quantity * mlPerServing;
@@ -398,7 +466,6 @@ const FormulaNeedsCalculator = ({
 
       if (ingredient.type === "Powder") {
         // For powder: np100 values are per 100ml of prepared formula
-        const multiplier = mlPrepared / 100;
 
         // Map nutrient names to np100 column names
         const nutrientMap: Record<string, string> = {
@@ -425,15 +492,15 @@ const FormulaNeedsCalculator = ({
           Biotin: "np100_biotin_mcg",
           Choline: "np100_choline_mg",
           Chromium: "np100_chromium_mcg",
-          Copper: "np100_cooper_mg",
-          Fluoride: "fluoride",
+          Copper: "np100_copper_mg",
+          Fluoride: "np100_fluoride_mg",
           Iodine: "np100_iodine_mcg",
           Manganese: "np100_manganese_mg",
           Phosphorus: "np100_phosphorus_mg",
           Selenium: "np100_selenium_mcg",
           Sodium: "np100_sodium_mg",
           Chloride: "np100_chloride_mg",
-          "Fiber (DGA)": "fiber",
+          "Fiber (DGA)": "np100_fiber_g",
         };
 
         Object.entries(nutrientMap).forEach(([nutrientName, columnName]) => {
@@ -441,7 +508,7 @@ const FormulaNeedsCalculator = ({
           const value = ingredient.row[columnName] as number;
           if (value != null && !isNaN(value)) {
             if (!totals[nutrientName]) totals[nutrientName] = 0;
-            totals[nutrientName] += value * multiplier;
+            totals[nutrientName] += value;
           }
         });
 
@@ -473,13 +540,14 @@ const FormulaNeedsCalculator = ({
           Protein: "total_protein_g",
           Carbohydrates: "total_carbohydrate_g",
           Fats: "total_fat_g",
+          "Fiber (DGA)": "npc_fiber_g",
           Calcium: "npc_calcium_mg",
           Iron: "npc_iron_mg",
           "Vitamin D": "npc_vitamin_d_mcg",
           Potassium: "npc_potassium_mg",
           Magnesium: "npc_magnesium_mg",
           Zinc: "npc_zinc_mg",
-          "Vitamin A": "npc_vitamin_a_mcg_re",
+          "Vitamin A": "npc_vitamin_a_mcg",
           "Vitamin E": "npc_vitamin_e_mg",
           "Vitamin C": "npc_vitamin_c_mg",
           "Vitamin K": "npc_vitamin_k_mcg",
@@ -493,15 +561,14 @@ const FormulaNeedsCalculator = ({
           Biotin: "npc_biotin_mcg",
           Choline: "npc_choline_mg",
           Chromium: "npc_chromium_mcg",
-          Copper: "npc_cooper_mg",
-          Fluoride: "fluoride",
+          Copper: "npc_copper_mg",
+          Fluoride: "npc_fluoride_mg",
           Iodine: "npc_iodine_mcg",
           Manganese: "npc_manganese_mg",
           Phosphorus: "npc_phosphorus_mg",
           Selenium: "npc_selenium_mcg",
           Sodium: "npc_sodium_mg",
           Chloride: "npc_chloride_mg",
-          "Fiber (DGA)": "fiber",
           "Holliday-Segar": "water_ml",
           "DRI Fluid": "water_ml",
         };
@@ -525,7 +592,7 @@ const FormulaNeedsCalculator = ({
     // Divide by servings per day
     Object.keys(totals).forEach((key) => {
       if (servings > 0) {
-        totals[key] = totals[key] / servings;
+        totals[key] = totals[key] * servings;
       }
     });
 
@@ -548,7 +615,7 @@ const FormulaNeedsCalculator = ({
       (ideal) => ideal.name === nutrient.name
     );
     const formattedIdeal = idealNutrient
-      ? formatIdealAmount(nutrient.name, idealNutrient.amount, servings)
+      ? formatIdealAmount(nutrient.name, idealNutrient.amount)
       : "";
 
     let calculatedValue = calculatedNutrients[nutrient.name] || 0;
@@ -583,6 +650,8 @@ const FormulaNeedsCalculator = ({
           "Vitamin D",
           "Vitamin B12",
           "Molybdenum",
+          "Vitamin K",
+          "Copper",
         ].includes(nutrient.name)
       )
         unit = "mcg";
@@ -591,8 +660,16 @@ const FormulaNeedsCalculator = ({
       let roundedValue;
       if (nutrient.name === "DRI Fluid") {
         roundedValue = Math.round(calculatedValue * 100) / 100;
-      } else {
+      } else if (
+        nutrient.name === "Calories" ||
+        Number.isInteger(calculatedValue) ||
+        nutrient.name === "Reduced Calories" ||
+        nutrient.name === "Catch-Up Calories" ||
+        nutrient.name === "Holliday-Segar"
+      ) {
         roundedValue = Math.round(calculatedValue);
+      } else {
+        roundedValue = calculatedValue.toFixed(1);
       }
       formattedAmount = `${roundedValue} ${unit}`;
 
@@ -640,6 +717,19 @@ const FormulaNeedsCalculator = ({
       isBelowThreshold,
     };
   });
+  const calorieForCalc = parseFloat(
+    displayedNutrients.find((n) => n.name === "Calories")?.formattedAmount ||
+      "0"
+  );
+
+  const totalVolume = Math.round(
+    selectedIngredients.reduce(
+      (total, ingredient) => total + getVolume(ingredient),
+      0
+    ) * servings
+  );
+
+  const kcalPerMl = totalVolume > 0 ? calorieForCalc / totalVolume : 0;
 
   return (
     <>
@@ -882,27 +972,31 @@ const FormulaNeedsCalculator = ({
               </div>
 
               <div className="flex-1 flex flex-col items-center justify-center">
-                <p className="text-3xl font-bold">
+                <p className="text-xl md:text-3xl font-bold">
                   {Math.round(
                     selectedIngredients.reduce(
-                      (total, ingredient) => total + getGramsOrMl(ingredient),
+                      (total, ingredient) => total + getVolume(ingredient),
                       0
-                    ) / servings
+                    ) * servings
                   )}{" "}
                   mL
                 </p>
                 <p className="text-sm mt-2 font-semibold">Total Volume</p>
+                <p className="text-sm mt-1">
+                  {kcalPerMl.toFixed(1)} kcal/mL ({(kcalPerMl * 30).toFixed(1)}{" "}
+                  kcal/oz)
+                </p>
               </div>
 
               <div className="flex-1 flex flex-col items-center justify-center">
-                <p className="text-3xl font-bold">
+                <p className="text-xl md:text-3xl font-bold">
                   {
                     displayedNutrients.find(
                       (nutrient) => nutrient.name === "Holliday-Segar"
                     )?.formattedAmount
                   }
                 </p>
-                <p className="text-sm mt-2 font-semibold">Water</p>
+                <p className="text-sm mt-2 font-semibold">Free Water</p>
               </div>
             </div>
           </div>

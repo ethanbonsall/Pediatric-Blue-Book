@@ -21,7 +21,9 @@ interface NutrientNeedsCalculatorProps {
   onNutrientsCalculated?: (nutrients: Nutrient[]) => void;
 }
 
-const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalculatorProps) => {
+const NutrientNeedsCalculator = ({
+  onNutrientsCalculated,
+}: NutrientNeedsCalculatorProps) => {
   // Variables for user to use calculator
   let age_input_placeholder = "Years 0-17";
   let max_input_age = 17;
@@ -47,6 +49,7 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
   let carb_lower_percentage = 0;
   let carb_upper_percentage = 0;
   let protein_per_kg = 0;
+  let reduced_calories = 0;
 
   // Variables needed to get have calculator be functional
 
@@ -79,6 +82,8 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
   // Nutrients
   const [calories, setCalories] = useState<number>(0);
   const [caloriesPerKG, setCaloriesPerKG] = useState<number>(0);
+  const [reducedCaloriesPerKG, setReducedCaloriesPerKG] = useState<number>(0);
+  const [catchupCalroiesPerKG, setCatchupCaloriesPerKG] = useState<number>(0);
   const [vitaminA, setVitaminA] = useState("");
   const [vitaminC, setVitaminC] = useState("");
   const [vitaminD, setVitaminD] = useState("");
@@ -116,6 +121,7 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
   const [driFluid, setDriFluid] = useState<number>(0);
   const [catchUpEnergy, setCatchUpEnergy] = useState<number>(0);
   const [proteinPerKg, setProteinPerKg] = useState<number>(0);
+  const [reducedCalorieNeeds, setReducedCalorieNeeds] = useState<number>(0);
 
   // Sets up nutrient needs object
   const nutrientsObj: Record<string, string> = {};
@@ -181,7 +187,7 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "nutrition_needs_summary.pdf"; // PLACEHOLDER
+      link.download = "nutrition_needs_summary.pdf";
       link.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -243,136 +249,128 @@ const NutrientNeedsCalculator = ({ onNutrientsCalculated }: NutrientNeedsCalcula
       height_in_meters = height;
     }
 
-
-// ECG — Energy Cost of Growth
-let ECG = 20;
-if (sex === "Male") {
-  if (age_in_years < 0.25) ECG = 200;
-  else if (age_in_years < 0.5) ECG = 50;
-  else if (age_in_years < 4) ECG = 20;
-  else if (age_in_years < 9) ECG = 15;
-  else if (age_in_years < 14) ECG = 25;
-  else ECG = 20;
-} else {
-  if (age_in_years < 0.25) ECG = 180;
-  else if (age_in_years < 0.5) ECG = 60;
-  else if (age_in_years < 1) ECG = 20;
-  else if (age_in_years < 9) ECG = 15;
-  else if (age_in_years < 14) ECG = 30;
-  else ECG = 20;
-}
-
-
-// Convert height to cm if needed
-const height_cm = height_in_meters * 100;
-
-
-// Ages 0–2.99
-if (sex === "Male" && age_in_years < 3) {
-  calorie_needs =
-    -716.45 -
-    age_in_years +
-    17.82 * height_cm +
-    15.06 * weight_in_kg +
-    ECG;
-}
-
-if (sex === "Female" && age_in_years < 3) {
-  calorie_needs =
-    -69.15 +
-    80 * age_in_years +
-    2.65 * height_cm +
-    54.15 * weight_in_kg +
-    ECG;
-}
-
-// Ages 3–18.99
-if (age_in_years >= 3 && age_in_years < 19) {
-  if (sex === "Male") {
-    switch (activityLevel) {
-      case "Inactive":
-        calorie_needs =
-          -447.51 +
-          3.68 * age_in_years +
-          13.01 * height_cm +
-          13.15 * weight_in_kg +
-          ECG;
-        break;
-
-      case "Low Active":
-        calorie_needs =
-          19.12 +
-          3.68 * age_in_years +
-          8.62 * height_cm +
-          20.28 * weight_in_kg +
-          ECG;
-        break;
-
-      case "Active":
-        calorie_needs =
-          -388.19 +
-          3.68 * age_in_years +
-          12.66 * height_cm +
-          20.46 * weight_in_kg +
-          ECG;
-        break;
-
-      case "Very Active":
-        calorie_needs =
-          -671.75 +
-          3.68 * age_in_years +
-          15.38 * height_cm +
-          23.25 * weight_in_kg +
-          ECG;
-        break;
+    // ECG — Energy Cost of Growth
+    let ECG = 20;
+    if (sex === "Male") {
+      if (age_in_years < 0.25) ECG = 200;
+      else if (age_in_years < 0.5) ECG = 50;
+      else if (age_in_years < 4) ECG = 20;
+      else if (age_in_years < 9) ECG = 15;
+      else if (age_in_years < 14) ECG = 25;
+      else ECG = 20;
+    } else {
+      if (age_in_years < 0.25) ECG = 180;
+      else if (age_in_years < 0.5) ECG = 60;
+      else if (age_in_years < 1) ECG = 20;
+      else if (age_in_years < 9) ECG = 15;
+      else if (age_in_years < 14) ECG = 30;
+      else ECG = 20;
     }
-  }
 
-  if (sex === "Female") {
-    switch (activityLevel) {
-      case "Inactive":
-        calorie_needs =
-          55.59 -
-          22.25 * age_in_years +
-          8.43 * height_cm +
-          17.07 * weight_in_kg +
-          ECG;
-        break;
+    // Convert height to cm if needed
+    const height_cm = height_in_meters * 100;
 
-      case "Low Active":
-        calorie_needs =
-          -297.54 -
-          22.25 * age_in_years +
-          12.77 * height_cm +
-          14.73 * weight_in_kg +
-          ECG;
-        break;
-
-      case "Active":
-        calorie_needs =
-          -189.55 -
-          22.25 * age_in_years +
-          11.74 * height_cm +
-          18.34 * weight_in_kg +
-          ECG;
-        break;
-
-      case "Very Active":
-        calorie_needs =
-          -709.59 -
-          22.25 * age_in_years +
-          18.22 * height_cm +
-          14.25 * weight_in_kg +
-          ECG;
-        break;
+    // Ages 0–2.99
+    if (sex === "Male" && age_in_years < 3) {
+      calorie_needs =
+        -716.45 - age_in_years + 17.82 * height_cm + 15.06 * weight_in_kg + ECG;
     }
-  }
-}
 
-// Store results
-setCalories(Math.round(calorie_needs));
-setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
+    if (sex === "Female" && age_in_years < 3) {
+      calorie_needs =
+        -69.15 +
+        80 * age_in_years +
+        2.65 * height_cm +
+        54.15 * weight_in_kg +
+        ECG;
+    }
 
+    // Ages 3–18.99
+    if (age_in_years >= 3 && age_in_years < 19) {
+      if (sex === "Male") {
+        switch (activityLevel) {
+          case "Inactive":
+            calorie_needs =
+              -447.51 +
+              3.68 * age_in_years +
+              13.01 * height_cm +
+              13.15 * weight_in_kg +
+              ECG;
+            break;
+
+          case "Low Active":
+            calorie_needs =
+              19.12 +
+              3.68 * age_in_years +
+              8.62 * height_cm +
+              20.28 * weight_in_kg +
+              ECG;
+            break;
+
+          case "Active":
+            calorie_needs =
+              -388.19 +
+              3.68 * age_in_years +
+              12.66 * height_cm +
+              20.46 * weight_in_kg +
+              ECG;
+            break;
+
+          case "Very Active":
+            calorie_needs =
+              -671.75 +
+              3.68 * age_in_years +
+              15.38 * height_cm +
+              23.25 * weight_in_kg +
+              ECG;
+            break;
+        }
+      }
+
+      if (sex === "Female") {
+        switch (activityLevel) {
+          case "Inactive":
+            calorie_needs =
+              55.59 -
+              22.25 * age_in_years +
+              8.43 * height_cm +
+              17.07 * weight_in_kg +
+              ECG;
+            break;
+
+          case "Low Active":
+            calorie_needs =
+              -297.54 -
+              22.25 * age_in_years +
+              12.77 * height_cm +
+              14.73 * weight_in_kg +
+              ECG;
+            break;
+
+          case "Active":
+            calorie_needs =
+              -189.55 -
+              22.25 * age_in_years +
+              11.74 * height_cm +
+              18.34 * weight_in_kg +
+              ECG;
+            break;
+
+          case "Very Active":
+            calorie_needs =
+              -709.59 -
+              22.25 * age_in_years +
+              18.22 * height_cm +
+              14.25 * weight_in_kg +
+              ECG;
+            break;
+        }
+      }
+    }
+
+    // Store results
+    setCalories(Math.round(calorie_needs));
+    setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
 
     // Getting 25th and 50th percentile BMI's from supabase for 2-18 and ideal weight directly for 0-2
     try {
@@ -390,20 +388,14 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
       const weightPercentile = data[0];
 
       //Calculating Ideal Weight
-      if (age_in_years < 2) {
-        setidealWeight25(Math.round(weightPercentile.p25 * 10) / 10);
-        setIdealWeight50(Math.round(weightPercentile.p50 * 10) / 10);
-        ideal_weight_25 = weightPercentile.p25;
-        ideal_weight_50 = weightPercentile.p50;
-      } else {
-        ideal_weight_25 =
-          height_in_meters * height_in_meters * weightPercentile.p25;
-        ideal_weight_50 =
-          height_in_meters * height_in_meters * weightPercentile.p50;
 
-        setidealWeight25(Math.round(ideal_weight_25 * 10) / 10);
-        setIdealWeight50(Math.round(ideal_weight_50 * 10) / 10);
-      }
+      ideal_weight_25 =
+        height_in_meters * height_in_meters * weightPercentile.p25;
+      ideal_weight_50 =
+        height_in_meters * height_in_meters * weightPercentile.p50;
+
+      setidealWeight25(Math.round(ideal_weight_25 * 10) / 10);
+      setIdealWeight50(Math.round(ideal_weight_50 * 10) / 10);
     } catch (err) {
       console.error("Error fetching weight data:", err);
     }
@@ -458,7 +450,7 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
       protein_per_kg = 0.8;
       setProteinPerKg(0.8);
     }
-      
+
     // Calculate raw protein needs
     const protein_needs = protein_per_kg * weight_in_kg;
     const high_protein_needs = protein_needs * 1.5;
@@ -479,24 +471,26 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
       fat_cutoff = 30;
       carb_cutoff = 95;
     } else if (age_in_years < 4) {
-      fat_lower_percentage = Math.round(calorie_needs * 0.3 / 9 * 10) / 10;
-      fat_upper_percentage = Math.round(calorie_needs * 0.4 / 9 * 10) / 10;
-      carb_lower_percentage = Math.round(calorie_needs * 0.45 / 4 * 10) / 10;
-      carb_upper_percentage = Math.round(calorie_needs * 0.65 / 4 * 10) / 10;
+      fat_lower_percentage = Math.round(((calorie_needs * 0.3) / 9) * 10) / 10;
+      fat_upper_percentage = Math.round(((calorie_needs * 0.4) / 9) * 10) / 10;
+      carb_lower_percentage =
+        Math.round(((calorie_needs * 0.45) / 4) * 10) / 10;
+      carb_upper_percentage =
+        Math.round(((calorie_needs * 0.65) / 4) * 10) / 10;
     } else {
-      fat_lower_percentage = Math.round(calorie_needs * 0.25 / 9 * 10) / 10;
-      fat_upper_percentage = Math.round(calorie_needs * 0.35 / 9 * 10) / 10;
-      carb_lower_percentage = Math.round(calorie_needs * 0.45 / 4 * 10) / 10;
-      carb_upper_percentage = Math.round(calorie_needs * 0.65 / 4 * 10) / 10;
+      fat_lower_percentage = Math.round(((calorie_needs * 0.25) / 9) * 10) / 10;
+      fat_upper_percentage = Math.round(((calorie_needs * 0.35) / 9) * 10) / 10;
+      carb_lower_percentage =
+        Math.round(((calorie_needs * 0.45) / 4) * 10) / 10;
+      carb_upper_percentage =
+        Math.round(((calorie_needs * 0.65) / 4) * 10) / 10;
     }
 
     if (infant) {
       setCarbohydrates(`${carb_cutoff} g`);
       setFat(`${fat_cutoff} g`);
     } else {
-      setCarbohydrates(
-        `${carb_lower_percentage} - ${carb_upper_percentage} g`
-      );
+      setCarbohydrates(`${carb_lower_percentage} - ${carb_upper_percentage} g`);
       setFat(`${fat_lower_percentage} - ${fat_upper_percentage} g`);
     }
 
@@ -553,49 +547,105 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
 
     // Catchup calories calculations
     catchup_calories = calorie_needs * (ideal_weight_50 / weight_in_kg);
-    const roundedCatchUp = Math.round(catchup_calories * 10) / 10;
+    reduced_calories = calorie_needs * (ideal_weight_25 / weight_in_kg);
+    setReducedCalorieNeeds(Math.round(reduced_calories));
+    const roundedCatchUp = Math.round(catchup_calories);
     setCatchUpEnergy(roundedCatchUp);
+    setCatchupCaloriesPerKG(
+      Math.round((catchup_calories / weight_in_kg) * 10) / 10
+    );
+    setReducedCaloriesPerKG(
+      Math.round((reduced_calories / weight_in_kg) * 10) / 10
+    );
 
     setHasCalculated(true);
 
     // Build nutrients array and call callback using the calculated values
     if (onNutrientsCalculated) {
       const caloriesDisplay = Math.round(calorie_needs);
-      const caloriesPerKGDisplay = Math.round((calorie_needs / weight_in_kg) * 10) / 10;
+      const caloriesPerKGDisplay =
+        Math.round((calorie_needs / weight_in_kg) * 10) / 10;
       const proteinDisplay = Math.round(protein_needs * 10) / 10;
       const highProteinDisplay = Math.round(high_protein_needs * 10) / 10;
-      
+
       const calculatedNutrients: Nutrient[] = [
         {
           name: "Calories",
           amount: `${
-            caloriesDisplay ? caloriesDisplay + " cal (" + caloriesPerKGDisplay + " cal/kg)" : ""
+            caloriesDisplay
+              ? caloriesDisplay + " cal (" + caloriesPerKGDisplay + " cal/kg)"
+              : ""
+          }`,
+        },
+        {
+          name: "Catch-Up Calories",
+          amount: `${
+            needsType == "Increased" && catchUpEnergy
+              ? catchUpEnergy + " cal "
+              : ""
+          }`,
+        },
+        {
+          name: "Reduced Calories",
+          amount: `${
+            needsType == "Reduced" && reducedCalorieNeeds
+              ? reducedCalorieNeeds + " cal "
+              : ""
           }`,
         },
         {
           name: "Holliday-Segar",
-          amount: `${holliday_segar_fluid ? Math.round(holliday_segar_fluid) + " mL" : ""}`,
+          amount: `${
+            holliday_segar_fluid ? Math.round(holliday_segar_fluid) + " mL" : ""
+          }`,
         },
-        { name: "DRI Fluid", amount: `${dri ? Math.round(dri * 10) / 10 + " L" : ""}` },
-        { name: "Protein", amount: `${proteinDisplay ? "≥ " + proteinDisplay + " g " + "(" + protein_per_kg + " g/kg" + ")": ""}` },
+        {
+          name: "DRI Fluid",
+          amount: `${dri ? Math.round(dri * 10) / 10 + " L" : ""}`,
+        },
+        {
+          name: "Protein",
+          amount: `${
+            proteinDisplay
+              ? "≥ " +
+                proteinDisplay +
+                " g " +
+                "(" +
+                protein_per_kg +
+                " g/kg" +
+                ")"
+              : ""
+          }`,
+        },
         {
           name: `${needsType == "Increased" ? "High Protein" : ""}`,
           amount: `${
-            needsType == "Increased" && highProteinDisplay ? "≥ " + highProteinDisplay + " g" : ""
+            needsType == "Increased" && highProteinDisplay
+              ? "≥ " + highProteinDisplay + " g"
+              : ""
           }`,
         },
         {
           name: "Carbohydrates",
-          amount: infant 
+          amount: infant
             ? `${carb_cutoff ? carb_cutoff + " g" : ""}`
-            : `${carb_lower_percentage ? carb_lower_percentage + " - " + carb_upper_percentage + " g" : ""}`,
+            : `${
+                carb_lower_percentage
+                  ? carb_lower_percentage + " - " + carb_upper_percentage + " g"
+                  : ""
+              }`,
         },
-        { 
-          name: "Fats", 
+        {
+          name: "Fats",
           amount: infant
             ? `${fat_cutoff ? fat_cutoff + " g" : ""}`
-            : `${fat_lower_percentage ? fat_lower_percentage + " - " + fat_upper_percentage + " g" : ""}`,
+            : `${
+                fat_lower_percentage
+                  ? fat_lower_percentage + " - " + fat_upper_percentage + " g"
+                  : ""
+              }`,
         },
+        { name: "Fiber (DGA)", amount: nutrientsObj["Fiber"] || "" },
         { name: "Calcium", amount: nutrientsObj["Calcium"] || "" },
         { name: "Iron", amount: nutrientsObj["Iron"] || "" },
         { name: "Vitamin D", amount: nutrientsObj["Vitamin D"] || "" },
@@ -612,7 +662,10 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
         { name: "Vitamin B6", amount: nutrientsObj["Vitamin B6"] || "" },
         { name: "Folate", amount: nutrientsObj["Folate"] || "" },
         { name: "Vitamin B12", amount: nutrientsObj["Vitamin B12"] || "" },
-        { name: "Pantothenic Acid", amount: nutrientsObj["Pantothenic Acid"] || "" },
+        {
+          name: "Pantothenic Acid",
+          amount: nutrientsObj["Pantothenic Acid"] || "",
+        },
         { name: "Biotin", amount: nutrientsObj["Biotin"] || "" },
         { name: "Choline", amount: nutrientsObj["Choline"] || "" },
         { name: "Chromium", amount: nutrientsObj["Chromium"] || "" },
@@ -624,7 +677,6 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
         { name: "Selenium", amount: nutrientsObj["Selenium"] || "" },
         { name: "Sodium", amount: nutrientsObj["Sodium"] || "" },
         { name: "Chloride", amount: nutrientsObj["Chloride"] || "" },
-        { name: "Fiber (DGA)", amount: nutrientsObj["Fiber"] || "" },
       ];
       // Use setTimeout to ensure state updates are processed first
       setTimeout(() => {
@@ -642,11 +694,34 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
       }`,
     },
     {
+      name: `${needsType == "Increased" ? "Catch-Up Calories" : ""}`,
+      amount: `${
+        needsType == "Increased" && catchUpEnergy
+          ? catchUpEnergy + " cal (" + catchupCalroiesPerKG + " cal/kg)"
+          : ""
+      }`,
+    },
+    {
+      name: `${needsType == "Reduced" ? "Reduced Calories" : ""}`,
+      amount: `${
+        needsType == "Reduced" && reducedCalorieNeeds
+          ? reducedCalorieNeeds + " cal (" + reducedCaloriesPerKG + " cal/kg)"
+          : ""
+      }`,
+    },
+    {
       name: "Holliday-Segar",
       amount: `${segarFluid ? segarFluid + " mL" : ""}`,
     },
     { name: "DRI Fluid", amount: `${driFluid ? driFluid + " L" : ""}` },
-    { name: "Protein", amount: `${protein ? "≥ " + protein + " g " + "(" + proteinPerKg + " g/kg" + ")": ""}` },
+    {
+      name: "Protein",
+      amount: `${
+        protein
+          ? "≥ " + protein + " g " + "(" + proteinPerKg + " g/kg" + ")"
+          : ""
+      }`,
+    },
     {
       name: `${needsType == "Increased" ? "High Protein" : ""}`,
       amount: `${
@@ -658,6 +733,7 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
       amount: `${carbohydrates ? carbohydrates : ""}`,
     },
     { name: "Fats", amount: `${fat ? fat : ""}` },
+    { name: "Fiber (DGA)", amount: `${fiber || ""}` },
     { name: "Calcium", amount: `${calcium || ""}` },
     { name: "Iron", amount: `${iron || ""}` },
     { name: "Vitamin D", amount: `${vitaminD || ""}` },
@@ -686,8 +762,7 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
     { name: "Selenium", amount: `${selenium || ""}` },
     { name: "Sodium", amount: `${sodium || ""}` },
     { name: "Chloride", amount: `${chloride || ""}` },
-    { name: "Fiber (DGA)", amount: `${fiber || ""}` },
-  ]; 
+  ];
 
   return (
     <div
@@ -1033,16 +1108,18 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
             </div>
 
             {nutrients
-             .filter(n => n.name !== "")
-             .map((nutrient, index) => (
-              <div key={index}>
-                <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh]">
-                  <p className="w-[50%]">{nutrient.name}</p>
-                  <p className="w-[40%] text-lg lg:text-xl text-nowrap">{nutrient.amount}</p>
+              .filter((n) => n.name !== "")
+              .map((nutrient, index) => (
+                <div key={index}>
+                  <div className="flex flex-row text-xl lg:text-2xl pl-[1dvw] py-[1dvh]">
+                    <p className="w-[50%]">{nutrient.name}</p>
+                    <p className="w-[40%] text-lg lg:text-xl text-nowrap">
+                      {nutrient.amount}
+                    </p>
+                  </div>
+                  <hr className="w-full" />
                 </div>
-                <hr className="w-full" />
-              </div>
-          ))}
+              ))}
           </div>
         </div>
         <div className="flex flex-col items-center md:justify-start">
@@ -1050,31 +1127,23 @@ setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
             <p className="text-lg xl:text-xl 2xl:text-2xl font-bold">
               Ideal Body Weight
             </p>
-            <div className="flex flex-row text-md lg:text-lg 2xl:text-3xl ">
+            <div className="flex flex-row text-md lg:text-lg 2xl:text-2xl ">
               <p className="font-[550]">
-                BMI (50th Percentile for age):&nbsp;
+                BMI at 50th Percentile for age:&nbsp;
               </p>
               <p>
                 {idealWeight50} kg (
                 {Math.round((idealWeight50 * 2.205 * 10) / 10)} lb)
               </p>
             </div>
-            <div className="flex flex-row text-md lg:text-lg 2xl:text-3xl ">
+            <div className="flex flex-row text-md lg:text-lg 2xl:text-2xl ">
               <p className="font-[550]">
-                BMI (25th Percentile for age):&nbsp;
+                BMI at 25th Percentile for age:&nbsp;
               </p>
               <p>
                 {idealWeight25} kg (
                 {Math.round((idealWeight25 * 2.205 * 10) / 10)} lb)
               </p>
-            </div>
-            <div className="flex flex-row text-md lg:text-lg 2xl:text-3xl">
-              { needsType == "Increased" ? (
-                <>
-                  <p className="font-[550]">Catch Up Needs:&nbsp;</p>
-                  <p>{catchUpEnergy} cal</p>
-                </>
-              ) : null}
             </div>
           </div>
           <div className="flex flex-row justify-center gap-x-8 md:gap-x-4 md:w-fit mt-4 mb-2 h-fit self-center">

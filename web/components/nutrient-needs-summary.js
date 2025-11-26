@@ -107,14 +107,16 @@ const MyDocument = ({ nutrients, ideal50, ideal25, catchUp }) => {
               <Text style={styles.tableHeaderText}>Amount</Text>
             </View>
           </View>
-          {nutrients.map((nutrient, index) => (
-            <TableRow
-              key={index}
-              label={nutrient.name}
-              value={nutrient.amount}
-              isEven={index % 2 === 0}
-            />
-          ))}
+          {nutrients
+            .filter((n) => n.name && n.name.trim() !== "")
+            .map((nutrient, index) => (
+              <TableRow
+                key={index}
+                label={nutrient.name}
+                value={nutrient.amount.replace(/≥/g, "")}
+                isEven={index % 2 === 0}
+              />
+            ))}
         </View>
         <Text style={styles.subheader}>Ideal Body Weight</Text>
         <Text style={styles.text}>
