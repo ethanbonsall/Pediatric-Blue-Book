@@ -41,8 +41,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+
+package-lock.json
+
 # artillery load test reports
 *.artillery-report.json
 *.artillery-report.html
 login-report.json
 lookup-report.json
+

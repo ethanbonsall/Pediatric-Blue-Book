@@ -32,8 +32,12 @@
     "**/*.ts",
     "**/*.tsx",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
-, "components/formula-summary.tsx"  ],
+    ".next/types/**/*.ts",
+    "components/formula-summary.tsx",
+    ".next/types/**/*.ts",
+    "jest.d.ts",
+    "jest.setup.js"
+  ],
   "exclude": [
     "node_modules"
   ]
