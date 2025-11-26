@@ -47,3 +47,5 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+        token: 3f52049d-340b-41dc-b0db-76495773c063
+
