@@ -28,6 +28,8 @@ const customJestConfig = {
     '!**/.next/**',
     '!**/coverage/**',
   ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'json'],
   transformIgnorePatterns: [
     'node_modules/(?!(lucide-react|@radix-ui|@react-pdf)/)',
     '^.+\\.module\\.(css|sass|scss)$',
