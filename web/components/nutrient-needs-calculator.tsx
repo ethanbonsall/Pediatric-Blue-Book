@@ -374,33 +374,60 @@ const NutrientNeedsCalculator = ({
     setCaloriesPerKG(Math.round((calorie_needs / weight_in_kg) * 10) / 10);
 
     // Getting 25th and 50th percentile BMI's from supabase for 2-18 and ideal weight directly for 0-2
-    try {
-      const { data, error } = await supabase
-        .from("weight")
-        .select("p25, p50")
-        .eq("sex", sex.toLowerCase())
-        .lte("age", age_in_months)
-        .order("age", { ascending: false })
-        .limit(1);
+    if (age_in_years < 2) {
+      try {
+        const { data, error } = await supabase
+          .from("weight_under_two")
+          .select("p25, p50")
+          .eq("gender", sex.toLowerCase())
+          .gt("length_top", height_cm)
+          .lte("length_bottom", height_cm);
 
-      if (error) throw error;
-      if (!data || data.length === 0) throw new Error("No weight data found");
+        if (error) throw error;
+        if (!data || data.length === 0)
+          alert(
+            "Weight for children under two only for children with length >45cm and <110cm"
+          );
 
-      const weightPercentile = data[0];
+        const weightPercentile = data[0];
 
-      //Calculating Ideal Weight
+        //Calculating Ideal Weight
+        ideal_weight_25 = weightPercentile.p25;
+        ideal_weight_50 = weightPercentile.p50;
 
-      ideal_weight_25 =
-        height_in_meters * height_in_meters * weightPercentile.p25;
-      ideal_weight_50 =
-        height_in_meters * height_in_meters * weightPercentile.p50;
+        setidealWeight25(ideal_weight_25);
+        setIdealWeight50(ideal_weight_50);
+      } catch (err) {
+        console.error("Error fetching weight data:", err);
+      }
+    } else {
+      try {
+        const { data, error } = await supabase
+          .from("weight")
+          .select("p25, p50")
+          .eq("sex", sex.toLowerCase())
+          .lte("age", age_in_months)
+          .order("age", { ascending: false })
+          .limit(1);
 
-      setidealWeight25(Math.round(ideal_weight_25 * 10) / 10);
-      setIdealWeight50(Math.round(ideal_weight_50 * 10) / 10);
-    } catch (err) {
-      console.error("Error fetching weight data:", err);
+        if (error) throw error;
+        if (!data || data.length === 0) throw new Error("No weight data found");
+
+        const weightPercentile = data[0];
+
+        //Calculating Ideal Weight
+
+        ideal_weight_25 =
+          height_in_meters * height_in_meters * weightPercentile.p25;
+        ideal_weight_50 =
+          height_in_meters * height_in_meters * weightPercentile.p50;
+
+        setidealWeight25(Math.round(ideal_weight_25 * 10) / 10);
+        setIdealWeight50(Math.round(ideal_weight_50 * 10) / 10);
+      } catch (err) {
+        console.error("Error fetching weight data:", err);
+      }
     }
-
     // Calculate fluid intake using the Holliday Segar Method
     if (weight_in_kg <= 10) {
       holliday_segar_fluid = 100 * weight_in_kg;
