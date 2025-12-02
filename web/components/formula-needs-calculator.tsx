@@ -1,3 +1,7 @@
+// File: web/components/formula-needs-calculator.tsx
+// Component for creating custom formula recipes by mixing multiple ingredients (powders, liquids, supplements).
+// Calculates nutritional content of combined ingredients, compares to ideal nutrient needs, and generates PDF summaries.
+
 import {
   CheckSquare,
   Ellipsis,
@@ -16,18 +20,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import Popup from "./pop_up";
+import Popup from "./pop-up";
 import { supabase } from "@/lib/supabase";
 import type { ProductRow, Ingredient } from "@/lib/types";
-import CalorieCircle from "./CalorieCircle";
+import CalorieCircle from "./calorie-circle";
 import FormulaDocument from "./formula-summary";
 import { pdf } from "@react-pdf/renderer";
 
+// Type definition for nutrient data structure
 type Nutrient = {
   name: string;
   amount: string;
 };
 
+// Type definition for selected ingredient in formula recipe
 type SelectedIngredient = {
   name: string;
   type: string;
@@ -35,8 +41,9 @@ type SelectedIngredient = {
   row?: ProductRow;
 };
 
+// Props interface for FormulaNeedsCalculator component
 interface FormulaNeedsCalculatorProps {
-  idealNutrients?: Nutrient[];
+  idealNutrients?: Nutrient[]; // Optional array of ideal nutrient values from nutrient needs calculator
 }
 
 const FormulaNeedsCalculator = ({
@@ -64,7 +71,9 @@ const FormulaNeedsCalculator = ({
   // Tracks if user has started adding ingredients for PDF generation
   const [hasMixed, setHasMixed] = useState(false);
 
+  // Effect: Fetches all active powder and liquid ingredients from database on component mount
   useEffect(() => {
+    // Function: Retrieves active powder and liquid products from Supabase and stores as available ingredients
     const getIngredients = async () => {
       // fetch rows for powder and liquid
       const [powderRes, liquidRes] = await Promise.all([

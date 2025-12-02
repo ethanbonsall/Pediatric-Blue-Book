@@ -1,3 +1,7 @@
+// File: web/components/pop-up.tsx
+// Modal popup component for displaying detailed ingredient/product information and allowing users
+// to add ingredients to their formula recipe with specified amounts and serving types.
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Select,
@@ -11,6 +15,7 @@ import { Plus, X } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import type { ProductRow } from "@/lib/types";
 
+// Props interface for Popup component
 const Popup = ({
   popUp,
   setPopUp,
@@ -19,12 +24,12 @@ const Popup = ({
   initialAmount,
   ingredientType,
 }: {
-  popUp: boolean;
-  setPopUp: (val: boolean) => void;
-  selectedIngredient?: ProductRow | null;
-  onAdd?: (amount: string, servingType: string) => void;
-  initialAmount?: { amount: string; servingType: string } | null;
-  ingredientType?: string;
+  popUp: boolean; // Controls visibility of the popup
+  setPopUp: (val: boolean) => void; // Function to toggle popup visibility
+  selectedIngredient?: ProductRow | null; // Product/ingredient data to display
+  onAdd?: (amount: string, servingType: string) => void; // Callback when ingredient is added to recipe
+  initialAmount?: { amount: string; servingType: string } | null; // Pre-filled amount values for editing
+  ingredientType?: string; // Type of ingredient (Powder/Liquid)
 }) => {
   const s = selectedIngredient ?? {};
 

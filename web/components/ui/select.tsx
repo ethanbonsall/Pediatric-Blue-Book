@@ -1,3 +1,7 @@
+// File: web/components/ui/select.tsx
+// Reusable select/dropdown component built on Radix UI Select primitives.
+// Provides accessible select functionality with customizable styling.
+
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";

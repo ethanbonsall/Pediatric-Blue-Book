@@ -1,3 +1,7 @@
+// File: web/components/nutrient-needs-calculator.tsx
+// Component for calculating pediatric nutrient needs based on age, weight, height, sex, and activity level.
+// Implements various calculation methods (DRI, Holliday-Segar, catch-up growth, etc.) and generates PDF summaries.
+
 import { useState } from "react";
 import {
   Select,
@@ -13,13 +17,15 @@ import { pdf } from "@react-pdf/renderer";
 import MyDocument from "./nutrient-needs-summary";
 import { BookOpenText } from "lucide-react";
 
+// Type definition for nutrient data structure
 type Nutrient = {
   name: string;
   amount: string;
 };
 
+// Props interface for NutrientNeedsCalculator component
 interface NutrientNeedsCalculatorProps {
-  onNutrientsCalculated?: (nutrients: Nutrient[]) => void;
+  onNutrientsCalculated?: (nutrients: Nutrient[]) => void; // Optional callback to pass calculated nutrients to parent
 }
 
 const NutrientNeedsCalculator = ({
@@ -221,6 +227,8 @@ const NutrientNeedsCalculator = ({
 
   const heightBool = heightUnit === "Imperial" ? true : false;
 
+  // Function: Main calculation function that computes all nutrient needs based on user inputs
+  // Converts units, calculates calories, macros, vitamins, minerals, and fluid requirements
   const calculate = async () => {
     //Setting Up Variables Needed For Calculation
 

@@ -1,3 +1,7 @@
+// File: web/pages/signup.tsx
+// User registration page that allows new users to create an account.
+// Validates email format, password strength, and requires acceptance of terms and privacy policy.
+
 /* eslint-disable @next/next/no-img-element */
 
 import { useState, useEffect } from "react";
@@ -37,11 +41,14 @@ const Index = () => {
     /[0-9]/.test(password) &&
     /[^A-Za-z0-9]/.test(password);
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // Handler: Marks privacy policy as viewed when user clicks to view it
   const handlePolicyClick = () => {
     setViewedPolicy(true);
   };
 
+  // Effect: Checks if user is already logged in and redirects to home if authenticated
   useEffect(() => {
+    // Function: Checks current session and redirects authenticated users
     const checkSession = async () => {
       const {
         data: { session },

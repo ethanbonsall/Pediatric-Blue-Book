@@ -1,4 +1,6 @@
-// app/user-guide/page.tsx
+// File: web/pages/user-guide.tsx
+// User guide page that provides documentation and instructions for using the Pediatric Blue Book application.
+// Includes guides for regular users and admins, explaining features and workflows.
 
 import Navbar from "@/components/navbar-profile";
 import React from "react";
