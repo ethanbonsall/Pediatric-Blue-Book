@@ -1,28 +1,44 @@
+// File: web/pages/index.tsx
+// Main entry point for the application. Handles routing between landing page, login, and authenticated app views.
+// Manages authentication state and determines which component to render based on user session status.
+
 "use client";
-/* eslint-disable @next/next/no-img-element */
-import NavBar from "@/components/navbar";
-import PBB from "../public/transparent-logo.png";
-import { supabase } from "@/lib/supabase";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
+import { supabase } from "@/lib/supabase";
+import NavBar from "@/components/navbar";
 import NutrientNeedsCalculator from "@/components/nutrient-needs-calculator";
 import FormulaNeedsCalculator from "@/components/formula-needs-calculator";
 import FormulaLookup from "@/components/formula-lookup";
+import LandingPage from "@/components/landing-page";
+import Login from "@/components/login";
+import { useSearchParams } from "next/navigation";
 
+// Type definition for nutrient data structure
 type Nutrient = {
   name: string;
   amount: string;
 };
 
 const Index = () => {
-  const [signedIn, setSignedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [nutrients, setNutrients] = useState<Nutrient[]>([]);
+  // State management
+  const [showLogin, setShowLogin] = useState(false); // Controls whether login form is displayed
+  const [signedIn, setSignedIn] = useState(false); // Tracks user authentication status
+  const [loading, setLoading] = useState(true); // Loading state while checking authentication
+  const [nutrients, setNutrients] = useState<Nutrient[]>([]); // Stores calculated nutrient values
 
+  const searchParams = useSearchParams();
+  // Effect: Check URL parameters for login query string and show login form if present
   useEffect(() => {
+    const loginParam = searchParams?.get("login");
+    if (loginParam === "true") {
+      setShowLogin(true);
+    }
+  }, [searchParams]);
+
+  // Effect: Check authentication status on component mount and set up auth state listener
+  useEffect(() => {
+    // Function to check current session and update signed in state
     const checkSession = async () => {
       const {
         data: { session },
@@ -33,126 +49,66 @@ const Index = () => {
 
     checkSession();
 
+    // Set up listener for authentication state changes (login/logout)
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSignedIn(!!session);
       }
     );
 
+    // Cleanup: Unsubscribe from auth listener when component unmounts
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
 
+  // Handler: Displays contact information alert (placeholder for future implementation)
+  const handleContact = () => {
+    // TODO: Implement contact functionality
+    alert("Contact info coming soon");
+  };
+
+  // Loading state
   if (loading) {
     return (
-      <div className="flex h-screen justify-center items-center ">
+      <div className="flex h-screen justify-center items-center">
         Loading...
       </div>
     );
   }
 
-  const handleSubmit = async () => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      alert(error.message);
-    } else {
-      setSignedIn(true);
-    }
-  };
+  // If signed in, show the main app
+  if (signedIn) {
+    return (
+      <>
+        <Head>
+          <title>Pediatric Blue Book</title>
+        </Head>
+        <div className="flex flex-col items-center w-full font-roboto min-h-screen bg-background">
+          <NavBar />
+          <NutrientNeedsCalculator onNutrientsCalculated={setNutrients} />
+          <FormulaNeedsCalculator idealNutrients={nutrients} />
+          <FormulaLookup />
+        </div>
+      </>
+    );
+  }
+
+  // If showing login form
+  if (showLogin) {
+    return (
+      <Login
+        onLoginSuccess={() => setSignedIn(true)}
+        onBackToLanding={() => setShowLogin(false)}
+      />
+    );
+  }
 
   return (
-    <>
-      <Head>
-        <title>Pediatric Blue Book</title>
-      </Head>
-      <div>
-        {signedIn ? (
-          <div className="flex flex-col items-center w-full font-roboto min-h-screen bg-background">
-            <NavBar />
-            <NutrientNeedsCalculator onNutrientsCalculated={setNutrients} />
-            <FormulaNeedsCalculator idealNutrients={nutrients} />
-            <FormulaLookup />
-          </div>
-        ) : (
-          <div className="bg-flow flex flex-col items-center justify-center w-full font-roboto min-h-screen">
-            <div className="flex flex-col text-center items-center justify-center h-screen">
-              <div className="flex flex-col items-center justify-center mb-[5dvh]">
-                <img
-                  className="text-5xl md:text-6xl xl:text-[80px] w-[80dvw] lg:w-[25dvw] font-semibold text-white"
-                  alt="Pediatric Blue Book"
-                  src={PBB.src}
-                />
-              </div>
-              <div className="flex flex-col w-fit h-fit bg-gradient-to-bl from-primary to-primary-600 justify-center text-white text-left items-center gap-6 p-8 rounded mb-[5dvh] shadow-2xl mx-1">
-                <div className="flex flex-col w-full gap-2">
-                  <p className="text-4xl md:text-5xl font-bold text-white">
-                    Login
-                  </p>
-                  <p className="text-md md:text-xl">
-                    Enter your email and password below to login to your
-                    account.
-                  </p>
-                </div>
-                <div className="flex flex-col text-left w-full">
-                  <p className="text-2xl mb-2 text-white">Email</p>
-                  <input
-                    className="rounded px-4 py-2 bg-white text-black w-full"
-                    autoComplete="email"
-                    name="email"
-                    onInput={(e) =>
-                      setEmail((e.target as HTMLInputElement).value)
-                    }
-                  />
-                </div>
-                <div className="flex flex-col text-left w-full">
-                  <div className="flex flex-row justify-between items-center">
-                    <p className="text-2xl mb-2 font-medium text-white">
-                      Password
-                    </p>
-                    <Link
-                      className="text-md md:text-xl mb-1 md:mb-2 hover:underline"
-                      href="/forgot-password"
-                    >
-                      Forgot your password?
-                    </Link>
-                  </div>
-                  <input
-                    className="rounded px-4 py-2 bg-white text-black w-full"
-                    autoComplete="password"
-                    name="password"
-                    type="password"
-                    onInput={(e) =>
-                      setPassword((e.target as HTMLInputElement).value)
-                    }
-                  />
-                </div>
-                <div className="flex flex-col w-full justify-center items-center gap-y-4">
-                  <button
-                    className="bg-secondary hover:bg-secondary-900 text-white px-4 py-2 rounded w-full transition-all duration-300"
-                    onClick={async () => {
-                      await handleSubmit();
-                    }}
-                  >
-                    Login
-                  </button>
-                  <Link
-                    className=" text-white text-md text-center hover:underline"
-                    href="/signup"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div></div>
-          </div>
-        )}
-      </div>
-    </>
+    <LandingPage
+      onLoginClick={() => setShowLogin(true)}
+      onContactClick={handleContact}
+    />
   );
 };
 

@@ -1,3 +1,7 @@
+// File: web/components/navbar-profile.tsx
+// Navigation bar component for profile and other secondary pages.
+// Provides home link and user profile avatar navigation.
+
 /* eslint-disable @next/next/no-img-element */
 "use client";
 

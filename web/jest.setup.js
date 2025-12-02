@@ -24,6 +24,24 @@ jest.mock('next/router', () => ({
   },
 }))
 
+// Mock Next.js navigation (useSearchParams)
+jest.mock('next/navigation', () => ({
+  useSearchParams: jest.fn(() => ({
+    get: jest.fn((key) => {
+      // Default to returning null, tests can override this
+      return null
+    }),
+  })),
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    refresh: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    prefetch: jest.fn(),
+  })),
+}))
+
 // Mock Next.js Link component
 jest.mock('next/link', () => {
   const React = require('react')
@@ -132,4 +150,7 @@ jest.mock('@/lib/supabase', () => ({
     })),
   },
 }))
+
+// Mock window.alert
+global.alert = jest.fn()
 

@@ -1,3 +1,7 @@
+// File: web/pages/404.tsx
+// 404 error page displayed when a user navigates to a non-existent route.
+// Provides a user-friendly error message.
+
 const Four04 = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-center align-middle justify-center gap-8 text-text">

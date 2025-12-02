@@ -1,3 +1,7 @@
+// File: web/pages/reset-password.tsx
+// Password reset page where users can set a new password after clicking the reset link in their email.
+// Updates user password via Supabase and signs them out to require re-login.
+
 import { supabase } from "@/lib/supabase";
 import { X } from "lucide-react";
 import Head from "next/head";
@@ -8,6 +12,7 @@ const Reset = () => {
   const [Password, setPassword] = useState("");
   const [showNotification, setShowNotification] = useState(false);
 
+  // Function: Updates user's password in Supabase authentication
   async function updatePassword() {
     const { error } = await supabase.auth.updateUser({ password: Password });
     if (error) {
@@ -17,13 +22,14 @@ const Reset = () => {
       setShowNotification(true);
     }
   }
+  // Function: Signs out the current user and redirects to login page
   async function handleSignOut() {
     const { error } = await supabase.auth.signOut();
     if (error) {
       alert(error.message);
       return;
     }
-    router.push("/");
+    router.push("/?login=true");
   }
 
   return (

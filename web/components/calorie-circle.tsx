@@ -1,7 +1,12 @@
+// File: web/components/calorie-circle.tsx
+// Visual component that displays calorie information as a circular progress indicator.
+// Shows current calorie amount vs ideal amount with color-coded status (red if below threshold, green otherwise).
+
+// Props interface for CalorieCircle component
 interface CalorieCircleProps {
-  formattedAmount: string;
-  formattedIdeal: string;
-  isBelowThreshold: boolean;
+  formattedAmount: string; // Current calorie amount to display
+  formattedIdeal: string; // Ideal calorie amount for comparison
+  isBelowThreshold: boolean; // Whether current amount is below the threshold (determines color)
 }
 
 const CalorieCircle = ({
@@ -9,6 +14,7 @@ const CalorieCircle = ({
   formattedIdeal,
   isBelowThreshold,
 }: CalorieCircleProps) => {
+  // Function: Extracts numeric value from formatted string (removes units, etc.)
   const parseNumeric = (value: string): number => {
     const match = value.match(/[\d.]+/);
     return match ? parseFloat(match[0]) : 0;

@@ -1,3 +1,7 @@
+// File: web/pages/signup.tsx
+// User registration page that allows new users to create an account.
+// Validates email format, password strength, and requires acceptance of terms and privacy policy.
+
 /* eslint-disable @next/next/no-img-element */
 
 import { useState, useEffect } from "react";
@@ -37,11 +41,14 @@ const Index = () => {
     /[0-9]/.test(password) &&
     /[^A-Za-z0-9]/.test(password);
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // Handler: Marks privacy policy as viewed when user clicks to view it
   const handlePolicyClick = () => {
     setViewedPolicy(true);
   };
 
+  // Effect: Checks if user is already logged in and redirects to home if authenticated
   useEffect(() => {
+    // Function: Checks current session and redirects authenticated users
     const checkSession = async () => {
       const {
         data: { session },
@@ -193,7 +200,7 @@ const Index = () => {
             />
           </div>
           <div className="flex flex-col w-fit h-fit bg-gradient-to-bl from-primary to-primary-600 justify-center text-white text-left items-center gap-6 p-4 md:p-8 rounded mb-4 xl:mb-[5dvh] shadow-2xl mx-1">
-            <div className="flex flex-col w-full gap-2">
+            <div className="flex flex-col w-full gap-2 items-center text-center">
               <p className="text-4xl lg:text-5xl font-bold text-white">
                 Sign Up
               </p>
@@ -337,7 +344,7 @@ const Index = () => {
               >
                 Sign Up
               </button>
-              <Link href="/" className="hover:underline text-md md:text-lg">
+              <Link href="/?login=true" className="hover:underline text-md md:text-lg">
                 Already have an account?
               </Link>
             </div>
@@ -350,3 +357,4 @@ const Index = () => {
 };
 
 export default Index;
+

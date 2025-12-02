@@ -1,3 +1,7 @@
+// File: web/pages/profile.tsx
+// User profile page where authenticated users can view and edit their account information.
+// Allows updating username, title, email, and password with validation.
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react";
@@ -35,7 +39,9 @@ const Profile = () => {
     /[0-9]/.test(password) &&
     /[^A-Za-z0-9]/.test(password);
 
+  // Effect: Checks authentication status and fetches user data on component mount
   useEffect(() => {
+    // Function: Verifies user session and redirects if not authenticated
     const checkSession = async () => {
       const {
         data: { session },

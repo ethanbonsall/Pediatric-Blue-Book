@@ -6,6 +6,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { supabase } from '@/lib/supabase'
 import Index from '@/pages/index'
 import Profile from '@/pages/profile'
+import { useSearchParams } from 'next/navigation'
 
 // Note: Using the global Supabase mock from jest.setup.js
 
@@ -18,6 +19,11 @@ describe('Authentication Tests', () => {
     it('should render login form when user is not signed in', async () => {
       ;(supabase.auth.getSession as jest.Mock).mockResolvedValue({
         data: { session: null },
+      })
+      
+      // Mock useSearchParams to return null (no login query param)
+      ;(useSearchParams as jest.Mock).mockReturnValue({
+        get: jest.fn(() => null),
       })
       
       // Mock the from() query for Navbar component
@@ -35,9 +41,22 @@ describe('Authentication Tests', () => {
 
       render(<Index />)
 
+      // Wait for loading to finish
       await waitFor(() => {
-        const loginHeadings = screen.getAllByText(/login/i)
-        expect(loginHeadings.length).toBeGreaterThan(0)
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+      })
+
+      // Click the Login button to show the login form
+      const loginButtons = screen.getAllByText(/login/i)
+      const loginButton = loginButtons.find(btn => 
+        btn.tagName === 'BUTTON' && btn.textContent === 'Login'
+      )
+      
+      if (loginButton) {
+        fireEvent.click(loginButton)
+      }
+
+      await waitFor(() => {
         const emailInput = document.querySelector('input[name="email"]')
         expect(emailInput).toBeInTheDocument()
       })
@@ -56,6 +75,11 @@ describe('Authentication Tests', () => {
         error: null,
       })
       
+      // Mock useSearchParams to return null (no login query param)
+      ;(useSearchParams as jest.Mock).mockReturnValue({
+        get: jest.fn(() => null),
+      })
+      
       // Mock the from() query for Navbar component
       const mockNavbarQuery = {
         select: jest.fn(() => ({
@@ -71,24 +95,38 @@ describe('Authentication Tests', () => {
 
       render(<Index />)
 
+      // Wait for loading to finish
       await waitFor(() => {
-        const loginTexts = screen.getAllByText(/login/i)
-        expect(loginTexts.length).toBeGreaterThan(0)
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+      })
+
+      // Click the Login button to show the login form
+      const loginButtons = screen.getAllByText(/login/i)
+      const navLoginButton = loginButtons.find(btn => 
+        btn.tagName === 'BUTTON' && btn.textContent === 'Login'
+      )
+      
+      if (navLoginButton) {
+        fireEvent.click(navLoginButton)
+      }
+
+      await waitFor(() => {
+        const emailInput = document.querySelector('input[name="email"]')
+        expect(emailInput).toBeInTheDocument()
       })
 
       const emailInput = document.querySelector('input[name="email"]') as HTMLInputElement
       expect(emailInput).toBeInTheDocument()
       const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement
       expect(passwordInput).toBeInTheDocument()
-      const loginButtons = screen.getAllByRole('button')
-      const loginButton = loginButtons.find(btn => 
-        btn.textContent?.toLowerCase().includes('login') || 
-        btn.textContent === 'Login'
-      ) || loginButtons[0]
+      
+      // Find the submit button in the login form
+      const submitButton = screen.getByRole('button', { name: /^login$/i })
+      expect(submitButton).toBeInTheDocument()
 
-      fireEvent.input(emailInput, { target: { value: 'test@example.com' } })
-      fireEvent.input(passwordInput, { target: { value: 'password123' } })
-      fireEvent.click(loginButton)
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+      fireEvent.change(passwordInput, { target: { value: 'password123' } })
+      fireEvent.click(submitButton)
 
       await waitFor(() => {
         expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
@@ -106,6 +144,11 @@ describe('Authentication Tests', () => {
       ;(supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
         data: { user: null, session: null },
         error: { message: errorMessage },
+      })
+      
+      // Mock useSearchParams to return null (no login query param)
+      ;(useSearchParams as jest.Mock).mockReturnValue({
+        get: jest.fn(() => null),
       })
       
       // Mock the from() query for Navbar component
@@ -126,24 +169,38 @@ describe('Authentication Tests', () => {
 
       render(<Index />)
 
+      // Wait for loading to finish
       await waitFor(() => {
-        const loginHeadings = screen.getAllByText(/login/i)
-        expect(loginHeadings.length).toBeGreaterThan(0)
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+      })
+
+      // Click the Login button to show the login form
+      const loginButtons = screen.getAllByText(/login/i)
+      const navLoginButton = loginButtons.find(btn => 
+        btn.tagName === 'BUTTON' && btn.textContent === 'Login'
+      )
+      
+      if (navLoginButton) {
+        fireEvent.click(navLoginButton)
+      }
+
+      await waitFor(() => {
+        const emailInput = document.querySelector('input[name="email"]')
+        expect(emailInput).toBeInTheDocument()
       })
 
       const emailInput = document.querySelector('input[name="email"]') as HTMLInputElement
       expect(emailInput).toBeInTheDocument()
       const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement
       expect(passwordInput).toBeInTheDocument()
-      const loginButtons = screen.getAllByRole('button')
-      const loginButton = loginButtons.find(btn => 
-        btn.textContent?.toLowerCase().includes('login') || 
-        btn.textContent === 'Login'
-      ) || loginButtons[0]
+      
+      // Find the submit button in the login form
+      const submitButton = screen.getByRole('button', { name: /^login$/i })
+      expect(submitButton).toBeInTheDocument()
 
-      fireEvent.input(emailInput, { target: { value: 'wrong@example.com' } })
-      fireEvent.input(passwordInput, { target: { value: 'wrongpassword' } })
-      fireEvent.click(loginButton)
+      fireEvent.change(emailInput, { target: { value: 'wrong@example.com' } })
+      fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } })
+      fireEvent.click(submitButton)
 
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(errorMessage)
@@ -155,6 +212,11 @@ describe('Authentication Tests', () => {
     it('should check session on component mount', async () => {
       ;(supabase.auth.getSession as jest.Mock).mockResolvedValue({
         data: { session: null },
+      })
+      
+      // Mock useSearchParams to return null (no login query param)
+      ;(useSearchParams as jest.Mock).mockReturnValue({
+        get: jest.fn(() => null),
       })
       
       // Mock the from() query for Navbar component
@@ -180,6 +242,11 @@ describe('Authentication Tests', () => {
     it('should set up auth state change listener', async () => {
       ;(supabase.auth.getSession as jest.Mock).mockResolvedValue({
         data: { session: null },
+      })
+      
+      // Mock useSearchParams to return null (no login query param)
+      ;(useSearchParams as jest.Mock).mockReturnValue({
+        get: jest.fn(() => null),
       })
       
       // Mock the from() query for Navbar component
@@ -299,6 +366,11 @@ describe('Authentication Tests', () => {
           })
       )
       
+      // Mock useSearchParams to return null (no login query param)
+      ;(useSearchParams as jest.Mock).mockReturnValue({
+        get: jest.fn(() => null),
+      })
+      
       // Mock the from() query for Navbar component
       const mockNavbarQuery = {
         select: jest.fn(() => ({
@@ -324,6 +396,11 @@ describe('Authentication Tests', () => {
     it('should display main content when user is signed in', async () => {
       ;(supabase.auth.getSession as jest.Mock).mockResolvedValue({
         data: { session: { user: { id: '123' } } },
+      })
+      
+      // Mock useSearchParams to return null (no login query param)
+      ;(useSearchParams as jest.Mock).mockReturnValue({
+        get: jest.fn(() => null),
       })
       
       // Mock the from() query for Navbar component

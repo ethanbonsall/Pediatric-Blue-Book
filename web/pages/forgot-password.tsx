@@ -1,3 +1,7 @@
+// File: web/pages/forgot-password.tsx
+// Password reset request page that allows users to request a password reset email.
+// Sends password reset link via Supabase authentication service.
+
 import { supabase } from "@/lib/supabase";
 import { X } from "lucide-react";
 import Head from "next/head";
@@ -7,6 +11,7 @@ import { useState } from "react";
 const Forgot = () => {
   const [email, setEmail] = useState("");
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // Function: Sends password reset email to the provided email address via Supabase
   async function sendResetEmail(email: string) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: "https://www.pediatricbluebook.com/reset-password",
@@ -78,7 +83,7 @@ const Forgot = () => {
               Request Reset Link
             </button>
             <Link
-              href="/"
+              href="/?login=true"
               className="text-lg self-center text-black font-semibold hover:text-gray-800"
             >
               Back To Login

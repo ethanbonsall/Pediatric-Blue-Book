@@ -1,3 +1,7 @@
+// File: web/pages/admin.tsx
+// Admin panel page for managing product database (powder and liquid ingredients).
+// Allows admins to view, add, edit, approve, activate, and deactivate products in the database.
+
 import { useEffect, useState } from "react";
 import {
   Select,

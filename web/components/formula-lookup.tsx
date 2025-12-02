@@ -1,3 +1,7 @@
+// File: web/components/formula-lookup.tsx
+// Component for searching and viewing formula product information from the database.
+// Allows users to filter by product type (Powder/Liquid) and displays detailed product information in popups.
+
 import { HeartIcon, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -8,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import Popup from "./pop_up_lookup";
+import Popup from "./pop-up-lookup";
 import { supabase } from "@/lib/supabase";
 import type { ProductRow, Ingredient } from "@/lib/types";
 
@@ -25,7 +29,9 @@ const FormulaNeedsCalculator = () => {
   const [selectedIngredient, setSelectedIngredient] =
     useState<ProductRow | null>(null);
 
+  // Effect: Fetches all active powder and liquid ingredients from database on component mount
   useEffect(() => {
+    // Function: Retrieves active powder and liquid products from Supabase and stores as ingredients
     const getIngredients = async () => {
       // fetch rows for powder and liquid, only active products
       const [powderRes, liquidRes] = await Promise.all([

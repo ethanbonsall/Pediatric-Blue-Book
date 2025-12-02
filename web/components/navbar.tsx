@@ -1,3 +1,7 @@
+// File: web/components/navbar.tsx
+// Navigation bar component for authenticated users. Displays logo, navigation links to main sections,
+// and user profile avatar. Conditionally shows admin panel link for admin/superuser roles.
+
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
@@ -9,10 +13,13 @@ import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
 export default function Navbar() {
+  // State: Tracks whether current user has admin or superuser role
   const [isAdmin, setIsAdmin] = useState(false);
   // const [isLoading, setIsLoading] = useState(true);
 
+  // Effect: Fetches user role from database on component mount to determine admin status
   useEffect(() => {
+    // Function: Retrieves current user's role from users table and sets admin state if applicable
     const GetUserRole = async () => {
       try {
         const {

@@ -1,10 +1,16 @@
+// File: web/components/formula-summary.tsx
+// PDF document component for generating printable formula recipe summaries.
+// Displays ingredient list, nutritional information, and comparison to ideal nutrient needs.
+
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
+// Interface for selected ingredient in formula recipe
 export interface SelectedIngredient {
   name: string;
   amount: string | number;
 }
 
+// Interface for calculated nutrient values with formatting
 export interface CalculatedNutrient {
   name: string;
   amount?: string | number;
@@ -12,11 +18,12 @@ export interface CalculatedNutrient {
   formattedIdeal?: string | number;
 }
 
+// Props interface for FormulaDocument component
 export interface FormulaDocumentProps {
-  selectedIngredients: SelectedIngredient[];
-  servings: number;
-  calculatedNutrients: CalculatedNutrient[];
-  totalVolume: number;
+  selectedIngredients: SelectedIngredient[]; // List of ingredients in the formula
+  servings: number; // Number of servings the formula makes
+  calculatedNutrients: CalculatedNutrient[]; // Calculated nutritional values
+  totalVolume: number; // Total volume of the formula
 }
 
 // Create styles

@@ -1,3 +1,7 @@
+// File: web/components/nutrient-needs-summary.js
+// PDF document component for generating printable nutrient needs calculation summaries.
+// Displays calculated nutrient requirements in a formatted PDF document.
+
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 // Create styles

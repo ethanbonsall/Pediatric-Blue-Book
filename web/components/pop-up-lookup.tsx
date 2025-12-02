@@ -1,14 +1,19 @@
+// File: web/components/pop-up-lookup.tsx
+// Modal popup component for displaying detailed product information in read-only mode.
+// Used in the formula lookup tool to show product details without allowing recipe modification.
+
 import { X } from "lucide-react";
 import type { ProductRow } from "@/lib/types";
 
+// Props interface for Popup component (lookup version)
 const Popup = ({
   popUp,
   setPopUp,
   selectedIngredient,
 }: {
-  popUp: boolean;
-  setPopUp: (val: boolean) => void;
-  selectedIngredient?: ProductRow | null;
+  popUp: boolean; // Controls visibility of the popup
+  setPopUp: (val: boolean) => void; // Function to toggle popup visibility
+  selectedIngredient?: ProductRow | null; // Product data to display
 }) => {
   const s = selectedIngredient ?? {};
   const product_name =
