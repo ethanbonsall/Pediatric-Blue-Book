@@ -2,15 +2,7 @@
 // Component for creating custom formula recipes by mixing multiple ingredients (powders, liquids, supplements).
 // Calculates nutritional content of combined ingredients, compares to ideal nutrient needs, and generates PDF summaries.
 
-import {
-  CheckSquare,
-  Ellipsis,
-  HeartIcon,
-  Plus,
-  Square,
-  SquareArrowUpRight,
-  Trash2,
-} from "lucide-react";
+import { CheckSquare, Ellipsis, Plus, Square, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
   Select,
@@ -52,9 +44,7 @@ const FormulaNeedsCalculator = ({
   const [popUp, setPopUp] = useState(false);
   const [selectedIngredientForPopup, setSelectedIngredientForPopup] =
     useState<Ingredient | null>(null);
-  const Heart = () => {
-    return null;
-  };
+
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
@@ -481,7 +471,24 @@ const FormulaNeedsCalculator = ({
       if (!row) return;
 
       if (ingredient.type === "Powder") {
-        // For powder: np100 values are per 100ml of prepared formula
+        // For powder: np100 values are per 100 kcal
+        // First calculate the total calories from this ingredient
+        const caloriesPerGram = (row.calories_per_gram as number) || 0;
+        const gramsPerServing =
+          servingType === "Scoop"
+            ? (row.grams_per_scoop as number) || 0
+            : servingType === "Teaspoon"
+            ? (row.grams_per_teaspoon as number) || 0
+            : servingType === "Tablespoon"
+            ? (row.grams_per_tablespoon as number) || 0
+            : servingType === "Cup"
+            ? (row.grams_per_cup as number) || 0
+            : 0;
+        const totalGrams = gramsPerServing * quantity;
+        const calories = totalGrams * caloriesPerGram;
+
+        // Scale factor: np100 values are per 100 kcal, so divide calories by 100
+        const scaleFactor = calories / 100;
 
         // Map nutrient names to np100 column names
         const nutrientMap: Record<string, string> = {
@@ -524,23 +531,10 @@ const FormulaNeedsCalculator = ({
           const value = ingredient.row[columnName] as number;
           if (value != null && !isNaN(value)) {
             if (!totals[nutrientName]) totals[nutrientName] = 0;
-            totals[nutrientName] += value;
+            totals[nutrientName] += value * scaleFactor;
           }
         });
 
-        const caloriesPerGram = (row.calories_per_gram as number) || 0;
-        const gramsPerServing =
-          servingType === "Scoop"
-            ? (row.grams_per_scoop as number) || 0
-            : servingType === "Teaspoon"
-            ? (row.grams_per_teaspoon as number) || 0
-            : servingType === "Tablespoon"
-            ? (row.grams_per_tablespoon as number) || 0
-            : servingType === "Cup"
-            ? (row.grams_per_cup as number) || 0
-            : 0;
-        const totalGrams = gramsPerServing * quantity;
-        const calories = totalGrams * caloriesPerGram;
         if (calories > 0) {
           if (!totals["Calories"]) totals["Calories"] = 0;
           totals["Calories"] += calories;
@@ -605,7 +599,7 @@ const FormulaNeedsCalculator = ({
       }
     });
 
-    // Divide by servings per day
+    // Multiply by servings per day
     Object.keys(totals).forEach((key) => {
       if (servings > 0) {
         totals[key] = totals[key] * servings;
@@ -870,9 +864,6 @@ const FormulaNeedsCalculator = ({
                       case "Liquid":
                         setFilter("Liquid");
                         break;
-                      case "Favorites":
-                        setFilter("Favorites");
-                        break;
                     }
                   }}
                 >
@@ -898,12 +889,6 @@ const FormulaNeedsCalculator = ({
                         value="Liquid"
                       >
                         Liquid
-                      </SelectItem>
-                      <SelectItem
-                        className="w-full bg-white rounded text-text px-4 py-2 hover:bg-primary"
-                        value="Favorites"
-                      >
-                        Favorites
                       </SelectItem>
                     </SelectGroup>
                   </SelectContent>
@@ -932,12 +917,6 @@ const FormulaNeedsCalculator = ({
                             >
                               <Plus className="w-8 aspect-square" />
                             </button>
-                            <button
-                              onClick={Heart}
-                              className="z-30 ml-[1dvw] place-self-end w-fit h-fit aspect-square transition-all"
-                            >
-                              <HeartIcon className="w-8 aspect-square hover:fill-red-400" />
-                            </button>
                           </div>
                         </div>
                       </div>
@@ -959,17 +938,10 @@ const FormulaNeedsCalculator = ({
                       <Trash2 className="w-8" />
                     </button>
                   </div>
-                  <p className="w-2/5">Name</p>
+                  <p className="w-3/5">Name</p>
                   <p className="w-1/5">Type</p>
                   <p className="w-1/5">Amount</p>
-                  <div className="w-[12%] flex justify-end gap-2">
-                    <button className="w-8">
-                      <HeartIcon className="hover:fill-red-400" />
-                    </button>
-                    <button className="w-8">
-                      <SquareArrowUpRight />
-                    </button>
-                  </div>
+                  <div className="w-[12%] flex justify-end gap-2"></div>
                 </div>
                 <hr className="w-full" />
               </div>
@@ -989,7 +961,7 @@ const FormulaNeedsCalculator = ({
                           )}
                         </button>
                       </div>
-                      <p className="w-2/5">{selectedIngredient.name}</p>
+                      <p className="w-3/5">{selectedIngredient.name}</p>
                       <p className="w-1/5">{selectedIngredient.type}</p>
                       <p className="w-1/5">{selectedIngredient.amount}</p>
                       <div className="flex justify-end w-[12%]">
