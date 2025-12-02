@@ -32,13 +32,13 @@ const Index: React.FC = () => {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
 
   const searchParams = useSearchParams();
- useEffect(() => {
-  const loginParam = searchParams?.get("login");
+  
+  useEffect(() => {
+    const loginParam = searchParams?.get("login");
     if (loginParam === "true") {
-    setShowLogin(true);
+      setShowLogin(true);
     }
   }, [searchParams]);
-
 
   // Colors
   const colors = {
@@ -272,7 +272,7 @@ const Index: React.FC = () => {
                     href="/signup"
                     className="text-white text-md text-center hover:underline"
                   >
-                    Don't have an account? Sign Up
+                    Don&apos;t have an account? Sign Up
                   </a>
                 </div>
               </div>
@@ -439,7 +439,7 @@ const Index: React.FC = () => {
                 className="text-sm font-medium hover:underline transition-colors"
                 style={{ color: colors.primary900, textTransform: "none" }}
               >
-                Don't have an account? Sign Up
+                Don&apos;t have an account? Sign Up
               </a>
             </div>
 
