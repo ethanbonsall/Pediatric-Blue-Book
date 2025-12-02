@@ -1,13 +1,14 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
-import NavBar from "@/components/navbar";
-import { supabase } from "@/lib/supabase";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import Head from "next/head";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+import NavBar from "@/components/navbar";
 import NutrientNeedsCalculator from "@/components/nutrient-needs-calculator";
 import FormulaNeedsCalculator from "@/components/formula-needs-calculator";
 import FormulaLookup from "@/components/formula-lookup";
+import PBB from "../public/transparent-logo.png";
 import { useSearchParams } from "next/navigation";
 
 interface Feature {
@@ -34,8 +35,7 @@ const Index: React.FC = () => {
   const searchParams = useSearchParams();
  useEffect(() => {
   const loginParam = searchParams?.get("login");
-  const hash = typeof window !== "undefined" ? window.location.hash : "";
-    if (loginParam === "true" || hash === "#login") {
+    if (loginParam === "true") {
     setShowLogin(true);
     }
   }, [searchParams]);
@@ -207,7 +207,7 @@ const Index: React.FC = () => {
               <img
                 className="w-[80dvw] lg:w-[25dvw]"
                 alt="Pediatric Blue Book"
-                src="/transparent-logo.png"
+                src={PBB.src}
               />
             </div>
             <div className="flex flex-col w-fit h-fit bg-gradient-to-bl from-primary to-primary-600 justify-center text-white text-left items-center gap-6 p-8 rounded mb-[5dvh] shadow-2xl mx-1">
@@ -269,12 +269,12 @@ const Index: React.FC = () => {
                     ← Back to Landing
                   </button>
                   <span className="text-white hidden sm:block">|</span>
-                  <a
-                    href="/signup"
-                    className="text-white text-md text-center hover:underline"
-                  >
-                    Don't have an account? Sign Up
-                  </a>
+                  <Link
+                      href="/signup"
+                      className="text-white text-md text-center hover:underline"
+                    >
+                      Don&apos;t have an account? Sign Up
+                    </Link>
                 </div>
               </div>
             </div>
@@ -342,7 +342,7 @@ const Index: React.FC = () => {
             <div className="flex-1" />
             <div className="flex items-center justify-center">
               <img
-                src="/transparent-logo.png"
+                src={PBB.src}
                 alt="Pediatric Blue Book"
                 className="h-10 lg:h-12"
               />
@@ -377,7 +377,7 @@ const Index: React.FC = () => {
           <div className="max-w-4xl mx-auto animate-slide-up">
             <div className="mb-10 animate-float-glow flex justify-center">
               <img
-                src="/transparent-logo.png"
+                src={PBB.src}
                 alt="Pediatric Blue Book"
                 className="w-64 lg:w-80"
               />
@@ -433,15 +433,14 @@ const Index: React.FC = () => {
                 </svg>
               </button>
             </div>
-
             <div className="flex flex-col items-center gap-2 mb-6">
-              <a
+              <Link
                 href="/signup"
                 className="text-sm font-medium hover:underline transition-colors"
                 style={{ color: colors.primary900, textTransform: "none" }}
               >
-                Don't have an account? Sign Up
-              </a>
+                Don&apos;t have an account? Sign Up
+              </Link>
             </div>
 
             <div
