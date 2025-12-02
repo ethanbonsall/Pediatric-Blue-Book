@@ -1,13 +1,14 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
+import NavBar from "@/components/navbar";
+import PBB from "../public/transparent-logo.png";
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import Head from "next/head";
-import { supabase } from "@/lib/supabase";
-import NavBar from "@/components/navbar";
 import NutrientNeedsCalculator from "@/components/nutrient-needs-calculator";
 import FormulaNeedsCalculator from "@/components/formula-needs-calculator";
 import FormulaLookup from "@/components/formula-lookup";
-import PBB from "../public/transparent-logo.png";
 import { useSearchParams } from "next/navigation";
 
 interface Feature {
