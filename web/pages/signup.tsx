@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useState, useEffect } from "react";
+import PBB from "../public/transparent-logo.png";
 import { Check, ChevronRight, X } from "lucide-react";
 import * as React from "react";
 import { supabase } from "@/lib/supabase";
@@ -188,7 +189,7 @@ const Index = () => {
             <img
               className="text-5xl md:text-6xl xl:text-[80px] w-[70dvw] lg:w-[25dvw] font-semibold text-white"
               alt="Pediatric Blue Book"
-              src="/transparent-logo.png"
+              src={PBB.src}
             />
           </div>
           <div className="flex flex-col w-fit h-fit bg-gradient-to-bl from-primary to-primary-600 justify-center text-white text-left items-center gap-6 p-4 md:p-8 rounded mb-4 xl:mb-[5dvh] shadow-2xl mx-1">
@@ -336,7 +337,7 @@ const Index = () => {
               >
                 Sign Up
               </button>
-              <Link href="/#login" className="hover:underline text-md md:text-lg">
+              <Link href="/?login=true" className="hover:underline text-md md:text-lg">
                 Already have an account?
               </Link>
             </div>
