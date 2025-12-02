@@ -13,7 +13,7 @@ import {
 } from "../components/ui/select";
 import Navbar from "@/components/navbar-profile";
 import Head from "next/head";
-import { Check, Pencil, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
+import { Check, Download, Pencil, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { LiquidProductRow, PowderProductRow } from "@/lib/types";
@@ -77,6 +77,60 @@ const AdminTable = () => {
     "npc_percent_cal_from_fat",
   ];
 
+  const convertToCSV = (data: LiquidProductRow[] | PowderProductRow[]) => {
+    if (!data || data.length === 0) return '';
+
+    // Get headers from first object
+    const headers = Object.keys(data[0]).filter(key => key !== 'id');
+    const csvHeaders = headers.join(',');
+
+    // Convert rows to CSV format
+    const csvRows = data.map(row => {
+      return headers.map(header => {
+        const value = row[header as keyof typeof row];
+        // Handle values with commas, quotes, or newlines
+        if (value === null || value === undefined) return '';
+        const stringValue = String(value);
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+        return stringValue;
+      }).join(',');
+    });
+
+    return [csvHeaders, ...csvRows].join('\n');
+  };
+
+  async function exportData() {
+    const tableName = productType == "Liquid" ? "liquid_ingredient" : "powder_ingredient"
+    try {
+      const {data, error} = await supabase.from(tableName).select('*');
+      if (error) {
+        alert("Error retrieving data from Supabase: " + error.message)
+      }
+      if (!data || data.length === 0) {
+        alert('No data to export');
+        return;
+      }
+      // convert to CSV 
+      const csv = convertToCSV(data);
+
+      const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'}); 
+      const url = URL.createObjectURL(blob); 
+      const link = document.createElement('a'); 
+      link.href = url; 
+      link.download = productType + "_table_data";
+      link.click(); 
+      URL.revokeObjectURL(url); 
+    }
+    catch (error) { 
+      alert("Error exporting data: " + error)
+    }
+    finally {
+      return;
+    }
+
+  }
   function formatColumnName(column: string): string {
     // Replace underscores with spaces
     let name = column.replace(/_/g, " ").toLowerCase().trim();
@@ -692,6 +746,19 @@ const AdminTable = () => {
         </div>
 
         <div className="mt-4 flex justify-between items-center">
+          <div className = "flex gap-[10%]">
+            <div>
+              <Button
+                onClick={() => {
+                 exportData()
+                }}
+                variant="default"
+                className="rounded-full"
+                size="sm"
+              >
+                <Download /> Export as CSV
+              </Button>
+            </div>
           {isSuperUser ? (
             <div>
               {(actionMode == "default" || actionMode == "approve") && (
@@ -707,8 +774,10 @@ const AdminTable = () => {
             </div>
           ) : (
             <></>
-          )}
+          )}</div>
+        
           {actionMode == "default" && (
+            
             <div>
               <Button
                 onClick={() => {
@@ -722,6 +791,7 @@ const AdminTable = () => {
                 <Plus /> Add Entry
               </Button>
             </div>
+       
           )}
 
           {actionMode != "default" && (

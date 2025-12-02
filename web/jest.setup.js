@@ -2,26 +2,28 @@
 import '@testing-library/jest-dom'
 
 // Mock Next.js router
-jest.mock('next/router', () => ({
-  useRouter() {
-    return {
-      route: '/',
-      pathname: '/',
-      query: {},
-      asPath: '/',
-      push: jest.fn(),
-      replace: jest.fn(),
-      reload: jest.fn(),
-      back: jest.fn(),
-      prefetch: jest.fn().mockResolvedValue(undefined),
-      beforePopState: jest.fn(),
-      events: {
-        on: jest.fn(),
-        off: jest.fn(),
-        emit: jest.fn(),
-      },
-    }
+const mockRouter = {
+  route: '/',
+  pathname: '/',
+  query: {},
+  asPath: '/',
+  push: jest.fn(),
+  replace: jest.fn(),
+  reload: jest.fn(),
+  back: jest.fn(),
+  prefetch: jest.fn().mockResolvedValue(undefined),
+  beforePopState: jest.fn(),
+  events: {
+    on: jest.fn(),
+    off: jest.fn(),
+    emit: jest.fn(),
   },
+}
+
+jest.mock('next/router', () => ({
+  __esModule: true,
+  default: mockRouter,
+  useRouter: () => mockRouter,
 }))
 
 // Mock Next.js navigation (useSearchParams)
@@ -113,6 +115,68 @@ jest.mock('lucide-react', () => {
     Calculator: createIcon('Calculator'),
     Table: createIcon('Table'),
     Home: createIcon('Home'),
+    Download: createIcon('Download'),
+  }
+})
+
+// Mock @radix-ui/react-slot
+jest.mock('@radix-ui/react-slot', () => {
+  const React = require('react')
+  return {
+    Slot: React.forwardRef(({ children, ...props }, ref) => {
+      return React.createElement('div', { ref, ...props }, children)
+    }),
+  }
+})
+
+// Mock @radix-ui/react-select
+jest.mock('@radix-ui/react-select', () => {
+  const React = require('react')
+  const createSelectComponent = (displayName) => {
+    const Component = React.forwardRef(({ children, ...props }, ref) => {
+      return React.createElement('div', { ref, 'data-testid': displayName.toLowerCase(), ...props }, children)
+    })
+    Component.displayName = displayName
+    return Component
+  }
+
+  return {
+    Root: ({ children, onValueChange, ...props }) => {
+      return React.createElement('div', { 'data-testid': 'select-root', ...props }, children)
+    },
+    Group: createSelectComponent('SelectGroup'),
+    Value: ({ children, placeholder, ...props }) => {
+      return React.createElement('span', { 'data-testid': 'select-value', ...props }, children || placeholder)
+    },
+    Trigger: createSelectComponent('SelectTrigger'),
+    Content: ({ children, ...props }) => {
+      return React.createElement('div', { 'data-testid': 'select-content', ...props }, children)
+    },
+    Item: ({ children, value, ...props }) => {
+      return React.createElement('div', { 'data-testid': 'select-item', 'data-value': value, ...props }, children)
+    },
+    ItemText: ({ children, ...props }) => {
+      return React.createElement('span', { 'data-testid': 'select-item-text', ...props }, children)
+    },
+    ItemIndicator: ({ children, ...props }) => {
+      return React.createElement('span', { 'data-testid': 'select-item-indicator', ...props }, children)
+    },
+    Label: createSelectComponent('SelectLabel'),
+    Separator: createSelectComponent('SelectSeparator'),
+    ScrollUpButton: createSelectComponent('SelectScrollUpButton'),
+    ScrollDownButton: createSelectComponent('SelectScrollDownButton'),
+    Viewport: ({ children, ...props }) => {
+      return React.createElement('div', { 'data-testid': 'select-viewport', ...props }, children)
+    },
+    Portal: ({ children }) => {
+      return React.createElement(React.Fragment, null, children)
+    },
+    Icon: ({ children, asChild, ...props }) => {
+      if (asChild && children) {
+        return children
+      }
+      return React.createElement('span', { 'data-testid': 'select-icon', ...props }, children)
+    },
   }
 })
 
