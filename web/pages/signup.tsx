@@ -193,7 +193,7 @@ const Index = () => {
             />
           </div>
           <div className="flex flex-col w-fit h-fit bg-gradient-to-bl from-primary to-primary-600 justify-center text-white text-left items-center gap-6 p-4 md:p-8 rounded mb-4 xl:mb-[5dvh] shadow-2xl mx-1">
-            <div className="flex flex-col w-full gap-2">
+            <div className="flex flex-col w-full gap-2 items-center text-center">
               <p className="text-4xl lg:text-5xl font-bold text-white">
                 Sign Up
               </p>
@@ -337,7 +337,7 @@ const Index = () => {
               >
                 Sign Up
               </button>
-              <Link href="/" className="hover:underline text-md md:text-lg">
+              <Link href="/?login=true" className="hover:underline text-md md:text-lg">
                 Already have an account?
               </Link>
             </div>
