@@ -908,9 +908,11 @@ const FormulaNeedsCalculator = ({
                         key={index}
                       >
                         <div className="flex flex-row text-lg lg:text-xl 2xl:text-2xl pl-[1dvw] py-[1dvh] text-start items-center hover:bg-gray-50">
-                          <p className="w-2/5">{ingredient.name}</p>
-                          <p className="w-2/5 text-medium">{ingredient.type}</p>
-                          <div className="flex flex-row w-1/5 justify-end mr-[2%]">
+                          <p className="w-[72%]">{ingredient.name}</p>
+                          <p className="w-[18%] text-medium">
+                            {ingredient.type}
+                          </p>
+                          <div className="flex flex-row w-[10%] justify-end mr-[2%]">
                             <button
                               onMouseDown={() => handlePlusClick(ingredient)}
                               className="z-30 hover:bg-gray-200 place-self-end w-fit h-fit aspect-square transition-all"
