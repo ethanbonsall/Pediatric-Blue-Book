@@ -1,7 +1,6 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 import NavBar from "@/components/navbar";
-import PBB from "../public/transparent-logo.png";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -33,13 +32,14 @@ const Index: React.FC = () => {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
 
   const searchParams = useSearchParams();
-  
-  useEffect(() => {
-    const loginParam = searchParams?.get("login");
-    if (loginParam === "true") {
-      setShowLogin(true);
+ useEffect(() => {
+  const loginParam = searchParams?.get("login");
+  const hash = typeof window !== "undefined" ? window.location.hash : "";
+    if (loginParam === "true" || hash === "#login") {
+    setShowLogin(true);
     }
   }, [searchParams]);
+
 
   // Colors
   const colors = {
@@ -207,7 +207,7 @@ const Index: React.FC = () => {
               <img
                 className="w-[80dvw] lg:w-[25dvw]"
                 alt="Pediatric Blue Book"
-                src={PBB.src}
+                src="/transparent-logo.png"
               />
             </div>
             <div className="flex flex-col w-fit h-fit bg-gradient-to-bl from-primary to-primary-600 justify-center text-white text-left items-center gap-6 p-8 rounded mb-[5dvh] shadow-2xl mx-1">
@@ -273,7 +273,7 @@ const Index: React.FC = () => {
                     href="/signup"
                     className="text-white text-md text-center hover:underline"
                   >
-                    Don&apos;t have an account? Sign Up
+                    Don't have an account? Sign Up
                   </a>
                 </div>
               </div>
@@ -342,7 +342,7 @@ const Index: React.FC = () => {
             <div className="flex-1" />
             <div className="flex items-center justify-center">
               <img
-                src={PBB.src}
+                src="/transparent-logo.png"
                 alt="Pediatric Blue Book"
                 className="h-10 lg:h-12"
               />
@@ -377,7 +377,7 @@ const Index: React.FC = () => {
           <div className="max-w-4xl mx-auto animate-slide-up">
             <div className="mb-10 animate-float-glow flex justify-center">
               <img
-                src={PBB.src}
+                src="/transparent-logo.png"
                 alt="Pediatric Blue Book"
                 className="w-64 lg:w-80"
               />
@@ -440,7 +440,7 @@ const Index: React.FC = () => {
                 className="text-sm font-medium hover:underline transition-colors"
                 style={{ color: colors.primary900, textTransform: "none" }}
               >
-                Don&apos;t have an account? Sign Up
+                Don't have an account? Sign Up
               </a>
             </div>
 
