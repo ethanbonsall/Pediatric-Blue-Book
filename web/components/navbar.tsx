@@ -2,7 +2,9 @@
 "use client";
 
 import Link from "next/link";
+import PBB from "../public/transparent-logo.png";
 import { Apple, Calculator, Search, Table } from "lucide-react";
+import avatar from "../public/avatar.png";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
@@ -40,7 +42,7 @@ export default function Navbar() {
   return (
     <nav className="flex sticky top-0 p-2 lg:p-6 justify-between w-full z-50 bg-primary shadow-xl text-text">
       <Link href="#home" className="h-12">
-        <img src="/transparent-logo.png" alt="Pediatric Blue Book" className="h-full"></img>
+        <img src={PBB.src} alt="Pediatric Blue Book" className="h-full"></img>
       </Link>
 
       <div className="flex flex-row gap-x-3 lg:gap-x-7 text-2xl items-center font-medium text-background">
@@ -73,7 +75,7 @@ export default function Navbar() {
         </Link>
         <Link href="/profile">
           <img
-            src="/avatar.png"
+            src={avatar.src}
             alt="user"
             className="rounded-full h-[50px] aspect-square"
           />
