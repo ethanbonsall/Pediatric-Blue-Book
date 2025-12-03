@@ -15,9 +15,10 @@ interface LandingPageProps {
   onLoginClick: () => void; // Callback function triggered when user clicks login button
 }
 
-const LandingPage = ({ onLoginClick }: LandingPageProps) => {
+const LandingPage = ({onLoginClick}: LandingPageProps) => {
   // State: Tracks which feature card is currently being hovered (for visual feedback)
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+
   return (
     <>
       <Head>
@@ -209,7 +210,7 @@ const LandingPage = ({ onLoginClick }: LandingPageProps) => {
               >
                 FAQs
               </Link>
-                <Link
+              <Link
                 href="https://www.knowingnutritionhub.com/bluebook"
                 className="px-4 py-2 text-sm font-medium rounded-lg transition-all hover:opacity-80 text-primary-900"
               >
@@ -225,7 +226,8 @@ const LandingPage = ({ onLoginClick }: LandingPageProps) => {
               </a>
             </div>
             <p className="text-sm font-normal text-primary-900 normal-case">
-              © 2025 Lisa Richardson (DBA Knowing Nutrition) and the Development Team at UNC.
+              © 2025 Pediatric Nutrition Blue Book. Managed by Lisa Richardson,
+              MS, RD at Knowing Nutrition.
             </p>
           </div>
         </footer>
