@@ -13,13 +13,11 @@ import Head from "next/head";
 // Props interface for LandingPage component
 interface LandingPageProps {
   onLoginClick: () => void; // Callback function triggered when user clicks login button
-  onContactClick: () => void; // Callback function triggered when user clicks contact button
 }
 
-const LandingPage = ({ onLoginClick, onContactClick }: LandingPageProps) => {
+const LandingPage = ({ onLoginClick }: LandingPageProps) => {
   // State: Tracks which feature card is currently being hovered (for visual feedback)
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
-
   return (
     <>
       <Head>
@@ -211,7 +209,7 @@ const LandingPage = ({ onLoginClick, onContactClick }: LandingPageProps) => {
               >
                 FAQs
               </Link>
-              <Link
+                <Link
                 href="https://www.knowingnutritionhub.com/bluebook"
                 className="px-4 py-2 text-sm font-medium rounded-lg transition-all hover:opacity-80 text-primary-900"
               >
