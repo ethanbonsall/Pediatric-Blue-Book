@@ -83,9 +83,9 @@ npm install
 ```
 3. Run the log-in test and generate report 
 ```
-npm run test:load:login:report
+npm run test:load:login
 ```
 4. Run the look-up test and generate report
 ```
-npm run test:load:lookup:report
+npm run test:load:lookup
 ```
