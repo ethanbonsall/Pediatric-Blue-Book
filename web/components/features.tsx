@@ -126,4 +126,3 @@ export const features: Feature[] = [
     desc: "Access basic details on over 100 products in our comprehensive database.",
   },
 ];
-
