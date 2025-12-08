@@ -62,12 +62,7 @@ const Index = () => {
     };
   }, []);
 
-  // Handler: Displays contact information alert (placeholder for future implementation)
-  const handleContact = () => {
-    // TODO: Implement contact functionality
-    alert("Contact info coming soon");
-  };
-
+ 
   // Loading state
   if (loading) {
     return (
@@ -107,7 +102,6 @@ const Index = () => {
   return (
     <LandingPage
       onLoginClick={() => setShowLogin(true)}
-      onContactClick={handleContact}
     />
   );
 };
