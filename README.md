@@ -68,3 +68,24 @@ Watch mode:
 ```
 npm run test:watch
 ```
+
+Load tests are written with Artillery and stored in `load-test-login.yml` and `load-test-lookup.yml`. 
+
+Run all tests: 
+1. Create account in Pediatric Blue Book and add test credentials LOAD_TEST_USER_EMAIL and LOAD_TEST_USER_PASSWORD to .env.local. Ex: 
+```
+LOAD_TEST_USER_EMAIL = loadtest@example.com
+LOAD_TEST_USER_PASSWORD = testPassword123!
+```
+3. Install dependencies
+```
+npm install
+```
+3. Run the log-in test and generate report 
+```
+npm run test:load:login:report
+```
+4. Run the look-up test and generate report
+```
+npm run test:load:lookup:report
+```
