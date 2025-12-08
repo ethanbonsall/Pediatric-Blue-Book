@@ -104,7 +104,7 @@ export const features: Feature[] = [
       </svg>
     ),
     title: "Recipe Management",
-    desc: "Print and save your recipes for future reference (no patient data is stored).",
+    desc: "Print your recipes for future reference (no patient data is stored).",
   },
   {
     icon: (
@@ -126,4 +126,3 @@ export const features: Feature[] = [
     desc: "Access basic details on over 100 products in our comprehensive database.",
   },
 ];
-
