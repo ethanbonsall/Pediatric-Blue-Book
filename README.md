@@ -89,3 +89,10 @@ npm run test:load:login
 ```
 npm run test:load:lookup
 ```
+
+Results for Log In Load test show that 33% of requests encountered Supabase rate limits but were handled gracefully with 100% eventual success, there was stable performance throughout test, zero failures or errors, and all 120 login attempts were successful. Results for Lookup Load Test show that completion rate is 100%, response times median is 63.4 ms, and p95 is 138 ms. 
+
+
+
+
+
