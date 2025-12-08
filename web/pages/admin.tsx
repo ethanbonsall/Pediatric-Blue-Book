@@ -157,7 +157,7 @@ const AdminTable = () => {
     return formattedName;
   }
 
-  // Checking User permissions - FIXME
+  // Checking User permissions
   useEffect(() => {
     const GetUserRole = async () => {
       try {
@@ -178,7 +178,6 @@ const AdminTable = () => {
             .single();
 
           if (error) {
-            console.error("Error fetching user role: ", error);
             router.push("/login");
             return;
           }
@@ -197,7 +196,7 @@ const AdminTable = () => {
     GetUserRole();
   }, []);
 
-  // Retrieve formula data + fields, set calculated fields
+  // Retrieve formula data + fields
   const getFormulas = async (ingredientType: string) => {
     setProductType(ingredientType);
 
@@ -207,7 +206,7 @@ const AdminTable = () => {
         .select("*");
 
       if (liquidFormError) {
-        console.log("Error retrieving liquid formulas: ", liquidFormError);
+        alert("Error retrieving liquid formulas: ", liquidFormError);
       }
 
       const liquidRows = (liquidForm ?? []) as LiquidProductRow[];
@@ -226,10 +225,8 @@ const AdminTable = () => {
         .select("*");
 
       if (powderFormError) {
-        console.log("Error retrieving powder formulas: ", powderFormError);
-      } else {
-        console.log("Powder products!: ", powderForm.length);
-      }
+        alert("Error retrieving powder formulas: ", powderFormError);
+      } 
 
       const powderRows = (powderForm ?? []) as PowderProductRow[];
 
@@ -245,7 +242,6 @@ const AdminTable = () => {
     }
   };
 
-  // Retrieve powdered formulas + fields
 
   const filteredProducts = products.filter((product) => {
     if (filterBy === "Approved") return product.approved === true;
@@ -350,7 +346,6 @@ const AdminTable = () => {
     const { error } = await supabase.from(table).insert(cleanedProduct);
 
     if (error) {
-      console.log("Error inserting row: ", error.message);
       alert("Error inserting row: " + error.message);
     } else {
       alert("Changes saved!");
@@ -404,13 +399,14 @@ const AdminTable = () => {
       "npc_percent_cal_from_cho",
       "npc_percent_free_water",
     ];
+    // Only modify editable fields in final product 
     const sanitized = Object.fromEntries(
       Object.entries(editedFields).filter(
         ([key]) => !READ_ONLY_FIELDS.includes(key)
       )
     );
 
-    // If no fields edited
+    // If no fields edited, close modal
     if (Object.keys(sanitized).length == 0) {
       alert("No changes detected!");
       setIsEditModalOpen(false);
@@ -422,7 +418,7 @@ const AdminTable = () => {
         .update(sanitized)
         .eq("id", selectedProduct!.id);
       if (error) {
-        console.log("Error editing row: ", error.message);
+       alert("Error editing row: ", error.message);
       } else {
         alert("Changes saved!");
         setEditedFields({});
@@ -445,7 +441,7 @@ const AdminTable = () => {
       return newProducts;
     });
   };
-
+  // Update with bulk changes based on action mode
   const saveBulkChanges = async () => {
     let table = "";
     if (productType == "Liquid") {
@@ -472,7 +468,7 @@ const AdminTable = () => {
       .update({ [fieldToUpdate]: value })
       .in("id", Array.from(selectedProducts));
     if (error) {
-      console.log("Error updated table with bulk action: ", error.message);
+      alert("Error updated table with bulk action: ", error.message);
     } else {
       alert("Changes have been saved successfully.");
       setSelectedProducts(new Set());
