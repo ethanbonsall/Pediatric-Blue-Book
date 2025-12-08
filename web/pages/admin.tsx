@@ -13,7 +13,14 @@ import {
 } from "../components/ui/select";
 import Navbar from "@/components/navbar-profile";
 import Head from "next/head";
-import { Check, Download, Pencil, Plus, ShieldCheck, ShieldMinus } from "lucide-react";
+import {
+  Check,
+  Download,
+  Pencil,
+  Plus,
+  ShieldCheck,
+  ShieldMinus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { LiquidProductRow, PowderProductRow } from "@/lib/types";
@@ -78,58 +85,62 @@ const AdminTable = () => {
   ];
 
   const convertToCSV = (data: LiquidProductRow[] | PowderProductRow[]) => {
-    if (!data || data.length === 0) return '';
+    if (!data || data.length === 0) return "";
 
     // Get headers from first object
-    const headers = Object.keys(data[0]).filter(key => key !== 'id');
-    const csvHeaders = headers.join(',');
+    const headers = Object.keys(data[0]).filter((key) => key !== "id");
+    const csvHeaders = headers.join(",");
 
     // Convert rows to CSV format
-    const csvRows = data.map(row => {
-      return headers.map(header => {
-        const value = row[header as keyof typeof row];
-        // Handle values with commas, quotes, or newlines
-        if (value === null || value === undefined) return '';
-        const stringValue = String(value);
-        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-          return `"${stringValue.replace(/"/g, '""')}"`;
-        }
-        return stringValue;
-      }).join(',');
+    const csvRows = data.map((row) => {
+      return headers
+        .map((header) => {
+          const value = row[header as keyof typeof row];
+          // Handle values with commas, quotes, or newlines
+          if (value === null || value === undefined) return "";
+          const stringValue = String(value);
+          if (
+            stringValue.includes(",") ||
+            stringValue.includes('"') ||
+            stringValue.includes("\n")
+          ) {
+            return `"${stringValue.replace(/"/g, '""')}"`;
+          }
+          return stringValue;
+        })
+        .join(",");
     });
 
-    return [csvHeaders, ...csvRows].join('\n');
+    return [csvHeaders, ...csvRows].join("\n");
   };
 
   async function exportData() {
-    const tableName = productType == "Liquid" ? "liquid_ingredient" : "powder_ingredient"
+    const tableName =
+      productType == "Liquid" ? "liquid_ingredient" : "powder_ingredient";
     try {
-      const {data, error} = await supabase.from(tableName).select('*');
+      const { data, error } = await supabase.from(tableName).select("*");
       if (error) {
-        alert("Error retrieving data from Supabase: " + error.message)
+        alert("Error retrieving data from Supabase: " + error.message);
       }
       if (!data || data.length === 0) {
-        alert('No data to export');
+        alert("No data to export");
         return;
       }
-      // convert to CSV 
+      // convert to CSV
       const csv = convertToCSV(data);
 
-      const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'}); 
-      const url = URL.createObjectURL(blob); 
-      const link = document.createElement('a'); 
-      link.href = url; 
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
       link.download = productType + "_table_data";
-      link.click(); 
-      URL.revokeObjectURL(url); 
-    }
-    catch (error) { 
-      alert("Error exporting data: " + error)
-    }
-    finally {
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      alert("Error exporting data: " + error);
+    } finally {
       return;
     }
-
   }
   function formatColumnName(column: string): string {
     // Replace underscores with spaces
@@ -206,7 +217,7 @@ const AdminTable = () => {
         .select("*");
 
       if (liquidFormError) {
-        alert("Error retrieving liquid formulas: ", liquidFormError);
+        alert("Error retrieving liquid formulas: " + liquidFormError);
       }
 
       const liquidRows = (liquidForm ?? []) as LiquidProductRow[];
@@ -225,8 +236,8 @@ const AdminTable = () => {
         .select("*");
 
       if (powderFormError) {
-        alert("Error retrieving powder formulas: ", powderFormError);
-      } 
+        alert("Error retrieving powder formulas: " + powderFormError);
+      }
 
       const powderRows = (powderForm ?? []) as PowderProductRow[];
 
@@ -241,7 +252,6 @@ const AdminTable = () => {
       setColumns(powderColumns);
     }
   };
-
 
   const filteredProducts = products.filter((product) => {
     if (filterBy === "Approved") return product.approved === true;
@@ -399,7 +409,7 @@ const AdminTable = () => {
       "npc_percent_cal_from_cho",
       "npc_percent_free_water",
     ];
-    // Only modify editable fields in final product 
+    // Only modify editable fields in final product
     const sanitized = Object.fromEntries(
       Object.entries(editedFields).filter(
         ([key]) => !READ_ONLY_FIELDS.includes(key)
@@ -418,7 +428,7 @@ const AdminTable = () => {
         .update(sanitized)
         .eq("id", selectedProduct!.id);
       if (error) {
-       alert("Error editing row: ", error.message);
+        alert("Error editing row: " + error.message);
       } else {
         alert("Changes saved!");
         setEditedFields({});
@@ -468,7 +478,7 @@ const AdminTable = () => {
       .update({ [fieldToUpdate]: value })
       .in("id", Array.from(selectedProducts));
     if (error) {
-      alert("Error updated table with bulk action: ", error.message);
+      alert("Error updated table with bulk action: " + error.message);
     } else {
       alert("Changes have been saved successfully.");
       setSelectedProducts(new Set());
@@ -742,11 +752,11 @@ const AdminTable = () => {
         </div>
 
         <div className="mt-4 flex justify-between items-center">
-          <div className = "flex gap-[10%]">
+          <div className="flex gap-[10%]">
             <div>
               <Button
                 onClick={() => {
-                 exportData()
+                  exportData();
                 }}
                 variant="default"
                 className="rounded-full"
@@ -755,25 +765,25 @@ const AdminTable = () => {
                 <Download /> Export as CSV
               </Button>
             </div>
-          {isSuperUser ? (
-            <div>
-              {(actionMode == "default" || actionMode == "approve") && (
-                <Button
-                  variant="default"
-                  className="rounded-full"
-                  size="sm"
-                  onClick={() => setActionMode("approve")}
-                >
-                  <Check /> Approve
-                </Button>
-              )}
-            </div>
-          ) : (
-            <></>
-          )}</div>
-        
+            {isSuperUser ? (
+              <div>
+                {(actionMode == "default" || actionMode == "approve") && (
+                  <Button
+                    variant="default"
+                    className="rounded-full"
+                    size="sm"
+                    onClick={() => setActionMode("approve")}
+                  >
+                    <Check /> Approve
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
+
           {actionMode == "default" && (
-            
             <div>
               <Button
                 onClick={() => {
@@ -787,7 +797,6 @@ const AdminTable = () => {
                 <Plus /> Add Entry
               </Button>
             </div>
-       
           )}
 
           {actionMode != "default" && (
