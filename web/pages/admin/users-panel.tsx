@@ -191,7 +191,9 @@ export default function AdminUsersPage() {
             <table className="w-full text-sm">
               <thead className="sticky top-0 z-10 bg-background backdrop-blur-lg">
                 <tr className="border-b">
-                  <th className="px-4 py-3 text-left font-medium">First name</th>
+                  <th className="px-4 py-3 text-left font-medium">
+                    First name
+                  </th>
                   <th className="px-4 py-3 text-left font-medium">Email</th>
                   <th className="px-4 py-3 text-left font-medium">Title</th>
                   <th className="px-4 py-3 text-left font-medium">Role</th>
@@ -203,22 +205,14 @@ export default function AdminUsersPage() {
                     key={user.id}
                     className="border-b last:border-b-0 hover:bg-muted/30"
                   >
-                    <td className="px-4 py-3">
-                      {user.first_name ?? "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {user.email ?? "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {user.title ?? "—"}
-                    </td>
+                    <td className="px-4 py-3">{user.first_name ?? "—"}</td>
+                    <td className="px-4 py-3">{user.email ?? "—"}</td>
+                    <td className="px-4 py-3">{user.title ?? "—"}</td>
                     <td className="px-4 py-3">
                       {isSuperUser ? (
                         <Select
                           value={
-                            pendingRoleChanges[user.id] ??
-                            user.role ??
-                            "user"
+                            pendingRoleChanges[user.id] ?? user.role ?? "user"
                           }
                           onValueChange={(value) =>
                             handleRoleSelect(user.id, value)

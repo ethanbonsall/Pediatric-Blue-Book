@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // File: web/pages/admin/formula-inputs.tsx
 // Admin panel page for managing product database (powder and liquid ingredients).
 // Allows admins to view, add, edit, approve, activate, and deactivate products in the database.

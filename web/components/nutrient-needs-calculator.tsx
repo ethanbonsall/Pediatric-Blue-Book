@@ -819,7 +819,7 @@ const NutrientNeedsCalculator = ({
                 type="number"
                 min="0"
                 max={max_input_age}
-                onInput={handleAgeChange}
+                onChange={handleAgeChange}
                 placeholder={age_input_placeholder}
               ></input>
               <Select
@@ -867,7 +867,7 @@ const NutrientNeedsCalculator = ({
                 } border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2 `}
                 inputMode="decimal"
                 min="0"
-                onInput={handleHeightChange}
+                onChange={handleHeightChange}
                 placeholder="Height"
               ></input>
               <p className="text-md font-medium self-center">{height_unit}</p>
@@ -877,7 +877,7 @@ const NutrientNeedsCalculator = ({
                 } border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2`}
                 inputMode="numeric"
                 min="0"
-                onInput={handleHeightChangeInches}
+                onChange={handleHeightChangeInches}
               ></input>
               <p
                 className={`${
@@ -929,7 +929,7 @@ const NutrientNeedsCalculator = ({
               <input
                 className="border rounded focus:outline-none xl:text-lg 2xl:text-xl p-1 lg:p-2 w-[55%]"
                 inputMode="decimal"
-                onInput={handleWeightChange}
+                onChange={handleWeightChange}
                 placeholder="Weight"
               ></input>
               <p className="text-md font-medium self-center">{weight_unit}</p>
