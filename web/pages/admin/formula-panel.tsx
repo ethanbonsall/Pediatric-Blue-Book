@@ -1,4 +1,4 @@
-// File: web/pages/admin.tsx
+// File: web/pages/admin/formula-inputs.tsx
 // Admin panel page for managing product database (powder and liquid ingredients).
 // Allows admins to view, add, edit, approve, activate, and deactivate products in the database.
 
@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/select";
+} from "@/components/ui/select";
 import Navbar from "@/components/navbar-profile";
 import Head from "next/head";
 import {

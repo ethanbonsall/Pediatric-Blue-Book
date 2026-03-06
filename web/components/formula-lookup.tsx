@@ -162,11 +162,20 @@ const FormulaNeedsCalculator = () => {
               >
                 {filteredIngredients.map((ingredient, index) => (
                   <div key={index}>
-                    <button
-                      className="w-full normal-case font-medium h-fit transition-all duration-200"
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className="w-full normal-case font-medium h-fit transition-all duration-200 cursor-pointer"
                       onClick={() => {
                         setSelectedIngredient(ingredient.row ?? null);
                         setPopUp(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedIngredient(ingredient.row ?? null);
+                          setPopUp(true);
+                        }
                       }}
                     >
                       <div className="flex flex-row text-lg lg:text-xl 2xl:text-2xl pl-[1dvw] py-[1dvh] text-start items-center hover:bg-gray-50">
@@ -174,7 +183,9 @@ const FormulaNeedsCalculator = () => {
                         <p className="w-2/5 text-medium">{ingredient.type}</p>
                         <div className="flex flex-row w-1/5 justify-end mr-[2%]">
                           <button
-                            onMouseDown={() => {
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedIngredient(ingredient.row ?? null);
                               setPopUp(true);
                             }}
@@ -183,14 +194,18 @@ const FormulaNeedsCalculator = () => {
                             <Search className="w-8 aspect-square" />
                           </button>
                           <button
-                            onClick={Heart}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              Heart();
+                            }}
                             className="z-30  ml-[1dvw] place-self-end w-fit h-fit aspect-square transition-all"
                           >
                             <HeartIcon className="w-8 aspect-square hover:fill-red-400" />
                           </button>
                         </div>
                       </div>
-                    </button>
+                    </div>
                     <hr className="w-full" />
                   </div>
                 ))}
