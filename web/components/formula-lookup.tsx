@@ -184,7 +184,7 @@ const FormulaNeedsCalculator = () => {
                         <div className="flex flex-row w-1/5 justify-end mr-[2%]">
                           <button
                             type="button"
-                            onClick={(e) => {
+                            onMouseDown={(e) => {
                               e.stopPropagation();
                               setSelectedIngredient(ingredient.row ?? null);
                               setPopUp(true);
